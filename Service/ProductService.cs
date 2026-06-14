@@ -45,7 +45,12 @@ namespace Service
 
             if (model == null)
                 return DtoResponse<DtoProduct>.Fail("داده نامعتبر است");
-           
+
+            var validationResult = _validations.Validate(model);
+            if (!validationResult.IsValid)
+                return DtoResponse<DtoProduct>.Fail("اطلاعات محصول معتبر نیست");
+
+
 
             //if (string.IsNullOrWhiteSpace(model.Name))
             //    return DtoResponse<DtoProduct>.Fail("نام محصول الزامی است");
@@ -59,15 +64,39 @@ namespace Service
             //if (!_branch.Exists(model.BranchId))
             //    return DtoResponse<DtoProduct>.Fail("شعبه معتبر نمی‌باشد");
 
+            //var product = new Product();
+          
+            //product.Name = model.Name;
+            //product.Price = model.Price.GetValueOrDefault();
+            //product.Description = model.Description;
+            //product.Discount = model.Discount;
+            //product.HasDiscount = model.HasDiscount.GetValueOrDefault();
+            //product.DisconType = model.DisconType;
+            //product.BranchId = model.BranchId.GetValueOrDefault();
 
 
-            var product = _mapper.Map<Product>(model);
 
-            _shopDbContext.products.Add(product);
+
+             var product = _mapper.Map<Product>(model);
+
+             _shopDbContext.products.Add(product);
 
             _shopDbContext.SaveChanges();
 
-            var result = _mapper.Map<DtoProduct>(product);
+            //var result = new DtoProduct();
+
+            //result.Name = product.Name;
+            //result.Price = product.Price;
+            //result.Description = product.Description;
+            //result.Discount = product.Discount;
+            //result.HasDiscount = product.HasDiscount;
+            //result.DisconType = product.DisconType;
+            //result.BranchId = product.BranchId;
+
+
+
+
+           var result = _mapper.Map<DtoProduct>(product);
 
             return DtoResponse<DtoProduct> .Success(result);
 
@@ -90,7 +119,11 @@ namespace Service
             }
 
 
+
             _shopDbContext.products.Remove(poroduct);
+
+         
+            _shopDbContext.SaveChanges();
 
             return DtoResponse<bool>.Success();
         }
@@ -206,9 +239,25 @@ namespace Service
            .Take(query.PageSize);
 
 
-            var items = await Product
-           .ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
-           .ToListAsync();
+            var items = await Product.Select(x => new DtoProduct
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Price = x.Price,
+                Description = x.Description,
+                Discount = x.Discount,
+                HasDiscount = x.HasDiscount,
+                DisconType = x.DisconType,
+                BranchId = x.BranchId
+            }).ToListAsync();
+
+
+
+
+
+           // var items = await Product
+           //.ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
+           //.ToListAsync();
 
 
 
@@ -259,6 +308,7 @@ namespace Service
 
             if (!ValidationResult.IsValid)
             {
+                return DtoResponse<DtoProduct>.Fail("اطلاعات وارد شده معتبر نیست");
 
             }
 
@@ -273,21 +323,37 @@ namespace Service
 
 
             //if (model.Id <= 0)
-            //    return DtoResponse<DtoProduct>.Fail("شناسه نامعتبر است");
+            //return DtoResponse<DtoProduct>.Fail("شناسه نامعتبر است");
 
             //if (string.IsNullOrWhiteSpace(model.Name))
             //    return DtoResponse<DtoProduct>.Fail("نام محصول الزامی است");
 
+            product.Name = model.Name;
+            product.Price = model.Price.GetValueOrDefault();
+            product.Description = model.Description;
+            product.Discount = model.Discount;
+            product.HasDiscount = model.HasDiscount.GetValueOrDefault();
+            product.DisconType = model.DisconType;
+            product.BranchId = model.BranchId.GetValueOrDefault();
 
-          
 
 
-
-            _mapper.Map(model, product);
+            //_mapper.Map(model, product);
 
             _shopDbContext.SaveChanges();
 
-            var result = _mapper.Map<DtoProduct>(product);
+
+            var result = new DtoProduct();
+
+            result.Name = product.Name;
+            result.Price = product.Price;
+            result.Description = product.Description;
+            result.Discount = product.Discount;
+            result.HasDiscount = product.HasDiscount;
+            result.DisconType = product.DisconType;
+            result.BranchId = product.BranchId;
+
+            // var result = _mapper.Map<DtoProduct>(product);
 
             return DtoResponse<DtoProduct>.Success(result);
         }
