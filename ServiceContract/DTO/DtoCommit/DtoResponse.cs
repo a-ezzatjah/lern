@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace DTO
+namespace ServiceContract.DTO.DtoCommit
 {
     public class DtoResponse<T>
     {

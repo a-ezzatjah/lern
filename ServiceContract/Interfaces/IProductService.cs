@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DTO;
 using Entities;
 using ServiceContract.Common;
-using ServiceContract.DTO;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.DTO.DtoProduct;
 using ServiceContract.Quaries;
 
 namespace ServiceContract.Interfaces

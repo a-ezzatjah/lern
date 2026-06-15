@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DTO;
 using FluentValidation;
+using ServiceContract.DTO.DtoProduct;
 namespace Service.Validators
 {
-    class DtoProductUodateValidation : AbstractValidator<DtoProductUpdate>
+   public  class DtoProductUodateValidation : AbstractValidator<DtoProductUpdate>
     {
 
         public DtoProductUodateValidation()
@@ -25,11 +25,6 @@ namespace Service.Validators
                 .NotNull().WithMessage("شناسه الزامی میباشد")
                 .GreaterThanOrEqualTo (0).WithMessage("شناسه محصول نا معتبر هست ");
 
-
-            RuleFor(x => x.BranchId)
-                .NotNull().WithMessage("شعبه الزامی میباشد ")
-                .GreaterThan(0)
-                .WithMessage("شعبه نامعتبر است");
 
         }
 

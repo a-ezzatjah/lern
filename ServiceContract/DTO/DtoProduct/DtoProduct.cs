@@ -1,4 +1,6 @@
-﻿namespace DTO
+﻿using DTO;
+
+namespace ServiceContract.DTO.DtoProduct
 {
     public class DtoProduct
     {

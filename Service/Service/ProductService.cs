@@ -10,28 +10,27 @@ using Microsoft.EntityFrameworkCore;
 using Service.Mapping;
 using Service.Validators;
 using ServiceContract.Common;
-using ServiceContract.DTO;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.DTO.DtoProduct;
 using ServiceContract.Enums;
 using ServiceContract.Interfaces;
 using ServiceContract.Quaries;
 
-namespace Service
+namespace Service.Service
 {
     public class ProductService : IProductService
     {
         private readonly IMapper _mapper;
         private readonly ShopDbContext _shopDbContext;
-        private readonly IBranchService _branch;
         private readonly IValidator<DtoproductAdd> _validations;
         private readonly IValidator<DtoProductUpdate> _updateValidator;
 
 
 
 
-        public ProductService(IBranchService branchService, ShopDbContext shopDbContext, IMapper mapper,IValidator<DtoproductAdd> validationRules,IValidator<DtoProductUpdate> Update)
+        public ProductService(ShopDbContext shopDbContext, IMapper mapper,IValidator<DtoproductAdd> validationRules,IValidator<DtoProductUpdate> Update)
         {
             _mapper = mapper;
-            _branch = branchService;
             _shopDbContext = shopDbContext;
             _validations = validationRules;
             _updateValidator = Update;
@@ -197,7 +196,7 @@ namespace Service
                 {
                     Product = Product.Where(x =>
                         x.Name.Contains(query.SearchText) ||
-                        (x.Description != null && x.Description.Contains(query.SearchText)));
+                        x.Description != null && x.Description.Contains(query.SearchText));
                 }
                 else if (query.SearchType == EnumProductSearchType.Name)
                 {
@@ -248,7 +247,7 @@ namespace Service
                 Discount = x.Discount,
                 HasDiscount = x.HasDiscount,
                 DisconType = x.DisconType,
-                BranchId = x.BranchId
+                
             }).ToListAsync();
 
 
@@ -334,7 +333,7 @@ namespace Service
             product.Discount = model.Discount;
             product.HasDiscount = model.HasDiscount.GetValueOrDefault();
             product.DisconType = model.DisconType;
-            product.BranchId = model.BranchId.GetValueOrDefault();
+        
 
 
 
@@ -351,7 +350,7 @@ namespace Service
             result.Discount = product.Discount;
             result.HasDiscount = product.HasDiscount;
             result.DisconType = product.DisconType;
-            result.BranchId = product.BranchId;
+            
 
             // var result = _mapper.Map<DtoProduct>(product);
 

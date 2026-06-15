@@ -4,12 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DTO
+namespace Service.Service
 {
-    public class DtoSearchOption
+    public class CategoryService
     {
-        public string Key { get; set; }
 
-        public string Title { get; set; }
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }

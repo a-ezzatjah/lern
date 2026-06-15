@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DTO;
 
-namespace DTO
+namespace ServiceContract.DTO.DtoProduct
 {
    public class DtoProductUpdate
     {
@@ -15,7 +16,6 @@ namespace DTO
         public decimal? Discount { get; set; }
         public bool? HasDiscount { get; set; }
         public DisconTypeEnum? DisconType { get; set; }
-        public int? BranchId { get; set; }
 
     }
 }

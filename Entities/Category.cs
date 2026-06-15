@@ -11,9 +11,9 @@ namespace Entities
 
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Slug { get; set; }
-        public int? CategoryId { get; set; }
-        public Category? category { get; set; }
+        public string? Slug { get; set; }
+        public int? ParentId  { get; set; }
+        public Category? parent { get; set; }
         public int SortOrder { get; set; }
         public ICollection<Category>? Children { get; set; }
     }

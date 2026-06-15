@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
-using DTO;
 using Entities;
 using Microsoft.Identity.Client;
+using ServiceContract.DTO.DtoProduct;
 
 namespace Service.Mapping
 {
@@ -18,9 +18,7 @@ namespace Service.Mapping
         {
 
 
-            CreateMap<Product, DtoProduct>()
-               .ForMember(x => x.BranchName, otp => otp.MapFrom(s => s.Branch.Name != null ? s.Branch.Name : null));
-
+           
 
             CreateMap<DtoProduct, Product>();
 
@@ -39,9 +37,9 @@ namespace Service.Mapping
 
                 //.ForMember(x => x.HasDiscount, otp => otp.MapFrom(s => s.HasDiscount))
 
-                .ForMember(x => x.Discount, otp => otp.MapFrom(s => s.HasDiscount ? s.Discount : null))
+                .ForMember(x => x.Discount, otp => otp.MapFrom(s => s.HasDiscount == true ? s.Discount : null))
 
-                .ForMember(x => x.DisconType, otp => otp.MapFrom(s => s.HasDiscount ? s.DisconType : null));
+                .ForMember(x => x.DisconType, otp => otp.MapFrom(s => s.HasDiscount == true ? s.DisconType : null));
 
 
         }

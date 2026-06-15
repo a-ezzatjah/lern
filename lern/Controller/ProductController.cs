@@ -1,6 +1,6 @@
 ﻿using DTO;
 using Microsoft.AspNetCore.Mvc;
-using ServiceContract.DTO;
+using ServiceContract.DTO.DtoProduct;
 using ServiceContract.Interfaces;
 
 namespace lern.Controller

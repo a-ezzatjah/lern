@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DTO;
 
-namespace ServiceContract.DTO
+namespace ServiceContract.DTO.DtoProduct
 {
     public class DtoproductAdd
     {        
@@ -15,7 +15,7 @@ namespace ServiceContract.DTO
             public decimal? Discount { get; set; }
             public bool? HasDiscount { get; set; }
             public DisconTypeEnum? DisconType { get; set; }
-            public int? BranchId { get; set; }
+            
         
     }
 }

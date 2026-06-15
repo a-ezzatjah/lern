@@ -21,8 +21,7 @@ namespace Entities
         public decimal ?Discount { get; set; }
         public bool HasDiscount { get; set; }
         public DisconTypeEnum ?DisconType { get; set; }
-        public int BranchId { get; set; }
-        public Branch Branch { get; set; }
+        
 
 
 
