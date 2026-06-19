@@ -15,7 +15,6 @@ namespace ServiceContract.Interfaces
 
         public Task<DtoResponse<DtoCategory>> UpdateCategory(DtoCategoryUpdate model);
 
-        public DtoResponse<bool> DeleteCategory(int Categotyid);
 
 
 
