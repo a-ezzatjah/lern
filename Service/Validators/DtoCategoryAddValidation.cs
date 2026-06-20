@@ -11,7 +11,7 @@ using ServiceContract.DTO.DtoCategory;
 
 namespace Service.Validators
 {
-    class DtoCategoryAddValidation : AbstractValidator<AddDtoCategory>
+    public class DtoCategoryAddValidation : AbstractValidator<AddDtoCategory>
     {
 
         private readonly ShopDbContext _shopDbContext;
@@ -22,8 +22,10 @@ namespace Service.Validators
 
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("دسته بندی خالی میباشد")
+                .MustAsync(async (x, CancellationToken) => { return !await _shopDbContext.categories.AnyAsync(s => s.Name == x); })
                 .MaximumLength(50).WithMessage("تعداد کاراکتر های نام دسته بندی بیش از حد مجاز میباشد")
-                .Must(x => !string.IsNullOrWhiteSpace(x));
+                .Must(x => !string.IsNullOrWhiteSpace(x))
+                .WithMessage("نام دسته بندی نمی‌تواند فقط فاصله باشد");
 
 
             RuleFor(x => x.Slug)
@@ -35,14 +37,15 @@ namespace Service.Validators
 
 
             RuleFor(x => x.ParentId)
-                .MustAsync(async (x, CancellationToken) => { return await _shopDbContext.categories.AnyAsync(s=>s.Id==x);})
-                .WithMessage("ایدی فرزند نمیتونه با ایدی دسته برابر باشه");
+                .MustAsync(async (x, CancellationToken) =>
+                { if (x == null) return true; return await _shopDbContext.categories.AnyAsync(s => s.Id == x.Value); })
+                .WithMessage("آیدی برای دسته پدر وجود ندارد")
+            .GreaterThanOrEqualTo(1);
 
 
-
-           RuleFor(x => x.SortOrder)
-          .GreaterThanOrEqualTo(0)
-          .WithMessage("ترتیب نمایش نمی‌تواند منفی باشد");
+            RuleFor(x => x.SortOrder)
+           .GreaterThanOrEqualTo(0)
+           .WithMessage("ترتیب نمایش نمی‌تواند منفی باشد");
 
         }
 
