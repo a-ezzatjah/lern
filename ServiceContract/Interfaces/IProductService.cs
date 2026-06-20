@@ -29,7 +29,7 @@ namespace ServiceContract.Interfaces
 
         public DtoResponse<bool> Delete(int productid);
 
-        public string GetBranchName(int? branchid);
+        
 
 
     }

@@ -11,14 +11,15 @@ namespace ServiceContract.Interfaces
     public interface ICategoryService
     {
 
-        public Task<DtoResponse<DtoCategory>> AddCategory(AddDtoCategory model);
+        public Task<DtoResponse<DtoCategory>> AddCategoryAsync(AddDtoCategory model);
 
-        public Task<DtoResponse<DtoCategory>> UpdateCategory(DtoCategoryUpdate model);
+        public Task<DtoResponse<DtoCategory>> UpdateCategoryAsync(DtoCategoryUpdate model);
 
+        public DtoResponse<bool> DeleteCategoryAsync(int Categotyid);
 
+        public Task<List<DtoCategory>> GetAllAsync();
 
-
-
+        public List<DtoCategory> BuildTree(List<DtoCategory> allcategory, int? parentid);
 
 
 

@@ -28,7 +28,7 @@ namespace Service.Service
 
 
 
-        public ProductService(ShopDbContext shopDbContext, IMapper mapper,IValidator<DtoproductAdd> validationRules,IValidator<DtoProductUpdate> Update)
+        public ProductService(ShopDbContext shopDbContext, IMapper mapper, IValidator<DtoproductAdd> validationRules, IValidator<DtoProductUpdate> Update)
         {
             _mapper = mapper;
             _shopDbContext = shopDbContext;
@@ -51,53 +51,23 @@ namespace Service.Service
 
 
 
-            //if (string.IsNullOrWhiteSpace(model.Name))
-            //    return DtoResponse<DtoProduct>.Fail("نام محصول الزامی است");
-
             var oldproduct = _shopDbContext.products.Any(x => x.Name.ToLower() == model.Name.ToLower());
             if (oldproduct)
             {
                 return DtoResponse<DtoProduct>.Fail("محصول تکراری میباشد");
             }
 
-            //if (!_branch.Exists(model.BranchId))
-            //    return DtoResponse<DtoProduct>.Fail("شعبه معتبر نمی‌باشد");
 
-            //var product = new Product();
-          
-            //product.Name = model.Name;
-            //product.Price = model.Price.GetValueOrDefault();
-            //product.Description = model.Description;
-            //product.Discount = model.Discount;
-            //product.HasDiscount = model.HasDiscount.GetValueOrDefault();
-            //product.DisconType = model.DisconType;
-            //product.BranchId = model.BranchId.GetValueOrDefault();
+            var product = _mapper.Map<Product>(model);
 
-
-
-
-             var product = _mapper.Map<Product>(model);
-
-             _shopDbContext.products.Add(product);
+            _shopDbContext.products.Add(product);
 
             _shopDbContext.SaveChanges();
 
-            //var result = new DtoProduct();
 
-            //result.Name = product.Name;
-            //result.Price = product.Price;
-            //result.Description = product.Description;
-            //result.Discount = product.Discount;
-            //result.HasDiscount = product.HasDiscount;
-            //result.DisconType = product.DisconType;
-            //result.BranchId = product.BranchId;
+            var result = _mapper.Map<DtoProduct>(product);
 
-
-
-
-           var result = _mapper.Map<DtoProduct>(product);
-
-            return DtoResponse<DtoProduct> .Success(result);
+            return DtoResponse<DtoProduct>.Success(result);
 
 
         }
@@ -121,7 +91,7 @@ namespace Service.Service
 
             _shopDbContext.products.Remove(poroduct);
 
-         
+
             _shopDbContext.SaveChanges();
 
             return DtoResponse<bool>.Success();
@@ -148,14 +118,7 @@ namespace Service.Service
 
         public DtoProduct? GetById(int productId)
         {
-            //var result = _shopDbContext.products.Include(x=>x.Branch).FirstOrDefault(x => x.Id == productId);
-
-            //if (result == null) return null; // جلوگیری از کرش قبل از تبدیل
-
-            //return _mapper.Map<DtoProduct>(result);
-
-
-
+         
             return _shopDbContext.products
        .Where(x => x.Id == productId)
        .ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
@@ -169,7 +132,7 @@ namespace Service.Service
 
 
 
-         public Product? GetEntityById(int product)
+        public Product? GetEntityById(int product)
         {
             return _shopDbContext.products.FirstOrDefault(x => x.Id == product);
 
@@ -186,7 +149,7 @@ namespace Service.Service
 
         public async Task<PageResult<DtoProduct>> GetFilterAsync(ProductQuery query)
         {
-             IQueryable<Product> Product = _shopDbContext.products.AsNoTracking();
+            IQueryable<Product> Product = _shopDbContext.products.AsNoTracking();
 
             //var Product = _shopDbContext.products;
 
@@ -238,25 +201,12 @@ namespace Service.Service
            .Take(query.PageSize);
 
 
-            var items = await Product.Select(x => new DtoProduct
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Price = x.Price,
-                Description = x.Description,
-                Discount = x.Discount,
-                HasDiscount = x.HasDiscount,
-                DisconType = x.DisconType,
-                
-            }).ToListAsync();
 
 
 
-
-
-           // var items = await Product
-           //.ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
-           //.ToListAsync();
+            var items = await Product
+           .ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
+           .ToListAsync();
 
 
 
@@ -271,9 +221,6 @@ namespace Service.Service
         }
 
 
-        
-
-        
 
 
 
@@ -287,10 +234,6 @@ namespace Service.Service
 
             return result;
         }
-
-
-
-
 
 
 
@@ -318,41 +261,16 @@ namespace Service.Service
                 return DtoResponse<DtoProduct>.Fail("محصول موجود نمیباشد ");
             }
 
+ 
 
 
-
-            //if (model.Id <= 0)
-            //return DtoResponse<DtoProduct>.Fail("شناسه نامعتبر است");
-
-            //if (string.IsNullOrWhiteSpace(model.Name))
-            //    return DtoResponse<DtoProduct>.Fail("نام محصول الزامی است");
-
-            product.Name = model.Name;
-            product.Price = model.Price.GetValueOrDefault();
-            product.Description = model.Description;
-            product.Discount = model.Discount;
-            product.HasDiscount = model.HasDiscount.GetValueOrDefault();
-            product.DisconType = model.DisconType;
-        
-
-
-
-            //_mapper.Map(model, product);
+            _mapper.Map(model, product);
 
             _shopDbContext.SaveChanges();
 
 
-            var result = new DtoProduct();
 
-            result.Name = product.Name;
-            result.Price = product.Price;
-            result.Description = product.Description;
-            result.Discount = product.Discount;
-            result.HasDiscount = product.HasDiscount;
-            result.DisconType = product.DisconType;
-            
-
-            // var result = _mapper.Map<DtoProduct>(product);
+             var result = _mapper.Map<DtoProduct>(product);
 
             return DtoResponse<DtoProduct>.Success(result);
         }

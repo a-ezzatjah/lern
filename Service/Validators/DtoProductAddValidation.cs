@@ -16,14 +16,13 @@ namespace Service.Validators
         {
 
             RuleFor(x => x.Name)
-                .Must(x=>!string.IsNullOrWhiteSpace(x)).WithMessage("نام محصول الزامی میباشد ")
+                .Must(x=>!string.IsNullOrWhiteSpace(x)).WithMessage("نام محصول الزامی میباشد")
                 .MaximumLength(100).WithMessage("تعداد کاراکتر نام بیشتر از حد مجاز میباشد");
 
             
             RuleFor(x => x.Price)
                 .NotNull().WithMessage("قیمت الزامی میباشد")
                 .GreaterThan(0).WithMessage("قیمت نمیتواند کوچک تر از 0 باشه ");
-
 
 
         }
