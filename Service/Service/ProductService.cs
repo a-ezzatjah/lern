@@ -46,8 +46,14 @@ namespace Service.Service
                 return DtoResponse<DtoProduct>.Fail("داده نامعتبر است");
 
             var validationResult = _validations.Validate(model);
+
             if (!validationResult.IsValid)
-                return DtoResponse<DtoProduct>.Fail("اطلاعات محصول معتبر نیست");
+            {
+                var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
+                return DtoResponse<DtoProduct>.Fail(error);
+
+            }
+               
 
 
 
@@ -151,7 +157,6 @@ namespace Service.Service
         {
             IQueryable<Product> Product = _shopDbContext.products.AsNoTracking();
 
-            //var Product = _shopDbContext.products;
 
             if (!string.IsNullOrWhiteSpace(query.SearchText))
             {
@@ -246,11 +251,13 @@ namespace Service.Service
                 return DtoResponse<DtoProduct>.Fail("داده نامعتبر است");
 
 
-            var ValidationResult = _updateValidator.Validate(model);
 
-            if (!ValidationResult.IsValid)
+            var validationResult = _validations.Validate(model);
+
+            if (!validationResult.IsValid)
             {
-                return DtoResponse<DtoProduct>.Fail("اطلاعات وارد شده معتبر نیست");
+                var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
+                return DtoResponse<DtoProduct>.Fail(error);
 
             }
 

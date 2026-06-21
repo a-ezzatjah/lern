@@ -40,7 +40,8 @@ namespace Service.Validators
                 .MustAsync(async (x, CancellationToken) =>
                 { if (x == null) return true; return await _shopDbContext.categories.AnyAsync(s => s.Id == x.Value); })
                 .WithMessage("آیدی برای دسته پدر وجود ندارد")
-            .GreaterThanOrEqualTo(1);
+            .GreaterThanOrEqualTo(1)
+            .When(x => x.ParentId.HasValue);
 
 
             RuleFor(x => x.SortOrder)
@@ -48,10 +49,6 @@ namespace Service.Validators
            .WithMessage("ترتیب نمایش نمی‌تواند منفی باشد");
 
         }
-
-
-
-
 
 
 

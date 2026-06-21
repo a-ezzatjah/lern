@@ -20,8 +20,8 @@ namespace Service.Mapping
 
            
 
-            CreateMap<DtoProduct, Product>();
-
+            CreateMap<DtoproductAdd, Product>();
+            CreateMap<Product,DtoProduct>().ReverseMap();
 
             CreateMap<DtoProductUpdate, Product>()
 
@@ -31,11 +31,7 @@ namespace Service.Mapping
 
                 .ForMember(x => x.Price, otp => { otp.PreCondition(s => s.Price > 0); otp.MapFrom(s => s.Price); })
 
-                //.ForMember(x => x.Price, otp => { otp.PreCondition(s => s.Price.HasValue); otp.MapFrom(s => s.Price.Value); })
-
                 .ForMember(x => x.Description, otp => { otp.PreCondition(s => s.Description != null); otp.MapFrom(s => s.Description); })
-
-                //.ForMember(x => x.HasDiscount, otp => otp.MapFrom(s => s.HasDiscount))
 
                 .ForMember(x => x.Discount, otp => otp.MapFrom(s => s.HasDiscount == true ? s.Discount : null))
 

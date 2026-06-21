@@ -5,12 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Entities;
+using FluentValidation;
 using FluentValidation.Validators;
 using Microsoft.EntityFrameworkCore;
+using ServiceContract.Common;
 using ServiceContract.DTO.DtoCategory;
 using ServiceContract.DTO.DtoCommit;
 using ServiceContract.Interfaces;
+using ServiceContract.Queries;
 
 namespace Service.Service
 {
@@ -18,12 +22,18 @@ namespace Service.Service
     {
         public readonly ShopDbContext _shopDbContext;
         public readonly IMapper _mapper;
+        public readonly IValidator<AddDtoCategory> _addvalidation;
+        public readonly IValidator<DtoCategoryUpdate> _updatevalidation;
 
-        public CategoryService(ShopDbContext shopDbContext,IMapper mapper)
+
+        public CategoryService(ShopDbContext shopDbContext, IMapper mapper, IValidator<AddDtoCategory> addDtoCategory
+            , IValidator<DtoCategoryUpdate> dtoCategoryUpdate)
         {
 
             _shopDbContext = shopDbContext;
             _mapper = mapper;
+            _addvalidation = addDtoCategory;
+            _updatevalidation = dtoCategoryUpdate;
 
         }
 
@@ -34,12 +44,20 @@ namespace Service.Service
         public async Task<DtoResponse<DtoCategory>> AddCategoryAsync(AddDtoCategory model)
         {
 
-            if(model == null)
+            if (model == null)
             {
                 return DtoResponse<DtoCategory>.Fail("دسته بندی ساخته نشده است");
-            };
+            }
+            ;
 
+            var validation = _addvalidation.Validate(model);
+            if (!validation.IsValid)
+            {
 
+                var error = validation.Errors.Select(x => x.ErrorMessage).ToList();
+                return DtoResponse<DtoCategory>.Fail(error);
+
+            }
 
 
             var categorise = _mapper.Map<Category>(model);
@@ -52,7 +70,7 @@ namespace Service.Service
 
 
             return DtoResponse<DtoCategory>.Success(result);
-            
+
 
         }
 
@@ -61,9 +79,19 @@ namespace Service.Service
             throw new NotImplementedException();
         }
 
-        public async Task<List<DtoCategory>> GetAllAsync()
+        public async Task<PageResult<DtoCategory>> GetAllAsync(CategoryQuery query)
         {
-            var allcategory = await _shopDbContext.categories.AsNoTracking()
+            var categoryqury = _shopDbContext.categories.AsNoTracking();
+
+
+
+            if (!string.IsNullOrWhiteSpace(query.SearchText))
+            {
+                categoryqury = categoryqury.Where(x => x.Name.Contains(query.SearchText));
+            }
+
+
+            var allcategory = categoryqury
                 .Select(x => new DtoCategory
                 {
                     Id = x.Id,
@@ -72,12 +100,38 @@ namespace Service.Service
                     Slug = x.Slug,
                     SortOrder = x.SortOrder,
 
-                }).ToListAsync();
+                }).ToList();
 
             var result = BuildTree(allcategory, null);
-            return result;
 
 
+
+
+
+            var totalcount = allcategory.Count();
+
+
+
+
+            return new PageResult<DtoCategory>
+            {
+                TotalCount = totalcount,
+
+
+
+
+            };
+
+
+
+
+
+
+
+
+
+
+            
         }
 
 

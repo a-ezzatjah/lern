@@ -23,7 +23,7 @@ namespace Service.Validators
 
             RuleFor(x => x.Id)
                 .NotNull().WithMessage("شناسه الزامی میباشد")
-                .GreaterThanOrEqualTo (0).WithMessage("شناسه محصول نا معتبر هست ");
+                .GreaterThanOrEqualTo (1).WithMessage("شناسه محصول نا معتبر هست ");
 
 
         }

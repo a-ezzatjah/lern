@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ServiceContract.DTO.DtoCategory;
 using ServiceContract.DTO.DtoCommit;
+using ServiceContract.Queries;
 
 namespace ServiceContract.Interfaces
 {
@@ -17,7 +18,7 @@ namespace ServiceContract.Interfaces
 
         public DtoResponse<bool> DeleteCategoryAsync(int Categotyid);
 
-        public Task<List<DtoCategory>> GetAllAsync();
+        public Task<List<DtoCategory>> GetAllAsync(CategoryQuery query);
 
         public List<DtoCategory> BuildTree(List<DtoCategory> allcategory, int? parentid);
 

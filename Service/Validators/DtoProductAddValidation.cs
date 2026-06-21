@@ -22,7 +22,7 @@ namespace Service.Validators
             
             RuleFor(x => x.Price)
                 .NotNull().WithMessage("قیمت الزامی میباشد")
-                .GreaterThan(0).WithMessage("قیمت نمیتواند کوچک تر از 0 باشه ");
+                .GreaterThanOrEqualTo(1).WithMessage("قیمت نمیتواند کوچک تر از 0 باشه ");
 
 
         }
