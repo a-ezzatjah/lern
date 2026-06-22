@@ -10,6 +10,7 @@ using Entities;
 using FluentValidation;
 using FluentValidation.Validators;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using ServiceContract.Common;
 using ServiceContract.DTO.DtoCategory;
 using ServiceContract.DTO.DtoCommit;
@@ -20,21 +21,23 @@ namespace Service.Service
 {
     public class CategoryService : ICategoryService
     {
-        public readonly ShopDbContext _shopDbContext;
-        public readonly IMapper _mapper;
-        public readonly IValidator<AddDtoCategory> _addvalidation;
-        public readonly IValidator<DtoCategoryUpdate> _updatevalidation;
+        private readonly ShopDbContext _shopDbContext;
+        private readonly IMapper _mapper;
+        private readonly IValidator<AddDtoCategory> _addvalidation;
+        private readonly IValidator<DtoCategoryUpdate> _updatevalidation;
+        private readonly IMemoryCache _cache;
+        
 
 
         public CategoryService(ShopDbContext shopDbContext, IMapper mapper, IValidator<AddDtoCategory> addDtoCategory
-            , IValidator<DtoCategoryUpdate> dtoCategoryUpdate)
+            , IValidator<DtoCategoryUpdate> dtoCategoryUpdate,IMemoryCache memoryCache)
         {
 
             _shopDbContext = shopDbContext;
             _mapper = mapper;
             _addvalidation = addDtoCategory;
             _updatevalidation = dtoCategoryUpdate;
-
+            _cache = memoryCache;
         }
 
 
@@ -79,67 +82,59 @@ namespace Service.Service
             throw new NotImplementedException();
         }
 
+
         public async Task<PageResult<DtoCategory>> GetAllAsync(CategoryQuery query)
         {
-            var categoryqury = _shopDbContext.categories.AsNoTracking();
-
-
+            var category = _shopDbContext.categories.AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(query.SearchText))
             {
-                categoryqury = categoryqury.Where(x => x.Name.Contains(query.SearchText));
+                category = category.Where(x => x.Name.Contains(query.SearchText));
             }
 
 
-            var allcategory = categoryqury
-                .Select(x => new DtoCategory
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    ParentId = x.ParentId,
-                    Slug = x.Slug,
-                    SortOrder = x.SortOrder,
+            var totalcategory = await category.CountAsync();
 
-                }).ToList();
+            category =  category.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize);
 
-            var result = BuildTree(allcategory, null);
+            var item = await category.ProjectTo<DtoCategory>(_mapper.ConfigurationProvider).ToListAsync();
 
-
-
-
-
-            var totalcount = allcategory.Count();
-
-
-
-
-            return new PageResult<DtoCategory>
+            return new PageResult<DtoCategory>()
             {
-                TotalCount = totalcount,
-
-
-
+                Items = item,
+                TotalCount = totalcategory,
+                Page=query.Page,
+                PageSize=query.PageSize
 
             };
 
 
+        }
+
+        
 
 
 
+        public async Task<List<DtoCategory>> GetTreeAsync()
+        {
 
+            return await _cache.GetOrCreateAsync("categories_tree", async entry =>
+            {
+                var all = await _shopDbContext.categories.AsNoTracking()
+                    .ProjectTo<DtoCategory>(_mapper.ConfigurationProvider).ToListAsync();
+                return BuildTree(all, null);
+            });
 
+          
 
-
-
-            
         }
 
 
 
-        public List<DtoCategory> BuildTree(List<DtoCategory> allcategory, int? parentid)
+        public  List<DtoCategory> BuildTree(List<DtoCategory> allcategory, int? parentid)
         {
 
-            return allcategory.Where(x => x.ParentId == parentid)
+            return  allcategory.Where(x => x.ParentId == parentid)
                               .OrderBy(x => x.SortOrder)
                               .Select(x => new DtoCategory
                               {
