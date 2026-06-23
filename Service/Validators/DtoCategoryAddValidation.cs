@@ -22,8 +22,8 @@ namespace Service.Validators
 
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("دسته بندی خالی میباشد")
-                .MustAsync(async (x, CancellationToken) => { return !await _shopDbContext.categories.AnyAsync(s => s.Name == x); })
                 .MaximumLength(50).WithMessage("تعداد کاراکتر های نام دسته بندی بیش از حد مجاز میباشد")
+                .MustAsync(async (x, CancellationToken) => { return !await _shopDbContext.categories.AnyAsync(s => s.Name == x); })
                 .Must(x => !string.IsNullOrWhiteSpace(x))
                 .WithMessage("نام دسته بندی نمی‌تواند فقط فاصله باشد");
 

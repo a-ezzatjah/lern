@@ -12,6 +12,8 @@ using Service.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

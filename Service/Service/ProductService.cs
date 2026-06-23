@@ -15,6 +15,7 @@ using ServiceContract.DTO.DtoProduct;
 using ServiceContract.Enums;
 using ServiceContract.Interfaces;
 using ServiceContract.Quaries;
+using ServiceContract.Queries;
 
 namespace Service.Service
 {
@@ -39,6 +40,37 @@ namespace Service.Service
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public DtoResponse<DtoProduct> AddProduct(DtoproductAdd model)
         {
 
@@ -54,7 +86,6 @@ namespace Service.Service
 
             }
                
-
 
 
             var oldproduct = _shopDbContext.products.Any(x => x.Name.ToLower() == model.Name.ToLower());
@@ -77,6 +108,152 @@ namespace Service.Service
 
 
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public DtoResponse<DtoProduct> Update(DtoProductUpdate model)
+        {
+
+            if (model == null)
+                return DtoResponse<DtoProduct>.Fail("داده نامعتبر است");
+
+
+
+            var validationResult = _validations.Validate(model);
+
+            if (!validationResult.IsValid)
+            {
+                var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
+                return DtoResponse<DtoProduct>.Fail(error);
+
+            }
+
+
+            var product = GetEntityById(model.Id.Value);
+            if (product == null)
+            {
+                return DtoResponse<DtoProduct>.Fail("محصول موجود نمیباشد ");
+            }
+
+
+
+
+            _mapper.Map(model, product);
+
+            _shopDbContext.SaveChanges();
+
+
+
+            var result = _mapper.Map<DtoProduct>(product);
+
+            return DtoResponse<DtoProduct>.Success(result);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -108,10 +285,100 @@ namespace Service.Service
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public string GetBranchName(int? branchid)
         {
             throw new NotImplementedException();
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -138,6 +405,37 @@ namespace Service.Service
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public Product? GetEntityById(int product)
         {
             return _shopDbContext.products.FirstOrDefault(x => x.Id == product);
@@ -153,9 +451,41 @@ namespace Service.Service
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public async Task<PageResult<DtoProduct>> GetFilterAsync(ProductQuery query)
         {
             IQueryable<Product> Product = _shopDbContext.products.AsNoTracking();
+
+            query ??= new ProductQuery();
 
 
             if (!string.IsNullOrWhiteSpace(query.SearchText))
@@ -229,6 +559,56 @@ namespace Service.Service
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public List<DtoSearchOption> GetSelect()
         {
             var result = new List<DtoSearchOption>();
@@ -244,42 +624,47 @@ namespace Service.Service
 
 
 
-        public DtoResponse<DtoProduct> Update(DtoProductUpdate model)
-        {
-
-            if (model == null)
-                return DtoResponse<DtoProduct>.Fail("داده نامعتبر است");
 
 
 
-            var validationResult = _validations.Validate(model);
-
-            if (!validationResult.IsValid)
-            {
-                var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
-                return DtoResponse<DtoProduct>.Fail(error);
-
-            }
-
-
-            var product = GetEntityById(model.Id.Value);
-            if (product == null)
-            {
-                return DtoResponse<DtoProduct>.Fail("محصول موجود نمیباشد ");
-            }
-
- 
-
-
-            _mapper.Map(model, product);
-
-            _shopDbContext.SaveChanges();
 
 
 
-             var result = _mapper.Map<DtoProduct>(product);
 
-            return DtoResponse<DtoProduct>.Success(result);
-        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }

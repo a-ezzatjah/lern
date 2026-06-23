@@ -26,7 +26,8 @@ namespace Service.Service
         private readonly IValidator<AddDtoCategory> _addvalidation;
         private readonly IValidator<DtoCategoryUpdate> _updatevalidation;
         private readonly IMemoryCache _cache;
-        
+        private const string CategoriesTreeCacheKey = "categories_tree";
+
 
 
         public CategoryService(ShopDbContext shopDbContext, IMapper mapper, IValidator<AddDtoCategory> addDtoCategory
@@ -44,6 +45,21 @@ namespace Service.Service
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public async Task<DtoResponse<DtoCategory>> AddCategoryAsync(AddDtoCategory model)
         {
 
@@ -53,7 +69,7 @@ namespace Service.Service
             }
             ;
 
-            var validation = _addvalidation.Validate(model);
+            var validation = await _addvalidation.ValidateAsync(model);
             if (!validation.IsValid)
             {
 
@@ -69,6 +85,8 @@ namespace Service.Service
 
             await _shopDbContext.SaveChangesAsync();
 
+            _cache.Remove(CategoriesTreeCacheKey);
+
             var result = _mapper.Map<DtoCategory>(categorise);
 
 
@@ -77,15 +95,177 @@ namespace Service.Service
 
         }
 
-        public DtoResponse<bool> DeleteCategoryAsync(int Categotyid)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<DtoResponse<DtoCategory>> UpdateCategoryAsync(DtoCategoryUpdate model)
         {
-            throw new NotImplementedException();
+
+            if (model == null || model.Id == null) 
+            {
+                return DtoResponse<DtoCategory>.Fail("مقدار وجود ندارد");
+            }
+
+            var validation = await _updatevalidation.ValidateAsync(model);
+            if(!validation.IsValid)
+            {
+
+                var error = validation.Errors.Select(x => x.ErrorMessage).ToList();
+               return DtoResponse<DtoCategory>.Fail(error);
+
+            }
+
+            
+
+            var category = await _shopDbContext.categories.FirstOrDefaultAsync(x => x.Id == model.Id);
+
+
+            if (category == null)
+            {
+                return DtoResponse<DtoCategory>.Fail("دسته‌بندی پیدا نشد");
+            }
+
+
+            _mapper.Map(model , category);
+
+            await _shopDbContext.SaveChangesAsync();
+
+            _cache.Remove(CategoriesTreeCacheKey);
+
+            var result = _mapper.Map<DtoCategory>(category);
+
+           return DtoResponse<DtoCategory>.Success(result);
+
+
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<DtoResponse<bool>> DeleteCategoryAsync(int CategoryId)
+        {
+
+
+            var Category = await _shopDbContext.categories.FirstOrDefaultAsync(x => x.Id == CategoryId);
+
+
+            if (Category == null)
+            {
+                return DtoResponse<bool>.Fail("دسته‌بندی پیدا نشد");
+            }
+
+            var hasChildren = await _shopDbContext.categories.AnyAsync(x => x.ParentId == CategoryId);
+            if (hasChildren)
+            {
+                return DtoResponse<bool>.Fail("این دسته زیرمجموعه دارد و قابل حذف نیست");
+
+            }
+
+            _shopDbContext.Remove(Category);
+
+           await _shopDbContext.SaveChangesAsync();
+
+            _cache.Remove(CategoriesTreeCacheKey);
+
+            return DtoResponse<bool>.Success();
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         public async Task<PageResult<DtoCategory>> GetAllAsync(CategoryQuery query)
         {
-            var category = _shopDbContext.categories.AsNoTracking();
+            var category = _shopDbContext.categories
+                .OrderBy(x => x.SortOrder)
+                .ThenBy(x => x.Id)
+                .AsNoTracking();
+
+            query ??= new CategoryQuery();
+
 
             if (!string.IsNullOrWhiteSpace(query.SearchText))
             {
@@ -105,7 +285,6 @@ namespace Service.Service
                 TotalCount = totalcategory,
                 Page=query.Page,
                 PageSize=query.PageSize
-
             };
 
 
@@ -118,21 +297,25 @@ namespace Service.Service
         public async Task<List<DtoCategory>> GetTreeAsync()
         {
 
-            return await _cache.GetOrCreateAsync("categories_tree", async entry =>
+            return await _cache.GetOrCreateAsync(CategoriesTreeCacheKey, async entry =>
             {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
+
                 var all = await _shopDbContext.categories.AsNoTracking()
                     .ProjectTo<DtoCategory>(_mapper.ConfigurationProvider).ToListAsync();
                 return BuildTree(all, null);
-            });
+            }) ?? new List<DtoCategory>();
 
-          
+
 
         }
 
 
 
-        public  List<DtoCategory> BuildTree(List<DtoCategory> allcategory, int? parentid)
+        public  List<DtoCategory> BuildTree(List<DtoCategory> allcategory, int? parentid, int depth = 0)
         {
+
+            if (depth > 20) return new List<DtoCategory>();
 
             return  allcategory.Where(x => x.ParentId == parentid)
                               .OrderBy(x => x.SortOrder)
@@ -143,14 +326,15 @@ namespace Service.Service
                                   ParentId = x.ParentId,
                                   Slug = x.Slug,
                                   SortOrder = x.SortOrder,
-                                  Children = BuildTree(allcategory, x.Id)
-                              }).ToList();
+                                  Children = BuildTree(allcategory, x.Id,depth + 1)
+                              }).ToList(); 
 
         }
 
-        public Task<DtoResponse<DtoCategory>> UpdateCategoryAsync(DtoCategoryUpdate model)
-        {
-            throw new NotImplementedException();
-        }
+
+
+
+
+
     }
 }
