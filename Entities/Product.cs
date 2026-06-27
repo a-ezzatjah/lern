@@ -17,14 +17,20 @@ namespace Entities
       
         public string Name { get; set; }
         public decimal Price { get; set; }
+        public string Slug { get; set; } = null!;
+
         public string ?Description { get; set; }
-        public decimal ?Discount { get; set; }
-        public bool HasDiscount { get; set; }
-        public DisconTypeEnum ?DisconType { get; set; }
-        
 
+        public bool IsActive { get; set; } = true;
 
+        public ICollection<ProductCategory>? productCategories { get; set; }
 
+        public ICollection<ProductSaleOption> SaleOptions { get; set; } = new();
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+
+        public SeoData? Seo { get; set; }
 
     }
 }

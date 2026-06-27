@@ -16,5 +16,6 @@ namespace Entities
         public Category? parent { get; set; }
         public int SortOrder { get; set; }
         public ICollection<Category>? Children { get; set; }
+        public ICollection<ProductCategory>? productCategories { get; set; }
     }
 }
