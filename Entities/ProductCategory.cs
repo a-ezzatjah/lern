@@ -9,9 +9,9 @@ namespace Entities
     public class ProductCategory
     {
 
-        public int ParentId { get; set; }
+        public int ProductId { get; set; }
 
-        public Category Parent { set; get; } = null!;
+        public Product product { set; get; } = null!;
 
 
         public int CategoryId { get; set; }

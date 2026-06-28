@@ -23,9 +23,9 @@ namespace Entities
 
         public bool IsActive { get; set; } = true;
 
-        public ICollection<ProductCategory>? productCategories { get; set; }
+        public ICollection<ProductCategory> productCategories { get; set; } = new List<ProductCategory>();  //چرا پیش فرض کلاس
 
-        public ICollection<ProductSaleOption> SaleOptions { get; set; } = new();
+        public ICollection<ProductSaleOption> SaleOptions { get; set; } = new();  //چرا پیش فرض کلاس
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
