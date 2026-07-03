@@ -29,44 +29,17 @@ namespace Service.Service
 
 
 
-        public ProductService(ShopDbContext shopDbContext, IMapper mapper, IValidator<DtoproductAdd> validationRules, IValidator<DtoProductUpdate> Update)
+        public ProductService(
+            ShopDbContext shopDbContext,
+            IMapper mapper,
+            IValidator<DtoproductAdd> validationRules,
+            IValidator<DtoProductUpdate> updateValidator)
         {
-            _mapper = mapper;
             _shopDbContext = shopDbContext;
+            _mapper = mapper;
             _validations = validationRules;
-            _updateValidator = Update;
+            _updateValidator = updateValidator;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -85,7 +58,7 @@ namespace Service.Service
                 return DtoResponse<DtoProduct>.Fail(error);
 
             }
-               
+
 
 
             var oldproduct = _shopDbContext.products.Any(x => x.Name.ToLower() == model.Name.ToLower());
@@ -108,59 +81,6 @@ namespace Service.Service
 
 
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -206,54 +126,6 @@ namespace Service.Service
 
             return DtoResponse<DtoProduct>.Success(result);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -308,30 +180,6 @@ namespace Service.Service
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public string GetBranchName(int? branchid)
         {
             throw new NotImplementedException();
@@ -341,57 +189,9 @@ namespace Service.Service
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public DtoProduct? GetById(int productId)
         {
-         
+
             return _shopDbContext.products
        .Where(x => x.Id == productId)
        .ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
@@ -404,59 +204,11 @@ namespace Service.Service
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public Product? GetEntityById(int product)
         {
             return _shopDbContext.products.FirstOrDefault(x => x.Id == product);
 
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -554,44 +306,6 @@ namespace Service.Service
             };
 
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
