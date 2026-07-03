@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,30 +9,14 @@ namespace Entities
 {
     public class SaleOptionColor
     {
+        public int Id { get; set; }
 
-        int Id { get; set; }
+        [MaxLength(50)]
+        public string Color { get; set; } = null!;
 
-        string Color { get; set; } = null!;
+        public int SaleOptionId { get; set; }
+        public ProductSaleOption ProductSaleOption { get; set; } = null!;
 
-        int SaleOptionId { get; set; }
-
-        SearchOption saleOption { get; set; }
-
-        decimal Price { get; set; }
-
-
-        //public decimal CalculateBasePrice(decimal quantity) => quantity * Price;
-
-        //public decimal CalculateBaseWeight(decimal quantity)
-        //{
-        //    if (PerUnitWeight.HasValue)
-        //        return quantity * PerUnitWeight.Value;
-
-        //    if (FixedWeight.HasValue)
-        //        return quantity * FixedWeight.Value;
-
-        //    return 0;
-        //}
-
+        public decimal Price { get; set; }
     }
 }

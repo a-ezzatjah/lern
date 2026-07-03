@@ -21,11 +21,15 @@ namespace Entities
 
         public string ?Description { get; set; }
 
-        public bool IsActive { get; set; } = true;
+public bool IsActive { get; set; } = true;
 
-        public ICollection<ProductCategory> productCategories { get; set; } = new List<ProductCategory>();  //چرا پیش فرض کلاس
+        public decimal? Discount { get; set; }
+        public bool? HasDiscount { get; set; }
+        public DisconTypeEnum? DisconType { get; set; }
 
-        public ICollection<ProductSaleOption> SaleOptions { get; set; } = new();  //چرا پیش فرض کلاس
+        public ICollection<ProductCategory> productCategories { get; set; } = new List<ProductCategory>();
+
+        public ICollection<ProductSaleOption> SaleOptions { get; set; } = new List<ProductSaleOption>();
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
