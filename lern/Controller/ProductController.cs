@@ -5,44 +5,42 @@ using ServiceContract.Interfaces;
 
 namespace lern.Controller
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
+        private readonly IProductService _productService;
 
-            private readonly IProductService _productService;
+        public ProductController(IProductService productService)
+        {
+            _productService = productService;
+        }
 
-            public ProductController(IProductService productService)
-            {
-                _productService = productService;
-            }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            var result = await _productService.GetByIdAsync(id);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
 
-            [HttpGet("{id}")]
-            public IActionResult GetById(int id)
-            {
-                var result = _productService.GetById(id);
-                if (result == null) return NotFound();
-                return Ok(result);
-            }
+        [HttpPost]
+        public async Task<IActionResult> AddAsync(DtoproductAdd model)
+        {
+            var result = await _productService.AddProductAsync(model);
+            if (!result.Succeeded) return BadRequest(result.Errormessage);
+            return Ok(result.Data);
+        }
 
-            [HttpPost]
-            public IActionResult Add(DtoproductAdd model)
-            {
-                var result = _productService.AddProduct(model);
-                if (!result.Succeeded) return BadRequest(result.Errormessage);
-                return Ok(result.Data);
-            }
-
-            [HttpDelete("{id}")]
-            public IActionResult Delete(int id)
-            {
-                var result = _productService.Delete(id);
-                if (!result.Succeeded) return BadRequest(result.Errormessage);
-                return Ok();
-            }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var result = await _productService.DeleteAsync(id);
+            if (!result.Succeeded) return BadRequest(result.Errormessage);
+            return Ok();
         }
     }
+}
 
 
 

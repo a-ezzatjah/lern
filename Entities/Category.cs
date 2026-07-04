@@ -12,10 +12,10 @@ namespace Entities
         public int Id { get; set; }
         public string Name { get; set; }
         public string? Slug { get; set; }
-        public int? ParentId  { get; set; }
-        public Category? parent { get; set; }
+        public int? ParentId { get; set; }
+        public Category? Parent { get; set; }
         public int SortOrder { get; set; }
         public ICollection<Category> Children { get; set; } = new List<Category>();
-        public ICollection<ProductCategory> productCategories { get; set; } = new List<ProductCategory>();
+        public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
     }
 }

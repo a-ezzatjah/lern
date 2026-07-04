@@ -44,42 +44,33 @@ namespace Service.Service
 
 
 
-        public DtoResponse<DtoProduct> AddProduct(DtoproductAdd model)
+        public async Task<DtoResponse<DtoProduct>> AddProductAsync(DtoproductAdd model)
         {
-
             if (model == null)
                 return DtoResponse<DtoProduct>.Fail("داده نامعتبر است");
 
-            var validationResult = _validations.Validate(model);
+            var validationResult = await _validations.ValidateAsync(model);
 
             if (!validationResult.IsValid)
             {
                 var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
                 return DtoResponse<DtoProduct>.Fail(error);
-
             }
 
-
-
-            var oldproduct = _shopDbContext.products.Any(x => x.Name.ToLower() == model.Name.ToLower());
-            if (oldproduct)
+            var productExists = await _shopDbContext.Products.AnyAsync(x => x.Name.ToLower() == model.Name.ToLower());
+            if (productExists)
             {
                 return DtoResponse<DtoProduct>.Fail("محصول تکراری میباشد");
             }
 
-
             var product = _mapper.Map<Product>(model);
 
-            _shopDbContext.products.Add(product);
-
-            _shopDbContext.SaveChanges();
-
+            _shopDbContext.Products.Add(product);
+            await _shopDbContext.SaveChangesAsync();
 
             var result = _mapper.Map<DtoProduct>(product);
 
             return DtoResponse<DtoProduct>.Success(result);
-
-
         }
 
 
@@ -89,38 +80,27 @@ namespace Service.Service
 
 
 
-        public DtoResponse<DtoProduct> Update(DtoProductUpdate model)
+        public async Task<DtoResponse<DtoProduct>> UpdateAsync(DtoProductUpdate model)
         {
-
             if (model == null)
                 return DtoResponse<DtoProduct>.Fail("داده نامعتبر است");
 
-
-
-            var validationResult = _validations.Validate(model);
+            var validationResult = await _updateValidator.ValidateAsync(model);
 
             if (!validationResult.IsValid)
             {
                 var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
                 return DtoResponse<DtoProduct>.Fail(error);
-
             }
 
-
-            var product = GetEntityById(model.Id.Value);
+            var product = await GetEntityByIdAsync(model.Id.Value);
             if (product == null)
             {
-                return DtoResponse<DtoProduct>.Fail("محصول موجود نمیباشد ");
+                return DtoResponse<DtoProduct>.Fail("محصول موجود نمیباشد");
             }
 
-
-
-
             _mapper.Map(model, product);
-
-            _shopDbContext.SaveChanges();
-
-
+            await _shopDbContext.SaveChangesAsync();
 
             var result = _mapper.Map<DtoProduct>(product);
 
@@ -134,20 +114,16 @@ namespace Service.Service
 
 
 
-        public DtoResponse<bool> Delete(int productid)
+        public async Task<DtoResponse<bool>> DeleteAsync(int productId)
         {
-            var poroduct = GetEntityById(productid);
-            if (poroduct == null)
+            var product = await GetEntityByIdAsync(productId);
+            if (product == null)
             {
                 return DtoResponse<bool>.Fail("محصول مورد نظر یافت نشد");
             }
 
-
-
-            _shopDbContext.products.Remove(poroduct);
-
-
-            _shopDbContext.SaveChanges();
+            _shopDbContext.Products.Remove(product);
+            await _shopDbContext.SaveChangesAsync();
 
             return DtoResponse<bool>.Success();
         }
@@ -180,34 +156,27 @@ namespace Service.Service
 
 
 
-        public string GetBranchName(int? branchid)
+
+
+
+
+
+
+        public async Task<DtoProduct?> GetByIdAsync(int productId)
         {
-            throw new NotImplementedException();
+            return await _shopDbContext.Products
+                .Where(x => x.Id == productId)
+                .ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
         }
 
 
 
 
 
-        public DtoProduct? GetById(int productId)
+        public Task<Product?> GetEntityByIdAsync(int productId)
         {
-
-            return _shopDbContext.products
-       .Where(x => x.Id == productId)
-       .ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
-       .FirstOrDefault();
-
-
-        }
-
-
-
-
-
-        public Product? GetEntityById(int product)
-        {
-            return _shopDbContext.products.FirstOrDefault(x => x.Id == product);
-
+            return _shopDbContext.Products.FirstOrDefaultAsync(x => x.Id == productId);
         }
 
 
@@ -235,7 +204,7 @@ namespace Service.Service
 
         public async Task<PageResult<DtoProduct>> GetFilterAsync(ProductQuery query)
         {
-            IQueryable<Product> Product = _shopDbContext.products.AsNoTracking();
+            IQueryable<Product> productQuery = _shopDbContext.Products.AsNoTracking();
 
             query ??= new ProductQuery();
 
@@ -244,17 +213,17 @@ namespace Service.Service
             {
                 if (query.SearchType == EnumProductSearchType.All)
                 {
-                    Product = Product.Where(x =>
+                    productQuery = productQuery.Where(x =>
                         x.Name.Contains(query.SearchText) ||
                         x.Description != null && x.Description.Contains(query.SearchText));
                 }
                 else if (query.SearchType == EnumProductSearchType.Name)
                 {
-                    Product = Product.Where(x => x.Name.Contains(query.SearchText));
+                    productQuery = productQuery.Where(x => x.Name.Contains(query.SearchText));
                 }
                 else if (query.SearchType == EnumProductSearchType.Description)
                 {
-                    Product = Product.Where(x =>
+                    productQuery = productQuery.Where(x =>
                             x.Description != null &&
                             x.Description.Contains(query.SearchText));
                 }
@@ -262,38 +231,29 @@ namespace Service.Service
                     query.SearchType == EnumProductSearchType.Price
                     && decimal.TryParse(query.SearchText, out var priceValue))
                 {
-                    Product = Product.Where(x => x.Price == priceValue);
+                    productQuery = productQuery.Where(x => x.Price == priceValue);
                 }
             }
 
-            Product = (query.SortType, query.Order) switch
+            productQuery = (query.SortType, query.Order) switch
             {
-                (EnumProductSortType.Name, OrderEnum.ASC) => Product.OrderBy(x => x.Name),
-                (EnumProductSortType.Name, OrderEnum.DESC) => Product.OrderByDescending(x => x.Name),
-
-
-
-                (EnumProductSortType.Price, OrderEnum.ASC) => Product.OrderBy(x => x.Price),
-                (EnumProductSortType.Price, OrderEnum.DESC) => Product.OrderByDescending(x => x.Price),
-
-                _ => Product.OrderBy(x => x.Id)
+                (EnumProductSortType.Name, OrderEnum.ASC) => productQuery.OrderBy(x => x.Name),
+                (EnumProductSortType.Name, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Name),
+                (EnumProductSortType.Price, OrderEnum.ASC) => productQuery.OrderBy(x => x.Price),
+                (EnumProductSortType.Price, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Price),
+                _ => productQuery.OrderBy(x => x.Id)
             };
 
 
-            var totalCount = await Product.CountAsync();
+            var totalCount = await productQuery.CountAsync();
 
+            productQuery = productQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize);
 
-            Product = Product
-           .Skip((query.Page - 1) * query.PageSize)
-           .Take(query.PageSize);
-
-
-
-
-
-            var items = await Product
-           .ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
-           .ToListAsync();
+            var items = await productQuery
+                .ProjectTo<DtoProduct>(_mapper.ConfigurationProvider)
+                .ToListAsync();
 
 
 
@@ -323,55 +283,17 @@ namespace Service.Service
 
 
 
-        public List<DtoSearchOption> GetSelect()
+        public Task<List<DtoSearchOption>> GetSelectAsync()
         {
-            var result = new List<DtoSearchOption>();
+            var result = new List<DtoSearchOption>
+            {
+                new DtoSearchOption { Key = nameof(DtoProduct.Name), Title = "نام" },
+                new DtoSearchOption { Key = nameof(DtoProduct.Description), Title = "توضیحات" },
+                new DtoSearchOption { Key = nameof(DtoProduct.Price), Title = "قیمت" }
+            };
 
-            result.Add(new DtoSearchOption { Key = nameof(DtoProduct.Name), Title = "نام" });
-            result.Add(new DtoSearchOption { Key = nameof(DtoProduct.Description), Title = "توضیحات" });
-            result.Add(new DtoSearchOption { Key = nameof(DtoProduct.Price), Title = "قیمت" });
-
-            return result;
+            return Task.FromResult(result);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

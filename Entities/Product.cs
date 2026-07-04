@@ -18,16 +18,12 @@ namespace Entities
         public string Name { get; set; }
         public decimal Price { get; set; }
         public string Slug { get; set; } = null!;
-
-        public string ?Description { get; set; }
-
-public bool IsActive { get; set; } = true;
-
+        public string? Description { get; set; }
+        public bool IsActive { get; set; } = true;
         public decimal? Discount { get; set; }
         public bool? HasDiscount { get; set; }
         public DisconTypeEnum? DisconType { get; set; }
-
-        public ICollection<ProductCategory> productCategories { get; set; } = new List<ProductCategory>();
+        public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
 
         public ICollection<ProductSaleOption> SaleOptions { get; set; } = new List<ProductSaleOption>();
 

@@ -9,21 +9,20 @@ namespace Entities
 {
     public class SeoData
     {
+        [Key]
         public int Id { get; set; }
 
-        [MaxLength(200)]
-        public string? Title { get; set; }
+        public string? MetaTitle { get; set; }
+        public string? MetaDescription { get; set; }
+        public string? MetaKeywords { get; set; }
 
-        [MaxLength(500)]
-        public string? Description { get; set; }
-
-        [MaxLength(300)]
-        public string? Keywords { get; set; }
-
-        [MaxLength(500)]
         public string? CanonicalUrl { get; set; }
+        public string? OgTitle { get; set; }
+        public string? OgDescription { get; set; }
+        public string? OgImageUrl { get; set; }
 
-        public string? Schema { get; set; }
+        public bool IndexPage { get; set; } = true;
+        public bool FollowPage { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

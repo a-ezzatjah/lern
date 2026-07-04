@@ -16,11 +16,11 @@ namespace Entities
 
         }
 
-        public DbSet<Product> products { get; set; }
-        public DbSet<Category> categories { get; set; }
-        public DbSet<ProductCategory> productCategories { get; set; }
-        public DbSet<ProductSaleOption> productSaleOptions { get; set; }
-        public DbSet<SaleOptionColor> saleOptionColors { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<ProductSaleOption> ProductSaleOptions { get; set; }
+        public DbSet<SaleOptionColor> SaleOptionColors { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,31 +34,36 @@ namespace Entities
             // ProductCategory composite key
             modelBuilder.Entity<ProductCategory>().HasKey(x => new { x.ProductId, x.CategoryId });
             modelBuilder.Entity<ProductCategory>()
-                .HasOne(x => x.product)
-                .WithMany(x => x.productCategories)
+                .HasOne(x => x.Product)
+                .WithMany(x => x.ProductCategories)
                 .HasForeignKey(x => x.ProductId);
             modelBuilder.Entity<ProductCategory>()
                 .HasOne(x => x.Category)
-                .WithMany(x => x.productCategories)
+                .WithMany(x => x.ProductCategories)
                 .HasForeignKey(x => x.CategoryId);
 
             // Category self-referencing
             modelBuilder.Entity<Category>()
-                .HasOne(x => x.parent)
+                .HasOne(x => x.Parent)
                 .WithMany(x => x.Children)
                 .HasForeignKey(x => x.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Product → SeoData (Owned Entity)
+// Product → SeoData (Owned Entity)
             modelBuilder.Entity<Product>()
                 .OwnsOne(p => p.Seo, seo =>
                 {
                     seo.ToTable("ProductSeoData");
                     seo.Property(s => s.Id).HasColumnName("Id");
-                    seo.Property(s => s.Title).HasMaxLength(200);
-                    seo.Property(s => s.Description).HasMaxLength(500);
-                    seo.Property(s => s.Keywords).HasMaxLength(300);
-                    seo.Property(s => s.CanonicalUrl).HasMaxLength(500);
+                    seo.Property(s => s.MetaTitle).HasMaxLength(200).HasColumnName("MetaTitle");
+                    seo.Property(s => s.MetaDescription).HasMaxLength(500).HasColumnName("MetaDescription");
+                    seo.Property(s => s.MetaKeywords).HasMaxLength(300).HasColumnName("MetaKeywords");
+                    seo.Property(s => s.CanonicalUrl).HasMaxLength(500).HasColumnName("CanonicalUrl");
+                    seo.Property(s => s.OgTitle).HasMaxLength(200).HasColumnName("OgTitle");
+                    seo.Property(s => s.OgDescription).HasMaxLength(500).HasColumnName("OgDescription");
+                    seo.Property(s => s.OgImageUrl).HasMaxLength(500).HasColumnName("OgImageUrl");
+                    seo.Property(s => s.IndexPage).HasColumnName("IndexPage");
+                    seo.Property(s => s.FollowPage).HasColumnName("FollowPage");
                 });
 
             // Product → ProductSaleOption
@@ -71,7 +76,7 @@ namespace Entities
             // ProductSaleOption → SaleOptionColor
             modelBuilder.Entity<SaleOptionColor>()
                 .HasOne(soc => soc.ProductSaleOption)
-                .WithMany(pso => pso.saleOptionColors)
+                .WithMany(pso => pso.SaleOptionColors)
                 .HasForeignKey(soc => soc.SaleOptionId)
                 .OnDelete(DeleteBehavior.Cascade);
 

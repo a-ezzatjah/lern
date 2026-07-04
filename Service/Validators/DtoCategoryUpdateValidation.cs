@@ -32,7 +32,7 @@ namespace Service.Validators
                 .NotNull().WithMessage("نام دسته بندی وارد نشده است")
                 .NotEmpty().WithMessage("نام دسته بندی وارد نشده است")
                 .MustAsync(async (model,name, CancellationToken) => 
-                { return !await _shopDbContext.categories.AnyAsync(s => s.Name == name && s.Id != model.Id); })
+                { return !await _shopDbContext.Categories.AnyAsync(s => s.Name == name && s.Id != model.Id); })
                 .WithMessage("نام دسته بندی تکراری میباشد")
                 .MaximumLength(50).WithMessage("تعداد کاراکتر های نام دسته بیش از حد مجاز میباشد");
 
@@ -42,14 +42,14 @@ namespace Service.Validators
               .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("اسلاگ نمیتواند خالی باشد")
               .MaximumLength(50).WithMessage("اسلاگ نباید بیشتر از 50 کاراکتر باشد")
               .MustAsync(async (model,slug, CancellationToken) =>
-              { return !await _shopDbContext.categories.AnyAsync(s => s.Slug == slug && s.Id != model.Id); })
+              { return !await _shopDbContext.Categories.AnyAsync(s => s.Slug == slug && s.Id != model.Id); })
               .WithMessage("اسلاگ تکراری میباشد");
 
 
 
 
             RuleFor(x => x.ParentId)
-                .MustAsync(async (x, CancellationToken) => { return await _shopDbContext.categories.AnyAsync(s => s.Id == x); })
+                .MustAsync(async (x, CancellationToken) => { return await _shopDbContext.Categories.AnyAsync(s => s.Id == x); })
                 .When(x => x.ParentId.HasValue)
                 .NotEqual(x => x.Id)
                 .GreaterThanOrEqualTo(1).When(x => x.ParentId.HasValue);

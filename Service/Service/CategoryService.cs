@@ -81,7 +81,7 @@ namespace Service.Service
 
             var categorise = _mapper.Map<Category>(model);
 
-            _shopDbContext.categories.Add(categorise);
+            _shopDbContext.Categories.Add(categorise);
 
             await _shopDbContext.SaveChangesAsync();
 
@@ -137,7 +137,7 @@ namespace Service.Service
 
             
 
-            var category = await _shopDbContext.categories.FirstOrDefaultAsync(x => x.Id == model.Id);
+            var category = await _shopDbContext.Categories.FirstOrDefaultAsync(x => x.Id == model.Id);
 
 
             if (category == null)
@@ -199,7 +199,7 @@ namespace Service.Service
         {
 
 
-            var Category = await _shopDbContext.categories.FirstOrDefaultAsync(x => x.Id == CategoryId);
+            var Category = await _shopDbContext.Categories.FirstOrDefaultAsync(x => x.Id == CategoryId);
 
 
             if (Category == null)
@@ -207,7 +207,7 @@ namespace Service.Service
                 return DtoResponse<bool>.Fail("دسته‌بندی پیدا نشد");
             }
 
-            var hasChildren = await _shopDbContext.categories.AnyAsync(x => x.ParentId == CategoryId);
+            var hasChildren = await _shopDbContext.Categories.AnyAsync(x => x.ParentId == CategoryId);
             if (hasChildren)
             {
                 return DtoResponse<bool>.Fail("این دسته زیرمجموعه دارد و قابل حذف نیست");
@@ -259,7 +259,7 @@ namespace Service.Service
 
         public async Task<PageResult<DtoCategory>> GetAllAsync(CategoryQuery query)
         {
-            var category = _shopDbContext.categories
+            var category = _shopDbContext.Categories
                 .OrderBy(x => x.SortOrder)
                 .ThenBy(x => x.Id)
                 .AsNoTracking();
@@ -301,7 +301,7 @@ namespace Service.Service
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
 
-                var all = await _shopDbContext.categories.AsNoTracking()
+                var all = await _shopDbContext.Categories.AsNoTracking()
                     .ProjectTo<DtoCategory>(_mapper.ConfigurationProvider).ToListAsync();
                 return BuildTree(all, null);
             }) ?? new List<DtoCategory>();

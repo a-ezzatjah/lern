@@ -36,7 +36,7 @@ namespace Entities
         public decimal? PerUnitWidth { get; set; }
         public decimal? PerUnitHeight { get; set; }
 
-        public ICollection<SaleOptionColor> saleOptionColors { get; set;} = new List<SaleOptionColor>();
+        public ICollection<SaleOptionColor> SaleOptionColors { get; set;} = new List<SaleOptionColor>();
        
     }
 
