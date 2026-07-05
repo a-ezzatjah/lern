@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Entities;
 
 namespace ServiceContract.DTO.DtoCategory
 {
-    public class AddDtoCategory
+    public class DtoCategoryAdminList
     {
 
+
+        public int  Id { get; set; }
         public string Name { get; set; } = null!;
         public string Slug { get; set; } = null!;
         public int? ParentId { get; set; }
+
+        public string? ParentName { get; set; }
         public int? SortOrder { get; set; }
+
+        public int CildrenCount { get; set; }
 
 
 

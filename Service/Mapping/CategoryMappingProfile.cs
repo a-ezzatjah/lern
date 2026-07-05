@@ -7,6 +7,7 @@ using AutoMapper;
 using Entities;
 using Entities.Migrations;
 using ServiceContract.DTO.DtoCategory;
+using ServiceContract.DTO.DtoCategoryView;
 
 namespace Service.Mapping
 {
@@ -20,7 +21,9 @@ namespace Service.Mapping
                 .ForMember(s=>s.Slug, otp => otp.MapFrom(s => s.Slug != null ? s.Slug.Trim() : null));
 
 
-            CreateMap<Category, DtoCategory>().ReverseMap();
+            CreateMap<Category, DtoCategoryAdminList>();
+
+            CreateMap<Category, DtoCategoryView>();
 
             CreateMap<DtoCategoryUpdate, Category>()
                 .ForMember(x => x.Id, y => y.Ignore())

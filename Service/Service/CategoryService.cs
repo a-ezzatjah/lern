@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using ServiceContract.Common;
 using ServiceContract.DTO.DtoCategory;
+using ServiceContract.DTO.DtoCategoryView;
 using ServiceContract.DTO.DtoCommit;
 using ServiceContract.Interfaces;
 using ServiceContract.Queries;
@@ -31,7 +32,7 @@ namespace Service.Service
 
 
         public CategoryService(ShopDbContext shopDbContext, IMapper mapper, IValidator<AddDtoCategory> addDtoCategory
-            , IValidator<DtoCategoryUpdate> dtoCategoryUpdate,IMemoryCache memoryCache)
+            , IValidator<DtoCategoryUpdate> dtoCategoryUpdate, IMemoryCache memoryCache)
         {
 
             _shopDbContext = shopDbContext;
@@ -60,12 +61,12 @@ namespace Service.Service
 
 
 
-        public async Task<DtoResponse<DtoCategory>> AddCategoryAsync(AddDtoCategory model)
+        public async Task<DtoResponse<DtoCategoryAdminList>> AddCategoryAsync(AddDtoCategory model)
         {
 
             if (model == null)
             {
-                return DtoResponse<DtoCategory>.Fail("دسته بندی ساخته نشده است");
+                return DtoResponse<DtoCategoryAdminList>.Fail("دسته بندی ساخته نشده است");
             }
             ;
 
@@ -74,7 +75,7 @@ namespace Service.Service
             {
 
                 var error = validation.Errors.Select(x => x.ErrorMessage).ToList();
-                return DtoResponse<DtoCategory>.Fail(error);
+                return DtoResponse<DtoCategoryAdminList>.Fail(error);
 
             }
 
@@ -85,12 +86,28 @@ namespace Service.Service
 
             await _shopDbContext.SaveChangesAsync();
 
+            var result = await _shopDbContext.Categories.Where(x => x.Id == categorise.Id)
+                 .Select(x => new DtoCategoryAdminList
+                 {
+                     Id = x.Id,
+                     Name = x.Name,
+                     Slug = x.Slug,
+                     ParentId = x.ParentId,
+                     SortOrder = x.SortOrder,
+                     ParentName = x.Parent != null ? x.Parent.Name : null,
+                     CildrenCount = x.Children.Count(),
+                 }
+                 ).FirstOrDefaultAsync();
+
             _cache.Remove(CategoriesTreeCacheKey);
 
-            var result = _mapper.Map<DtoCategory>(categorise);
+            if (result != null)
+            {
+                return DtoResponse<DtoCategoryAdminList>.Fail("دسته‌بندی ساخته شد ولی بازیابی نتیجه ناموفق بود");
+            }
 
 
-            return DtoResponse<DtoCategory>.Success(result);
+            return DtoResponse<DtoCategoryAdminList>.Success(result);
 
 
         }
@@ -118,43 +135,43 @@ namespace Service.Service
 
 
 
-        public async Task<DtoResponse<DtoCategory>> UpdateCategoryAsync(DtoCategoryUpdate model)
+        public async Task<DtoResponse<DtoCategoryAdminList>> UpdateCategoryAsync(DtoCategoryUpdate model)
         {
 
-            if (model == null || model.Id == null) 
+            if (model == null || model.Id == null)
             {
-                return DtoResponse<DtoCategory>.Fail("مقدار وجود ندارد");
+                return DtoResponse<DtoCategoryAdminList>.Fail("مقدار وجود ندارد");
             }
 
             var validation = await _updatevalidation.ValidateAsync(model);
-            if(!validation.IsValid)
+            if (!validation.IsValid)
             {
 
                 var error = validation.Errors.Select(x => x.ErrorMessage).ToList();
-               return DtoResponse<DtoCategory>.Fail(error);
+                return DtoResponse<DtoCategoryAdminList>.Fail(error);
 
             }
 
-            
+
 
             var category = await _shopDbContext.Categories.FirstOrDefaultAsync(x => x.Id == model.Id);
 
 
             if (category == null)
             {
-                return DtoResponse<DtoCategory>.Fail("دسته‌بندی پیدا نشد");
+                return DtoResponse<DtoCategoryAdminList>.Fail("دسته‌بندی پیدا نشد");
             }
 
 
-            _mapper.Map(model , category);
+            _mapper.Map(model, category);
 
             await _shopDbContext.SaveChangesAsync();
 
             _cache.Remove(CategoriesTreeCacheKey);
 
-            var result = _mapper.Map<DtoCategory>(category);
+            var result = _mapper.Map<DtoCategoryAdminList>(category);
 
-           return DtoResponse<DtoCategory>.Success(result);
+            return DtoResponse<DtoCategoryAdminList>.Success(result);
 
 
         }
@@ -216,7 +233,7 @@ namespace Service.Service
 
             _shopDbContext.Remove(Category);
 
-           await _shopDbContext.SaveChangesAsync();
+            await _shopDbContext.SaveChangesAsync();
 
             _cache.Remove(CategoriesTreeCacheKey);
 
@@ -249,15 +266,7 @@ namespace Service.Service
 
 
 
-
-
-
-
-
-
-
-
-        public async Task<PageResult<DtoCategory>> GetAllAsync(CategoryQuery query)
+        public async Task<PageResult<DtoCategoryAdminList>> GetAllAsync(CategoryQuery query)
         {
             var category = _shopDbContext.Categories
                 .OrderBy(x => x.SortOrder)
@@ -275,26 +284,26 @@ namespace Service.Service
 
             var totalcategory = await category.CountAsync();
 
-            category =  category.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize);
+            category = category.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize);
 
-            var item = await category.ProjectTo<DtoCategory>(_mapper.ConfigurationProvider).ToListAsync();
+            var item = await category.ProjectTo<DtoCategoryAdminList>(_mapper.ConfigurationProvider).ToListAsync();
 
-            return new PageResult<DtoCategory>()
+            return new PageResult<DtoCategoryAdminList>()
             {
                 Items = item,
                 TotalCount = totalcategory,
-                Page=query.Page,
-                PageSize=query.PageSize
+                Page = query.Page,
+                PageSize = query.PageSize
             };
 
 
         }
 
-        
 
 
 
-        public async Task<List<DtoCategory>> GetTreeAsync()
+
+        public async Task<List<DtoCategoryView>> GetTreeAsync()
         {
 
             return await _cache.GetOrCreateAsync(CategoriesTreeCacheKey, async entry =>
@@ -302,9 +311,9 @@ namespace Service.Service
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
 
                 var all = await _shopDbContext.Categories.AsNoTracking()
-                    .ProjectTo<DtoCategory>(_mapper.ConfigurationProvider).ToListAsync();
+                    .ProjectTo<DtoCategoryView>(_mapper.ConfigurationProvider).ToListAsync();
                 return BuildTree(all, null);
-            }) ?? new List<DtoCategory>();
+            }) ?? new List<DtoCategoryView>();
 
 
 
@@ -312,22 +321,22 @@ namespace Service.Service
 
 
 
-        public  List<DtoCategory> BuildTree(List<DtoCategory> allcategory, int? parentid, int depth = 0)
+        public List<DtoCategoryView> BuildTree(List<DtoCategoryView> allcategory, int? parentid, int depth = 0)
         {
 
-            if (depth > 20) return new List<DtoCategory>();
+            if (depth > 20) return new List<DtoCategoryView>();
 
-            return  allcategory.Where(x => x.ParentId == parentid)
+            return allcategory.Where(x => x.ParentId == parentid)
                               .OrderBy(x => x.SortOrder)
-                              .Select(x => new DtoCategory
+                              .Select(x => new DtoCategoryView
                               {
                                   Id = x.Id,
                                   Name = x.Name,
                                   ParentId = x.ParentId,
                                   Slug = x.Slug,
                                   SortOrder = x.SortOrder,
-                                  Children = BuildTree(allcategory, x.Id,depth + 1)
-                              }).ToList(); 
+                                  Children = BuildTree(allcategory, x.Id, depth + 1)
+                              }).ToList();
 
         }
 
