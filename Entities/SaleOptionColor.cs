@@ -17,6 +17,8 @@ namespace Entities
         public int SaleOptionId { get; set; }
         public ProductSaleOption ProductSaleOption { get; set; } = null!;
 
-        public decimal Price { get; set; }
+        public decimal Price { get; set; }  // قیمت مخصوص این رنگ
+
+        public string? HexCode { get; set; }
     }
 }

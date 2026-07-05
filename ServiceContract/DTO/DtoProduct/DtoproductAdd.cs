@@ -8,14 +8,10 @@ using DTO;
 namespace ServiceContract.DTO.DtoProduct
 {
     public class DtoproductAdd
-    {        
-            public string? Name { get; set; }
-            public decimal? Price { get; set; }
-            public string? Description { get; set; }
-            public decimal? Discount { get; set; }
-            public bool? HasDiscount { get; set; }
-            public DisconTypeEnum? DisconType { get; set; }
-            
-        
+    {
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public decimal? DiscountValue { get; set; }
+        public DisconTypeEnum? DiscountType { get; set; }
     }
 }

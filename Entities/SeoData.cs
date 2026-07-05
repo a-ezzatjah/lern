@@ -9,8 +9,7 @@ namespace Entities
 {
     public class SeoData
     {
-        [Key]
-        public int Id { get; set; }
+    
 
         public string? MetaTitle { get; set; }
         public string? MetaDescription { get; set; }

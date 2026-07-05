@@ -18,6 +18,8 @@ namespace Entities
         public string Title { get; set; } = null!;
         public EnumSaleType SaleType { get; set; }
 
+        public decimal BasePrice {get;set;}
+
 
         public string? UnitName { get; set; }
         public string? InputLabel { get; set; }

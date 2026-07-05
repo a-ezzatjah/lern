@@ -16,11 +16,6 @@ namespace Service.Validators
             RuleFor(x => x.Name)
                 .Must(x=>!string.IsNullOrWhiteSpace(x)).WithMessage("نام محصول معتبر نمیباشد");
 
-            RuleFor(x => x.Price)
-          .NotNull().WithMessage("قیمت الزامی است")
-          .GreaterThanOrEqualTo(0).WithMessage("قیمت نامعتبر است");
-
-
             RuleFor(x => x.Id)
                 .NotNull().WithMessage("شناسه الزامی میباشد")
                 .GreaterThanOrEqualTo (1).WithMessage("شناسه محصول نا معتبر هست ");

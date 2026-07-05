@@ -227,20 +227,12 @@ namespace Service.Service
                             x.Description != null &&
                             x.Description.Contains(query.SearchText));
                 }
-                else if (
-                    query.SearchType == EnumProductSearchType.Price
-                    && decimal.TryParse(query.SearchText, out var priceValue))
-                {
-                    productQuery = productQuery.Where(x => x.Price == priceValue);
-                }
             }
 
             productQuery = (query.SortType, query.Order) switch
             {
                 (EnumProductSortType.Name, OrderEnum.ASC) => productQuery.OrderBy(x => x.Name),
                 (EnumProductSortType.Name, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Name),
-                (EnumProductSortType.Price, OrderEnum.ASC) => productQuery.OrderBy(x => x.Price),
-                (EnumProductSortType.Price, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Price),
                 _ => productQuery.OrderBy(x => x.Id)
             };
 
@@ -288,8 +280,7 @@ namespace Service.Service
             var result = new List<DtoSearchOption>
             {
                 new DtoSearchOption { Key = nameof(DtoProduct.Name), Title = "نام" },
-                new DtoSearchOption { Key = nameof(DtoProduct.Description), Title = "توضیحات" },
-                new DtoSearchOption { Key = nameof(DtoProduct.Price), Title = "قیمت" }
+                new DtoSearchOption { Key = nameof(DtoProduct.Description), Title = "توضیحات" }
             };
 
             return Task.FromResult(result);

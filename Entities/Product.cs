@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,13 +17,19 @@ namespace Entities
         public int Id { get; set; }
       
         public string Name { get; set; }
-        public decimal Price { get; set; }
         public string Slug { get; set; } = null!;
         public string? Description { get; set; }
         public bool IsActive { get; set; } = true;
-        public decimal? Discount { get; set; }
-        public bool? HasDiscount { get; set; }
-        public DisconTypeEnum? DisconType { get; set; }
+
+        [Column("Discount")]
+        public decimal? DiscountValue { get; set; }
+
+        [Column("DisconType")]
+        public DisconTypeEnum? DiscountType { get; set; }
+
+        [NotMapped]
+        public bool HasDiscount => DiscountValue.HasValue && DiscountValue.Value > 0;
+
         public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
 
         public ICollection<ProductSaleOption> SaleOptions { get; set; } = new List<ProductSaleOption>();

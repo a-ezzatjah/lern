@@ -53,8 +53,7 @@ namespace Entities
             modelBuilder.Entity<Product>()
                 .OwnsOne(p => p.Seo, seo =>
                 {
-                    seo.ToTable("ProductSeoData");
-                    seo.Property(s => s.Id).HasColumnName("Id");
+                   
                     seo.Property(s => s.MetaTitle).HasMaxLength(200).HasColumnName("MetaTitle");
                     seo.Property(s => s.MetaDescription).HasMaxLength(500).HasColumnName("MetaDescription");
                     seo.Property(s => s.MetaKeywords).HasMaxLength(300).HasColumnName("MetaKeywords");
@@ -65,6 +64,26 @@ namespace Entities
                     seo.Property(s => s.IndexPage).HasColumnName("IndexPage");
                     seo.Property(s => s.FollowPage).HasColumnName("FollowPage");
                 });
+
+
+            // Category → SeoData (Owned Entity)
+
+            modelBuilder.Entity<Category>()
+               .OwnsOne(c => c.Seo, seo =>
+               {
+                   seo.Property(s => s.MetaTitle).HasMaxLength(200).HasColumnName("MetaTitle");
+                   seo.Property(s => s.MetaDescription).HasMaxLength(500).HasColumnName("MetaDescription");
+                   seo.Property(s => s.MetaKeywords).HasMaxLength(300).HasColumnName("MetaKeywords");
+                   seo.Property(s => s.CanonicalUrl).HasMaxLength(500).HasColumnName("CanonicalUrl");
+                   seo.Property(s => s.OgTitle).HasMaxLength(200).HasColumnName("OgTitle");
+                   seo.Property(s => s.OgDescription).HasMaxLength(500).HasColumnName("OgDescription");
+                   seo.Property(s => s.OgImageUrl).HasMaxLength(500).HasColumnName("OgImageUrl");
+                   seo.Property(s => s.IndexPage).HasColumnName("IndexPage");
+                   seo.Property(s => s.FollowPage).HasColumnName("FollowPage");
+               });
+
+
+
 
             // Product → ProductSaleOption
             modelBuilder.Entity<ProductSaleOption>()
