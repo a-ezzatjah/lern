@@ -25,7 +25,6 @@ namespace ServiceContract.Interfaces
         public Task<List<DtoCategoryView>> GetTreeAsync();
 
 
-        public List<DtoCategoryView> BuildTree(List<DtoCategoryAdminList> allcategory, int? parentid, int depth = 0);
 
 
 

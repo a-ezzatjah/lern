@@ -101,7 +101,7 @@ namespace Service.Service
 
             _cache.Remove(CategoriesTreeCacheKey);
 
-            if (result != null)
+            if (result == null)
             {
                 return DtoResponse<DtoCategoryAdminList>.Fail("دسته‌بندی ساخته شد ولی بازیابی نتیجه ناموفق بود");
             }
@@ -138,7 +138,7 @@ namespace Service.Service
         public async Task<DtoResponse<DtoCategoryAdminList>> UpdateCategoryAsync(DtoCategoryUpdate model)
         {
 
-            if (model == null || model.Id == null)
+            if (model == null)
             {
                 return DtoResponse<DtoCategoryAdminList>.Fail("مقدار وجود ندارد");
             }
@@ -169,7 +169,21 @@ namespace Service.Service
 
             _cache.Remove(CategoriesTreeCacheKey);
 
-            var result = _mapper.Map<DtoCategoryAdminList>(category);
+            var result =  await _shopDbContext.Categories.Where(x=>x.Id == model.Id)
+                .Select(x=> new DtoCategoryAdminList {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Slug = x.Slug,
+                    ParentId = x.ParentId,
+                    SortOrder = x.SortOrder,
+                    ParentName = x.Parent != null ? x.Parent.Name : null,
+                    CildrenCount = x.Children.Count(),
+                }).FirstOrDefaultAsync();
+
+            if (result == null)
+            {
+                return DtoResponse<DtoCategoryAdminList>.Fail("ویرایش انجام شد ولی بازیابی نتیجه ناموفق بود");
+            }
 
             return DtoResponse<DtoCategoryAdminList>.Success(result);
 
@@ -231,6 +245,15 @@ namespace Service.Service
 
             }
 
+            var hasProducts = await _shopDbContext.ProductCategories.AnyAsync(x => x.CategoryId == CategoryId);
+
+            if (hasProducts)
+            {
+                return DtoResponse<bool>.Fail("این دسته به محصول متصل است و قابل حذف نیست");
+            }
+
+
+
             _shopDbContext.Remove(Category);
 
             await _shopDbContext.SaveChangesAsync();
@@ -268,7 +291,7 @@ namespace Service.Service
 
         public async Task<PageResult<DtoCategoryAdminList>> GetAllAsync(CategoryQuery query)
         {
-            var category = _shopDbContext.Categories
+            IQueryable<Category> category = _shopDbContext.Categories
                 .OrderBy(x => x.SortOrder)
                 .ThenBy(x => x.Id)
                 .AsNoTracking();
@@ -321,7 +344,7 @@ namespace Service.Service
 
 
 
-        public List<DtoCategoryView> BuildTree(List<DtoCategoryView> allcategory, int? parentid, int depth = 0)
+        private List<DtoCategoryView> BuildTree(List<DtoCategoryView> allcategory, int? parentid, int depth = 0)
         {
 
             if (depth > 20) return new List<DtoCategoryView>();

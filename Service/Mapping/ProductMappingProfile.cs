@@ -16,7 +16,7 @@ namespace Service.Mapping
         {
             CreateMap<DtoproductAdd, Product>();
 
-            CreateMap<Product, DtoProduct>();
+            CreateMap<Product, DtoProductAdminList>();
 
             CreateMap<DtoProductUpdate, Product>()
                 .ForMember(x => x.Id, y => y.Ignore())
