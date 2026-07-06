@@ -12,7 +12,7 @@ using ServiceContract.DTO.DtoProduct;
 
 namespace Service.Validators
 {
-   public class DtoProductAddValidation :  AbstractValidator<DtoproductAdd>
+    public class DtoProductAddValidation : AbstractValidator<DtoproductAdd>
     {
         private readonly ShopDbContext _shopDbContext;
 
@@ -24,12 +24,12 @@ namespace Service.Validators
 
 
             RuleFor(x => x.Name)
-                .Must(x=>!string.IsNullOrWhiteSpace(x)).WithMessage("نام محصول الزامی میباشد")
+                .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("نام محصول الزامی میباشد")
                 .MaximumLength(100).WithMessage("تعداد کاراکتر نام بیشتر از حد مجاز میباشد");
 
             RuleFor(x => x.Slug)
                 .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("اسلاگ الزامی میباشد")
-                .MustAsync(async (slug, CancellationToken) => {!await return _shopDbContext.Categories.AllAsync(x => x.Slug == slug, cancellationToken) })
+                .MustAsync(async (slug, CancellationToken) => { return !await _shopDbContext.Categories.AllAsync(x => x.Slug == slug, CancellationToken); })
                 .MaximumLength(50).WithMessage("مقادیر حروف بیش از حد مجاز میباشد");
 
 
@@ -41,28 +41,59 @@ namespace Service.Validators
 
             RuleForEach(x => x.CategoryIds).GreaterThan(0).WithMessage("شناسه دسته‌بندی معتبر نیست");
 
-               RuleFor(x => x.CategoryIds)
-              .MustAsync(async (categoryIds, cancellationToken) =>
-               await _shopDbContext.Categories.AnyAsync(c => categoryIds.Contains(c.Id), cancellationToken)).WithMessage("یک یا چند دسته‌بندی معتبر نیستند");
+            RuleFor(x => x.CategoryIds)
+           .MustAsync(async (categoryIds, cancellationToken) =>
+            await _shopDbContext.Categories.AnyAsync(c => categoryIds.Contains(c.Id), cancellationToken)).WithMessage("یک یا چند دسته‌بندی معتبر نیستند");
 
 
 
 
+            //          private async Task<bool> BeUniqueName(string? name, CancellationToken cancellationToken)
+            //    {
+            //        if (string.IsNullOrWhiteSpace(name))
+            //            return true;
 
+            //        return !await _context.Products
+            //            .AnyAsync(x => x.Name == name, cancellationToken);
+            //    }
 
+            //    private async Task<bool> BeUniqueSlug(string? slug, CancellationToken cancellationToken)
+            //    {
+            //        if (string.IsNullOrWhiteSpace(slug))
+            //            return true;
 
+            //        return !await _context.Products
+            //            .AnyAsync(x => x.Slug == slug, cancellationToken);
+            //    }
 
+            //    private async Task<bool> AllCategoriesExist(List<int> categoryIds, CancellationToken cancellationToken)
+            //    {
+            //        if (categoryIds == null || !categoryIds.Any())
+            //            return false;
 
+            //        var distinctIds = categoryIds.Distinct().ToList();
 
+            //        var count = await _context.Categories
+            //            .CountAsync(x => distinctIds.Contains(x.Id), cancellationToken);
 
-
-
-
+            //        return count == distinctIds.Count;
+            //    }
+            //}
         }
 
 
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 }
