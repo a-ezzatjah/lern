@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Entities;
-using Entities.Migrations;
 using ServiceContract.DTO.DtoCategory;
 using ServiceContract.DTO.DtoCategoryView;
 
@@ -21,9 +20,13 @@ namespace Service.Mapping
                 .ForMember(s=>s.Slug, otp => otp.MapFrom(s => s.Slug != null ? s.Slug.Trim() : null));
 
 
-            CreateMap<Category, DtoCategoryAdminList>();
+            CreateMap<Category, DtoCategoryAdminList>()
+                .ForMember(x => x.ParentName, otp => otp.MapFrom(s => s.Parent != null ? s.Parent.Name : null))
+                .ForMember(x => x.CildrenCount, otp => otp.MapFrom(s => s.Children.Count));
 
-            CreateMap<Category, DtoCategoryView>();
+            CreateMap<Category, DtoCategoryView>()
+                .ForMember(x => x.SortOrder, otp => otp.MapFrom(s => s.SortOrder ?? 0))
+                .ForMember(x => x.Children, otp => otp.Ignore());
 
             CreateMap<DtoCategoryUpdate, Category>()
                 .ForMember(x => x.Id, y => y.Ignore())

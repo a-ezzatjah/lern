@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,13 +23,13 @@ namespace Service.Validators
             RuleFor(x => x.Name)
                 .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("نام محصول معتبر نمیباشد")
                 .MustAsync(async (model, name, CancellationToken) =>
-                { return !await _shopDbContext.Categories.AnyAsync(x => x.Name == name && x.Id != model.Id); });
+                { return !await _shopDbContext.Products.AnyAsync(x => x.Name == name && x.Id != model.Id); });
 
 
             RuleFor(x => x.Slug)
                .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("اسلاگ محصول معتبر نمیباشد")
                .MustAsync(async (model, slug, CancellationToken) =>
-               { return !await _shopDbContext.Categories.AnyAsync(x => x.Slug == slug && x.Id != model.Id); });
+               { return !await _shopDbContext.Products.AnyAsync(x => x.Slug == slug && x.Id != model.Id); });
 
 
 
@@ -57,7 +57,12 @@ namespace Service.Validators
 
 
             RuleFor(x => x.CategoryIds)
-                .MustAsync(async (x, CancellationToken) => { return await _shopDbContext.Categories.AllAsync(c => x.Contains(c.Id), CancellationToken); });
+                .MustAsync(async (categoryIds, cancellationToken) =>
+                {
+                    var distinctIds = categoryIds.Distinct().ToList();
+                    var count = await _shopDbContext.Categories.CountAsync(c => distinctIds.Contains(c.Id), cancellationToken);
+                    return count == distinctIds.Count;
+                });
 
 
 

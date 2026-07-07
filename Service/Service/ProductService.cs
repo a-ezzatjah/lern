@@ -1,4 +1,4 @@
-﻿
+
 using System.ComponentModel;
 using System.Linq.Expressions;
 using AutoMapper;
@@ -57,13 +57,21 @@ namespace Service.Service
                 return DtoResponse<DtoProductAdminList>.Fail(error);
             }
 
-            var productExists = await _shopDbContext.Products.AnyAsync(x => x.Name.ToLower() == model.Name.ToLower());
+            var normalizedName = model.Name.Trim();
+            var productExists = await _shopDbContext.Products.AnyAsync(x => x.Name.ToLower() == normalizedName.ToLower());
             if (productExists)
             {
                 return DtoResponse<DtoProductAdminList>.Fail("محصول تکراری میباشد");
             }
 
             var product = _mapper.Map<Product>(model);
+            product.Name = model.Name.Trim();
+            product.Slug = model.Slug.Trim();
+            product.CreatedAt = DateTime.UtcNow;
+            product.ProductCategories = model.CategoryIds
+                .Distinct()
+                .Select(categoryId => new ProductCategory { Product = product, CategoryId = categoryId })
+                .ToList();
 
             _shopDbContext.Products.Add(product);
             await _shopDbContext.SaveChangesAsync();
@@ -93,13 +101,20 @@ namespace Service.Service
                 return DtoResponse<DtoProductAdminList>.Fail(error);
             }
 
-            var product = await GetEntityByIdAsync(model.Id.Value);
+var product = await GetEntityByIdAsync(model.Id);
             if (product == null)
             {
                 return DtoResponse<DtoProductAdminList>.Fail("محصول موجود نمیباشد");
             }
 
             _mapper.Map(model, product);
+            await _shopDbContext.Entry(product).Collection(x => x.ProductCategories).LoadAsync();
+            product.ProductCategories.Clear();
+            foreach (var categoryId in model.CategoryIds.Distinct())
+            {
+                product.ProductCategories.Add(new ProductCategory { ProductId = product.Id, CategoryId = categoryId });
+            }
+            product.UpdatedAt = DateTime.UtcNow;
             await _shopDbContext.SaveChangesAsync();
 
             var result = _mapper.Map<DtoProductAdminList>(product);
@@ -165,6 +180,7 @@ namespace Service.Service
         public async Task<DtoProductAdminList?> GetByIdAsync(int productId)
         {
             return await _shopDbContext.Products
+                .AsNoTracking()
                 .Where(x => x.Id == productId)
                 .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,7 +29,8 @@ namespace Service.Validators
 
             RuleFor(x => x.Slug)
                 .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("اسلاگ الزامی میباشد")
-                .MustAsync(async (slug, CancellationToken) => { return !await _shopDbContext.Categories.AllAsync(x => x.Slug == slug, CancellationToken); })
+                .MustAsync(async (slug, cancellationToken) =>
+                    !await _shopDbContext.Products.AnyAsync(x => x.Slug == slug, cancellationToken))
                 .MaximumLength(50).WithMessage("مقادیر حروف بیش از حد مجاز میباشد");
 
 
@@ -43,7 +44,11 @@ namespace Service.Validators
 
             RuleFor(x => x.CategoryIds)
            .MustAsync(async (categoryIds, cancellationToken) =>
-            await _shopDbContext.Categories.AnyAsync(c => categoryIds.Contains(c.Id), cancellationToken)).WithMessage("یک یا چند دسته‌بندی معتبر نیستند");
+           {
+               var distinctIds = categoryIds.Distinct().ToList();
+               var count = await _shopDbContext.Categories.CountAsync(c => distinctIds.Contains(c.Id), cancellationToken);
+               return count == distinctIds.Count;
+           }).WithMessage("یک یا چند دسته‌بندی معتبر نیستند");
 
 
 

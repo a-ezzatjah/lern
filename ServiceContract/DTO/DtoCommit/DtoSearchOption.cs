@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +8,8 @@ namespace ServiceContract.DTO.DtoCommit
 {
     public class DtoSearchOption
     {
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
 
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
     }
 }

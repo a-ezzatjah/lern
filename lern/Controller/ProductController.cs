@@ -1,4 +1,4 @@
-﻿using DTO;
+using DTO;
 using Microsoft.AspNetCore.Mvc;
 using ServiceContract.DTO.DtoProduct;
 using ServiceContract.Interfaces;
@@ -28,7 +28,7 @@ namespace lern.Controller
         public async Task<IActionResult> AddAsync(DtoproductAdd model)
         {
             var result = await _productService.AddProductAsync(model);
-            if (!result.Succeeded) return BadRequest(result.Errormessage);
+            if (!result.Succeeded) return BadRequest(result.Errors ?? new List<string> { result.Errormessage ?? "خطا" });
             return Ok(result.Data);
         }
 
@@ -36,7 +36,7 @@ namespace lern.Controller
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _productService.DeleteAsync(id);
-            if (!result.Succeeded) return BadRequest(result.Errormessage);
+            if (!result.Succeeded) return BadRequest(result.Errors ?? new List<string> { result.Errormessage ?? "خطا" });
             return Ok();
         }
     }
