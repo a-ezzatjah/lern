@@ -15,7 +15,7 @@ namespace ServiceContract.Interfaces
     {
         public Task<DtoResponse<DtoProductAdminList>> AddProductAsync(DtoproductAdd model);
 
-        public Task<DtoProductAdminList?> GetByIdAsync(int productId);
+        public Task<DtoProductDetail?> GetByIdAsync(int productId);
 
         public Task<Product?> GetEntityByIdAsync(int product);
 

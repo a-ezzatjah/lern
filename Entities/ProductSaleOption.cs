@@ -20,6 +20,8 @@ namespace Entities
 
         public decimal BasePrice {get;set;}
 
+        public string? ImageUrl { get; set; }
+
 
         public string? UnitName { get; set; }
         public string? InputLabel { get; set; }

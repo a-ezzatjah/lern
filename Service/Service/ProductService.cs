@@ -65,20 +65,28 @@ namespace Service.Service
             }
 
             var product = _mapper.Map<Product>(model);
-            product.Name = model.Name.Trim();
-            product.Slug = model.Slug.Trim();
+            
+           
             product.CreatedAt = DateTime.UtcNow;
             product.ProductCategories = model.CategoryIds
                 .Distinct()
                 .Select(categoryId => new ProductCategory { Product = product, CategoryId = categoryId })
                 .ToList();
+            product.SaleOptions = _mapper.Map<List<ProductSaleOption>>(model.SaleOptions);
 
             _shopDbContext.Products.Add(product);
             await _shopDbContext.SaveChangesAsync();
 
-            var result = _mapper.Map<DtoProductAdminList>(product);
+            var result = await _shopDbContext.Products.Where(x => x.Id == product.Id)
+                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
 
-            return DtoResponse<DtoProductAdminList>.Success(result);
+            return result != null
+      ? DtoResponse<DtoProductAdminList>.Success(result)
+      : DtoResponse<DtoProductAdminList>.Fail("خطا در بازخوانی اطلاعات...");
+
+
+
         }
 
 
@@ -101,23 +109,40 @@ namespace Service.Service
                 return DtoResponse<DtoProductAdminList>.Fail(error);
             }
 
-var product = await GetEntityByIdAsync(model.Id);
+var product = await _shopDbContext.Products
+                .Include(x=>x.ProductCategories)
+                .Include(x => x.SaleOptions)
+                    .ThenInclude(x => x.SaleOptionColors)
+                .FirstOrDefaultAsync(x=>x.Id == model.Id);
             if (product == null)
             {
                 return DtoResponse<DtoProductAdminList>.Fail("محصول موجود نمیباشد");
             }
 
             _mapper.Map(model, product);
-            await _shopDbContext.Entry(product).Collection(x => x.ProductCategories).LoadAsync();
-            product.ProductCategories.Clear();
-            foreach (var categoryId in model.CategoryIds.Distinct())
-            {
-                product.ProductCategories.Add(new ProductCategory { ProductId = product.Id, CategoryId = categoryId });
-            }
+
+            _shopDbContext.ProductCategories.RemoveRange(product.ProductCategories);
+
+
+            product.ProductCategories = model.CategoryIds
+                .Distinct()
+                .Select(categoryId => new ProductCategory
+                {
+                    ProductId = product.Id,
+                    CategoryId = categoryId
+                })
+                .ToList();
+
+            _shopDbContext.ProductSaleOptions.RemoveRange(product.SaleOptions);
+            product.SaleOptions = _mapper.Map<List<ProductSaleOption>>(model.SaleOptions);
+
+
             product.UpdatedAt = DateTime.UtcNow;
             await _shopDbContext.SaveChangesAsync();
 
-            var result = _mapper.Map<DtoProductAdminList>(product);
+            var result = await _shopDbContext.Products.Where(x => x.Id == product.Id)
+                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
 
             return DtoResponse<DtoProductAdminList>.Success(result);
         }
@@ -177,12 +202,16 @@ var product = await GetEntityByIdAsync(model.Id);
 
 
 
-        public async Task<DtoProductAdminList?> GetByIdAsync(int productId)
+        public async Task<DtoProductDetail?> GetByIdAsync(int productId)
         {
             return await _shopDbContext.Products
                 .AsNoTracking()
+                .Include(x => x.ProductCategories)
+                    .ThenInclude(x => x.Category)
+                .Include(x => x.SaleOptions)
+                    .ThenInclude(x => x.SaleOptionColors)
                 .Where(x => x.Id == productId)
-                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
+                .ProjectTo<DtoProductDetail>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
         }
 

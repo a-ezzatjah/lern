@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Entities;
 using ServiceContract.DTO.DtoProduct;
+using ServiceContract.DTO.DtoProductSaleOption;
+using ServiceContract.DTO.DtoSaleOptionColor;
 
 namespace Service.Mapping
 {
@@ -21,6 +23,30 @@ namespace Service.Mapping
                 .ForMember(x => x.Seo, otp => otp.Ignore())
                 .ForMember(x => x.CreatedAt, otp => otp.Ignore())
                 .ForMember(x => x.UpdatedAt, otp => otp.Ignore());
+
+            CreateMap<DtoAddProductSaleOption, ProductSaleOption>()
+                .ForMember(x => x.Id, otp => otp.Ignore())
+                .ForMember(x => x.ProductId, otp => otp.Ignore())
+                .ForMember(x => x.Product, otp => otp.Ignore());
+
+            CreateMap<UpdateDtoProductSaleOption, ProductSaleOption>()
+                .ForMember(x => x.Id, otp => otp.Ignore())
+                .ForMember(x => x.ProductId, otp => otp.Ignore())
+                .ForMember(x => x.Product, otp => otp.Ignore());
+
+            CreateMap<DtoAddSaleOptionColor, SaleOptionColor>()
+                .ForMember(x => x.Id, otp => otp.Ignore())
+                .ForMember(x => x.SaleOptionId, otp => otp.Ignore())
+                .ForMember(x => x.ProductSaleOption, otp => otp.Ignore());
+
+            CreateMap<DtoUpdateSaleOptionColor, SaleOptionColor>()
+                .ForMember(x => x.Id, otp => otp.Ignore())
+                .ForMember(x => x.SaleOptionId, otp => otp.Ignore())
+                .ForMember(x => x.ProductSaleOption, otp => otp.Ignore());
+
+            CreateMap<ProductSaleOption, DtoProductSaleOptionView>();
+
+            CreateMap<SaleOptionColor, DtoSaleOptionColorView>();
 
             CreateMap<Product, DtoProductAdminList>()
                 .ForMember(x => x.CategoriesCount, otp => otp.MapFrom(s => s.ProductCategories.Count))

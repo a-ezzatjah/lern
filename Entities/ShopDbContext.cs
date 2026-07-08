@@ -87,12 +87,24 @@ namespace Entities
 
             // Product → ProductSaleOption
             modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.ImageUrl)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<ProductSaleOption>()
                 .HasOne(pso => pso.Product)
                 .WithMany(p => p.SaleOptions)
                 .HasForeignKey(pso => pso.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // ProductSaleOption → SaleOptionColor
+            modelBuilder.Entity<SaleOptionColor>()
+                .Property(soc => soc.ImageUrl)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<SaleOptionColor>()
+                .Property(soc => soc.HexCode)
+                .HasMaxLength(20);
+
             modelBuilder.Entity<SaleOptionColor>()
                 .HasOne(soc => soc.ProductSaleOption)
                 .WithMany(pso => pso.SaleOptionColors)

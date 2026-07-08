@@ -20,5 +20,7 @@ namespace Entities
         public decimal Price { get; set; }  // قیمت مخصوص این رنگ
 
         public string? HexCode { get; set; }
+
+        public string? ImageUrl { get; set; }
     }
 }

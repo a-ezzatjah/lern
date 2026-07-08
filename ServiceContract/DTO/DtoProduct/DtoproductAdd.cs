@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DTO;
+using ServiceContract.DTO.DtoProductSaleOption;
 
 namespace ServiceContract.DTO.DtoProduct
 {
@@ -17,6 +18,7 @@ namespace ServiceContract.DTO.DtoProduct
         public DisconTypeEnum? DiscountType { get; set; }
         public bool IsActive { get; set; } = true;
         public List<int> CategoryIds { get; set; } = new();
+        public List<DtoAddProductSaleOption> SaleOptions { get; set; } = new();
 
     }
 }

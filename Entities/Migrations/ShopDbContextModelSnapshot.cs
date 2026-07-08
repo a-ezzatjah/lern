@@ -135,6 +135,10 @@ namespace Entities.Migrations
                     b.Property<string>("InputLabel")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<decimal?>("MaxQuantity")
                         .HasColumnType("decimal(18,2)");
 
@@ -190,7 +194,12 @@ namespace Entities.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("HexCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");

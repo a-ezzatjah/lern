@@ -38,7 +38,10 @@ namespace Service.Validators
                 .When(x => x.DiscountValue.HasValue);
 
 
-            RuleFor(x => x.CategoryIds).NotEmpty().WithMessage("باید حتما یک دسته بندی انتخاب شود");
+            RuleFor(x => x.CategoryIds)
+                 .NotEmpty().WithMessage("باید حتما یک دسته بندی انتخاب شود")
+                 .NotNull().WithMessage("باید حتما یک دسته بندی انتخاب شود");
+
 
             RuleForEach(x => x.CategoryIds).GreaterThan(0).WithMessage("شناسه دسته‌بندی معتبر نیست");
 
@@ -48,7 +51,29 @@ namespace Service.Validators
                var distinctIds = categoryIds.Distinct().ToList();
                var count = await _shopDbContext.Categories.CountAsync(c => distinctIds.Contains(c.Id), cancellationToken);
                return count == distinctIds.Count;
-           }).WithMessage("یک یا چند دسته‌بندی معتبر نیستند");
+           }).When(x => x.CategoryIds != null && x.CategoryIds.Any())
+             .WithMessage("یک یا چند دسته‌بندی معتبر نیستند");
+
+            RuleForEach(x => x.SaleOptions).ChildRules(option =>
+            {
+                option.RuleFor(x => x.Title)
+                    .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("عنوان حالت فروش الزامی میباشد");
+
+                option.RuleFor(x => x.BasePrice)
+                    .GreaterThan(0).WithMessage("قیمت پایه حالت فروش باید بیشتر از صفر باشد");
+
+                option.RuleFor(x => x.Step)
+                    .GreaterThan(0).WithMessage("گام تعداد باید بیشتر از صفر باشد");
+
+                option.RuleForEach(x => x.SaleOptionColors).ChildRules(color =>
+                {
+                    color.RuleFor(x => x.Color)
+                        .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("نام رنگ الزامی میباشد");
+
+                    color.RuleFor(x => x.Price)
+                        .GreaterThanOrEqualTo(0).WithMessage("قیمت رنگ نمی‌تواند منفی باشد");
+                });
+            });
 
 
 
