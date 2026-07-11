@@ -361,6 +361,12 @@ var product = await _shopDbContext.Products
                 .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
+              
+                
+
+
+
+
             return new PageResult<DtoProductAdminList>
             {
                 Items = items,
