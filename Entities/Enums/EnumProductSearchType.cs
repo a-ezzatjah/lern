@@ -8,14 +8,13 @@ namespace ServiceContract.Enums
 {
     public enum EnumProductSearchType
     {
-        All=0,
-
-        Name=1,
-
-        Description=2,
-
-        Price=3
-
+        All = 1,
+        Slug = 2,
+        Name = 3,
+        CategoryName = 4,
+        SaleOptionTitle = 6,
+        Color = 7,
+        price = 8
 
     }
 }

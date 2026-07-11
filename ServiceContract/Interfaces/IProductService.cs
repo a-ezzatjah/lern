@@ -21,7 +21,8 @@ namespace ServiceContract.Interfaces
 
         public Task<PageResult<DtoProductAdminList>> GetFilterAsync(ProductQuery query);
 
-        public Task<List<DtoSearchOption>> GetSelectAsync();
+        public Task<DtoProductAdminList?> GetAdminByIdAsync(int productId);
+
 
         public Task<DtoResponse<DtoProductAdminList>> UpdateAsync(DtoProductUpdate model);
 

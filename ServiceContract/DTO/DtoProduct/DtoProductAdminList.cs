@@ -6,11 +6,11 @@ namespace ServiceContract.DTO.DtoProduct
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
-        public string Slug { get; set; }
-        public string? Description { get; set; }
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
 
         public bool IsActive { get; set; }
+
 
         public decimal? DiscountValue { get; set; }
         public DisconTypeEnum? DiscountType { get; set; }
@@ -19,6 +19,9 @@ namespace ServiceContract.DTO.DtoProduct
 
         public int CategoriesCount { get; set; }
         public int SaleOptionsCount { get; set; }
+
+        public List<string> CategoriesName { get; set; } = new();
+        public List<string> SaleOptionTitle { get; set; } = new();
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

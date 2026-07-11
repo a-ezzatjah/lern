@@ -50,12 +50,15 @@ namespace Service.Mapping
 
             CreateMap<Product, DtoProductAdminList>()
                 .ForMember(x => x.CategoriesCount, otp => otp.MapFrom(s => s.ProductCategories.Count))
-                .ForMember(x => x.SaleOptionsCount, otp => otp.MapFrom(s => s.SaleOptions.Count));
+                .ForMember(x => x.SaleOptionsCount, otp => otp.MapFrom(s => s.SaleOptions.Count))
+                .ForMember(x => x.CategoriesName, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.Category.Name)))
+                .ForMember(x => x.SaleOptionTitle, otp => otp.MapFrom(s => s.SaleOptions.Select(pc => pc.Title)));
 
             CreateMap<Product, DtoProductDetail>()
                 .ForMember(x => x.CategoryIds, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.CategoryId)))
                 .ForMember(x => x.CategoryNames, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.Category.Name)));
-
+                
+            
             CreateMap<DtoProductUpdate, Product>()
                 .ForMember(x => x.Id, y => y.Ignore())
                 .ForMember(x => x.Name, otp => { otp.PreCondition(s => !string.IsNullOrWhiteSpace(s.Name)); otp.MapFrom(s => s.Name!.Trim()); })

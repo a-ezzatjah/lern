@@ -11,9 +11,19 @@ namespace ServiceContract.Enums
 
         Id=1,
 
-        Name=2,
+        slug=2,
 
-        Price=3
+        Name=3,
 
+        Price=4,
+
+        HasDiscount=5,
+
+        DiscountValue=6,
+
+        CategoryName=7,
+
+        SaleOptionTitle=8,
+    
     }
 }

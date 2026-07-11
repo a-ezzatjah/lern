@@ -18,6 +18,13 @@ namespace ServiceContract.Quaries
         [EnumDataType(typeof(EnumProductSearchType))]
         public EnumProductSearchType SearchType { get; set; } = EnumProductSearchType.Name;
 
+        public bool? HasDiscount { get; set; }
+
+        public DateTime? CreatedFrom { get; set; }
+        public DateTime? CreatedTo { get; set; }
+
+
+
 
         [EnumDataType(typeof(EnumProductSortType))]
         public EnumProductSortType SortType { get; set; } = EnumProductSortType.Id;

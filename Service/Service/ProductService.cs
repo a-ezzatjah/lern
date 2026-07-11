@@ -1,5 +1,6 @@
 
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -184,7 +185,18 @@ var product = await _shopDbContext.Products
 
 
 
-
+        public async Task<DtoProductAdminList?> GetAdminByIdAsync(int productId)
+        {
+            return await _shopDbContext.Products
+                .AsNoTracking()
+                .Include(x => x.ProductCategories)
+                    .ThenInclude(x => x.Category)
+                .Include(x => x.SaleOptions)
+                    .ThenInclude(x => x.SaleOptionColors)
+                .Where(x => x.Id == productId)
+                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+        }
 
 
 
@@ -249,7 +261,7 @@ var product = await _shopDbContext.Products
 
         public async Task<PageResult<DtoProductAdminList>> GetFilterAsync(ProductQuery query)
         {
-            IQueryable<Product> productQuery = _shopDbContext.Products.AsNoTracking();
+            IQueryable<Product> productQuery = _shopDbContext.Products.OrderByDescending(x => x.Id).AsNoTracking();
 
             query ??= new ProductQuery();
 
@@ -266,12 +278,31 @@ var product = await _shopDbContext.Products
                 {
                     productQuery = productQuery.Where(x => x.Name.Contains(query.SearchText));
                 }
-                else if (query.SearchType == EnumProductSearchType.Description)
+                else if (query.SearchType == EnumProductSearchType.Slug)
                 {
-                    productQuery = productQuery.Where(x =>
-                            x.Description != null &&
-                            x.Description.Contains(query.SearchText));
+                    productQuery = productQuery.Where(x => x.Slug.Contains(query.SearchText));
+                }  
+                else if (query.SearchType == EnumProductSearchType.CategoryName)
+                {
+                    productQuery = productQuery.Where(x => x.ProductCategories.Any(s => s.Category.Name.Contains(query.SearchText)));
                 }
+                else if (query.SearchType == EnumProductSearchType.SaleOptionTitle)
+                {
+                    productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.Title.Contains(query.SearchText)));
+                }
+                else if(query.SearchType == EnumProductSearchType.Color)
+                {
+                    productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.SaleOptionColors.Any(y => y.Color.Contains(query.SearchText))));
+                }
+                else if (query.SearchType == EnumProductSearchType.price)
+                {
+                    if (decimal.TryParse(query.SearchText, out var price))
+                    {
+                        productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.SaleOptionColors.Any(y => y.Price == price)));
+                    }
+                   
+                }
+
             }
 
             productQuery = (query.SortType, query.Order) switch
@@ -289,8 +320,15 @@ var product = await _shopDbContext.Products
                 .Take(query.PageSize);
 
             var items = await productQuery
-                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+                .Select(x => new DtoProductAdminList
+                {
+                    Id = x.Id,
+                    Name = x.Name , 
+                    
+                }).ToListAsync();
+                
+              
+                
 
 
 
@@ -307,29 +345,6 @@ var product = await _shopDbContext.Products
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public Task<List<DtoSearchOption>> GetSelectAsync()
-        {
-            var result = new List<DtoSearchOption>
-            {
-                new DtoSearchOption { Key = nameof(DtoProductAdminList.Name), Title = "نام" },
-                new DtoSearchOption { Key = nameof(DtoProductAdminList.Description), Title = "توضیحات" }
-            };
-
-            return Task.FromResult(result);
-        }
 
 
 

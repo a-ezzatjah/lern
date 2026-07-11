@@ -7,7 +7,7 @@ namespace ServiceContract.DTO.DtoProductSaleOption
     {
         public string Title { get; set; } = null!;
         public EnumSaleType SaleType { get; set; }
-        public decimal BasePrice { get; set; }
+        public decimal? BasePrice { get; set; }
         public string? ImageUrl { get; set; }
         public string? InputLabel { get; set; }
         public string? UnitName { get; set; }
