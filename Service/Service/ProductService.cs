@@ -1,6 +1,7 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq.Expressions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -13,6 +14,8 @@ using Service.Validators;
 using ServiceContract.Common;
 using ServiceContract.DTO.DtoCommit;
 using ServiceContract.DTO.DtoProduct;
+using ServiceContract.DTO.DtoProductSaleOption;
+using ServiceContract.DTO.DtoSaleOptionColor;
 using ServiceContract.Enums;
 using ServiceContract.Interfaces;
 using ServiceContract.Quaries;
@@ -145,7 +148,9 @@ var product = await _shopDbContext.Products
                 .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
-            return DtoResponse<DtoProductAdminList>.Success(result);
+            return result != null
+                ? DtoResponse<DtoProductAdminList>.Success(result)
+                : DtoResponse<DtoProductAdminList>.Fail("خطا در بازخوانی اطلاعات...");
         }
 
 
@@ -323,7 +328,35 @@ var product = await _shopDbContext.Products
                 .Select(x => new DtoProductAdminList
                 {
                     Id = x.Id,
-                    Name = x.Name , 
+                    Name = x.Name,
+                    Slug = x.Slug,
+                    CategoriesName = x.ProductCategories.Select(pc => pc.Category.Name).ToList(),
+                    SaleOptionTitle = x.SaleOptions.Select(so => so.Title).ToList(),
+                    CategoriesCount = x.ProductCategories.Count,
+                    SaleOptionsCount = x.SaleOptions.Count,
+                    IsActive = x.IsActive,
+                    DiscountValue = x.DiscountValue,
+                    DiscountType = x.DiscountType,
+                    HasDiscount = x.DiscountValue.HasValue && x.DiscountType.HasValue,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    SaleOptions = x.SaleOptions.Select(s => new DtoProductAdminSaleOption
+                    {
+                        Id = s.Id,
+                        Title = s.Title,
+                        BasePrice = s.BasePrice,
+                        ImageUrl = s.ImageUrl,
+                        Colors = s.SaleOptionColors.Select(c => new DtoProductAdminSaleOptionColor
+                        {
+                            Id = c.Id,
+                            Color = c.Color,
+                            HexCode = c.HexCode,
+                            ImageUrl = c.ImageUrl,
+                            Price = c.Price
+                        }).ToList()
+                    }).ToList()
+                   
+                     
                     
                 }).ToListAsync();
                 

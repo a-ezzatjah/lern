@@ -1,4 +1,5 @@
 ﻿using DTO;
+using ServiceContract.DTO.DtoProductSaleOption;
 
 namespace ServiceContract.DTO.DtoProduct
 {
@@ -22,6 +23,7 @@ namespace ServiceContract.DTO.DtoProduct
 
         public List<string> CategoriesName { get; set; } = new();
         public List<string> SaleOptionTitle { get; set; } = new();
+        public List<DtoProductAdminSaleOption> SaleOptions { get; set; } = new();
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
