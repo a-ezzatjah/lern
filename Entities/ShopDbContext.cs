@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -49,7 +49,7 @@ namespace Entities
                 .HasForeignKey(x => x.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-// Product → SeoData (Owned Entity)
+// Product â†’ SeoData (Owned Entity)
             modelBuilder.Entity<Product>()
                 .OwnsOne(p => p.Seo, seo =>
                 {
@@ -66,7 +66,7 @@ namespace Entities
                 });
 
 
-            // Category → SeoData (Owned Entity)
+            // Category â†’ SeoData (Owned Entity)
 
             modelBuilder.Entity<Category>()
                .OwnsOne(c => c.Seo, seo =>
@@ -85,7 +85,7 @@ namespace Entities
 
 
 
-            // Product → ProductSaleOption
+            // Product â†’ ProductSaleOption
             modelBuilder.Entity<ProductSaleOption>()
                 .Property(pso => pso.ImageUrl)
                 .HasMaxLength(500);
@@ -96,7 +96,35 @@ namespace Entities
                 .HasForeignKey(pso => pso.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ProductSaleOption → SaleOptionColor
+            // Decimal precision
+            modelBuilder.Entity<Product>()
+                .Property(p => p.DiscountValue).HasPrecision(18, 2);
+
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.BasePrice).HasPrecision(18, 2);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.MinQuantity).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.MaxQuantity).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.Step).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.FixedWeight).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.FixedLength).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.FixedWidth).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.FixedHeight).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.PerUnitWeight).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.PerUnitLength).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.PerUnitWidth).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.PerUnitHeight).HasPrecision(18, 3);
+            // ProductSaleOption â†’ SaleOptionColor
             modelBuilder.Entity<SaleOptionColor>()
                 .Property(soc => soc.ImageUrl)
                 .HasMaxLength(500);
@@ -104,6 +132,8 @@ namespace Entities
             modelBuilder.Entity<SaleOptionColor>()
                 .Property(soc => soc.HexCode)
                 .HasMaxLength(20);
+            modelBuilder.Entity<SaleOptionColor>()
+                .Property(soc => soc.Price).HasPrecision(18, 2);
 
             modelBuilder.Entity<SaleOptionColor>()
                 .HasOne(soc => soc.ProductSaleOption)
@@ -116,10 +146,18 @@ namespace Entities
                 .Property(p => p.Name).IsRequired().HasMaxLength(200);
             modelBuilder.Entity<Product>()
                 .Property(p => p.Slug).IsRequired().HasMaxLength(200);
+            modelBuilder.Entity<Product>()
+                .HasIndex(p => p.Name).IsUnique();
+            modelBuilder.Entity<Product>()
+                .HasIndex(p => p.Slug).IsUnique();
 
             // Category constraints
             modelBuilder.Entity<Category>()
                 .Property(c => c.Name).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.Name).IsUnique();
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.Slug).IsUnique();
         }
 
 

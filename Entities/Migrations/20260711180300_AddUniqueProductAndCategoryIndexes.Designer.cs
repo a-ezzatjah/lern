@@ -4,6 +4,7 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entities.Migrations
 {
     [DbContext(typeof(ShopDbContext))]
-    partial class ShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260711180300_AddUniqueProductAndCategoryIndexes")]
+    partial class AddUniqueProductAndCategoryIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,7 +80,6 @@ namespace Entities.Migrations
                         .HasColumnName("DisconType");
 
                     b.Property<decimal?>("DiscountValue")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("Discount");
 
@@ -132,24 +134,19 @@ namespace Entities.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("BasePrice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("FixedHeight")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("FixedLength")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("FixedWeight")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("FixedWidth")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)
@@ -159,28 +156,22 @@ namespace Entities.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("MaxQuantity")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MinQuantity")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("PerUnitHeight")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("PerUnitLength")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("PerUnitWeight")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("PerUnitWidth")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -189,8 +180,7 @@ namespace Entities.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Step")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -228,7 +218,6 @@ namespace Entities.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal?>("Price")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("SaleOptionId")

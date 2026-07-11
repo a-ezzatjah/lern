@@ -48,11 +48,17 @@ namespace Service.Mapping
 
             CreateMap<SaleOptionColor, DtoSaleOptionColorView>();
 
+            CreateMap<ProductSaleOption, DtoProductAdminSaleOption>()
+                .ForMember(x => x.Colors, otp => otp.MapFrom(s => s.SaleOptionColors));
+
+            CreateMap<SaleOptionColor, DtoProductAdminSaleOptionColor>();
+
             CreateMap<Product, DtoProductAdminList>()
                 .ForMember(x => x.CategoriesCount, otp => otp.MapFrom(s => s.ProductCategories.Count))
                 .ForMember(x => x.SaleOptionsCount, otp => otp.MapFrom(s => s.SaleOptions.Count))
                 .ForMember(x => x.CategoriesName, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.Category.Name)))
-                .ForMember(x => x.SaleOptionTitle, otp => otp.MapFrom(s => s.SaleOptions.Select(pc => pc.Title)));
+                .ForMember(x => x.SaleOptionTitle, otp => otp.MapFrom(s => s.SaleOptions.Select(pc => pc.Title)))
+                .ForMember(x => x.SaleOptions, otp => otp.MapFrom(s => s.SaleOptions));
 
             CreateMap<Product, DtoProductDetail>()
                 .ForMember(x => x.CategoryIds, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.CategoryId)))

@@ -297,6 +297,8 @@ namespace Service.Service
                 .AsNoTracking();
 
             query ??= new CategoryQuery();
+            query.Page = Math.Max(query.Page, 1);
+            query.PageSize = Math.Clamp(query.PageSize, 1, 100);
 
 
             if (!string.IsNullOrWhiteSpace(query.SearchText))

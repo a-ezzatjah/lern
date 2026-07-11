@@ -1,6 +1,7 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq.Expressions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -13,6 +14,8 @@ using Service.Validators;
 using ServiceContract.Common;
 using ServiceContract.DTO.DtoCommit;
 using ServiceContract.DTO.DtoProduct;
+using ServiceContract.DTO.DtoProductSaleOption;
+using ServiceContract.DTO.DtoSaleOptionColor;
 using ServiceContract.Enums;
 using ServiceContract.Interfaces;
 using ServiceContract.Quaries;
@@ -62,7 +65,7 @@ namespace Service.Service
             var productExists = await _shopDbContext.Products.AnyAsync(x => x.Name.ToLower() == normalizedName.ToLower());
             if (productExists)
             {
-                return DtoResponse<DtoProductAdminList>.Fail("محصول تکراری میباشد");
+                return DtoResponse<DtoProductAdminList>.Fail("محصول تکراری می‌باشد");
             }
 
             var product = _mapper.Map<Product>(model);
@@ -117,7 +120,7 @@ var product = await _shopDbContext.Products
                 .FirstOrDefaultAsync(x=>x.Id == model.Id);
             if (product == null)
             {
-                return DtoResponse<DtoProductAdminList>.Fail("محصول موجود نمیباشد");
+                return DtoResponse<DtoProductAdminList>.Fail("محصول موجود نمی‌باشد");
             }
 
             _mapper.Map(model, product);
@@ -145,7 +148,9 @@ var product = await _shopDbContext.Products
                 .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
-            return DtoResponse<DtoProductAdminList>.Success(result);
+            return result != null
+                ? DtoResponse<DtoProductAdminList>.Success(result)
+                : DtoResponse<DtoProductAdminList>.Fail("خطا در بازخوانی اطلاعات...");
         }
 
 
@@ -264,6 +269,8 @@ var product = await _shopDbContext.Products
             IQueryable<Product> productQuery = _shopDbContext.Products.OrderByDescending(x => x.Id).AsNoTracking();
 
             query ??= new ProductQuery();
+            query.Page = Math.Max(query.Page, 1);
+            query.PageSize = Math.Clamp(query.PageSize, 1, 100);
 
 
             if (!string.IsNullOrWhiteSpace(query.SearchText))
@@ -305,10 +312,41 @@ var product = await _shopDbContext.Products
 
             }
 
+            if (query.HasDiscount.HasValue)
+            {
+                productQuery = query.HasDiscount.Value
+                    ? productQuery.Where(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0)
+                    : productQuery.Where(x => !x.DiscountValue.HasValue || x.DiscountValue.Value <= 0);
+            }
+            if (query.CreatedFrom.HasValue)
+            {
+                productQuery = productQuery.Where(x => x.CreatedAt >= query.CreatedFrom.Value);
+            }
+
+            if (query.CreatedTo.HasValue)
+            {
+                var createdToExclusive = query.CreatedTo.Value.Date.AddDays(1);
+                productQuery = productQuery.Where(x => x.CreatedAt < createdToExclusive);
+            }
+
             productQuery = (query.SortType, query.Order) switch
             {
-                (EnumProductSortType.Name, OrderEnum.ASC) => productQuery.OrderBy(x => x.Name),
-                (EnumProductSortType.Name, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Name),
+                (EnumProductSortType.Id, OrderEnum.ASC) => productQuery.OrderBy(x => x.Id),
+                (EnumProductSortType.Id, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Id),
+                (EnumProductSortType.slug, OrderEnum.ASC) => productQuery.OrderBy(x => x.Slug).ThenBy(x => x.Id),
+                (EnumProductSortType.slug, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Slug).ThenByDescending(x => x.Id),
+                (EnumProductSortType.Name, OrderEnum.ASC) => productQuery.OrderBy(x => x.Name).ThenBy(x => x.Id),
+                (EnumProductSortType.Name, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Name).ThenByDescending(x => x.Id),
+                (EnumProductSortType.Price, OrderEnum.ASC) => productQuery.OrderBy(x => x.SaleOptions.Min(s => s.BasePrice)).ThenBy(x => x.Id),
+                (EnumProductSortType.Price, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.SaleOptions.Min(s => s.BasePrice)).ThenByDescending(x => x.Id),
+                (EnumProductSortType.HasDiscount, OrderEnum.ASC) => productQuery.OrderBy(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0).ThenBy(x => x.Id),
+                (EnumProductSortType.HasDiscount, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0).ThenByDescending(x => x.Id),
+                (EnumProductSortType.DiscountValue, OrderEnum.ASC) => productQuery.OrderBy(x => x.DiscountValue).ThenBy(x => x.Id),
+                (EnumProductSortType.DiscountValue, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.DiscountValue).ThenByDescending(x => x.Id),
+                (EnumProductSortType.CategoryName, OrderEnum.ASC) => productQuery.OrderBy(x => x.ProductCategories.Select(pc => pc.Category.Name).FirstOrDefault()).ThenBy(x => x.Id),
+                (EnumProductSortType.CategoryName, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.ProductCategories.Select(pc => pc.Category.Name).FirstOrDefault()).ThenByDescending(x => x.Id),
+                (EnumProductSortType.SaleOptionTitle, OrderEnum.ASC) => productQuery.OrderBy(x => x.SaleOptions.Select(s => s.Title).FirstOrDefault()).ThenBy(x => x.Id),
+                (EnumProductSortType.SaleOptionTitle, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.SaleOptions.Select(s => s.Title).FirstOrDefault()).ThenByDescending(x => x.Id),
                 _ => productQuery.OrderBy(x => x.Id)
             };
 
@@ -320,17 +358,8 @@ var product = await _shopDbContext.Products
                 .Take(query.PageSize);
 
             var items = await productQuery
-                .Select(x => new DtoProductAdminList
-                {
-                    Id = x.Id,
-                    Name = x.Name , 
-                    
-                }).ToListAsync();
-                
-              
-                
-
-
+                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
+                .ToListAsync();
 
             return new PageResult<DtoProductAdminList>
             {
