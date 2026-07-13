@@ -6,8 +6,8 @@ using Service.Mapping;
 using ServiceContract.Interfaces;
 using FluentValidation;
 using DTO;
-using Service.Validators;
 using Service.Service;
+using Service.Validators.ProductValodation;
 
 
 var builder = WebApplication.CreateBuilder(args);

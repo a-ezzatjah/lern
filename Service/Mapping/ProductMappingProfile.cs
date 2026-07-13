@@ -8,6 +8,7 @@ using Entities;
 using ServiceContract.DTO.DtoProduct;
 using ServiceContract.DTO.DtoProductSaleOption;
 using ServiceContract.DTO.DtoSaleOptionColor;
+using ServiceContract.DTO.DtoSeo;
 
 namespace Service.Mapping
 {
@@ -19,20 +20,19 @@ namespace Service.Mapping
                 .ForMember(x => x.Name, otp => otp.MapFrom(s => s.Name.Trim()))
                 .ForMember(x => x.Slug, otp => otp.MapFrom(s => s.Slug.Trim()))
                 .ForMember(x => x.ProductCategories, otp => otp.Ignore())
-                .ForMember(x => x.SaleOptions, otp => otp.Ignore())
                 .ForMember(x => x.Seo, otp => otp.Ignore())
                 .ForMember(x => x.CreatedAt, otp => otp.Ignore())
                 .ForMember(x => x.UpdatedAt, otp => otp.Ignore());
 
-            CreateMap<DtoAddProductSaleOption, ProductSaleOption>()
-                .ForMember(x => x.Id, otp => otp.Ignore())
-                .ForMember(x => x.ProductId, otp => otp.Ignore())
-                .ForMember(x => x.Product, otp => otp.Ignore());
+            CreateMap<DtoAddProductSaleOption, ProductSaleOption>();
+
+             CreateMap<DtoSeoData,SeoData>();
 
             CreateMap<UpdateDtoProductSaleOption, ProductSaleOption>()
                 .ForMember(x => x.Id, otp => otp.Ignore())
                 .ForMember(x => x.ProductId, otp => otp.Ignore())
-                .ForMember(x => x.Product, otp => otp.Ignore());
+                .ForMember(x => x.Product, otp => otp.Ignore())
+                .ForMember(x => x.SaleOptionColors, otp => otp.MapFrom(s => s.SaleOptionColors));
 
             CreateMap<DtoAddSaleOptionColor, SaleOptionColor>()
                 .ForMember(x => x.Id, otp => otp.Ignore())

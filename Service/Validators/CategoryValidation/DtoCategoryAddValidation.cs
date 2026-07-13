@@ -9,7 +9,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ServiceContract.DTO.DtoCategory;
 
-namespace Service.Validators
+namespace Service.Validators.CategoryValidation
 {
     public class DtoCategoryAddValidation : AbstractValidator<AddDtoCategory>
     {

@@ -22,6 +22,6 @@ namespace ServiceContract.DTO.DtoProduct
         public DisconTypeEnum? DiscountType { get; set; }
 
         public List<int> CategoryIds { get; set; } = new();
-        public List<UpdateDtoProductSaleOption> SaleOptions { get; set; } = new();
+        public List<UpdateDtoProductSaleOption>? SaleOptions { get; set; } 
     }
 }

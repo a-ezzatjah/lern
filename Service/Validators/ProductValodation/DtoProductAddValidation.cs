@@ -10,7 +10,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ServiceContract.DTO.DtoProduct;
 
-namespace Service.Validators
+namespace Service.Validators.ProductValodation
 {
     public class DtoProductAddValidation : AbstractValidator<DtoproductAdd>
     {

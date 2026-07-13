@@ -76,7 +76,6 @@ namespace Service.Service
                 .Distinct()
                 .Select(categoryId => new ProductCategory { Product = product, CategoryId = categoryId })
                 .ToList();
-            product.SaleOptions = _mapper.Map<List<ProductSaleOption>>(model.SaleOptions);
 
             _shopDbContext.Products.Add(product);
             await _shopDbContext.SaveChangesAsync();
@@ -362,9 +361,6 @@ var product = await _shopDbContext.Products
                 .ToListAsync();
 
               
-                
-
-
 
 
             return new PageResult<DtoProductAdminList>
