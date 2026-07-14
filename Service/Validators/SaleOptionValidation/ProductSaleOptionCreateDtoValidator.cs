@@ -10,10 +10,10 @@ using ServiceContract.DTO.DtoProductSaleOption;
 
 namespace Service.Validators.SaleOptionValidation
 {
-   public class AddSaleOptionValidation : AbstractValidator<DtoAddProductSaleOption>
+   public class ProductSaleOptionCreateDtoValidator : AbstractValidator<ProductSaleOptionCreateDto>
     {
 
-        public AddSaleOptionValidation()
+        public ProductSaleOptionCreateDtoValidator()
         {
 
             RuleFor(x => x.Title).NotEmpty().WithMessage("حالت فروش وارد نشده است");

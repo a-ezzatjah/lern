@@ -11,11 +11,11 @@ using ServiceContract.DTO.DtoCategory;
 
 namespace Service.Validators.CategoryValidation
 {
-    public class DtoCategoryAddValidation : AbstractValidator<AddDtoCategory>
+    public class CategoryCreateDtoValidator : AbstractValidator<CategoryCreateDto>
     {
 
         private readonly ShopDbContext _shopDbContext;
-        public DtoCategoryAddValidation(ShopDbContext shopDbContext)
+        public CategoryCreateDtoValidator(ShopDbContext shopDbContext)
         {
             _shopDbContext = shopDbContext;
 

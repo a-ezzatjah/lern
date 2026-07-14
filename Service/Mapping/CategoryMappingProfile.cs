@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Entities;
 using ServiceContract.DTO.DtoCategory;
-using ServiceContract.DTO.DtoCategoryView;
 
 namespace Service.Mapping
 {
@@ -15,20 +14,20 @@ namespace Service.Mapping
 
         public CategoryMappingProfile()
         {
-            CreateMap<AddDtoCategory, Category>()
+            CreateMap<CategoryCreateDto, Category>()
                 .ForMember(s => s.Name, otp => otp.MapFrom(s => s.Name != null ? s.Name.Trim() : null))
                 .ForMember(s=>s.Slug, otp => otp.MapFrom(s => s.Slug != null ? s.Slug.Trim() : null));
 
 
-            CreateMap<Category, DtoCategoryAdminList>()
+            CreateMap<Category, CategoryAdminListItemDto>()
                 .ForMember(x => x.ParentName, otp => otp.MapFrom(s => s.Parent != null ? s.Parent.Name : null))
                 .ForMember(x => x.CildrenCount, otp => otp.MapFrom(s => s.Children.Count));
 
-            CreateMap<Category, DtoCategoryView>()
+            CreateMap<Category, CategoryTreeItemDto>()
                 .ForMember(x => x.SortOrder, otp => otp.MapFrom(s => s.SortOrder ?? 0))
                 .ForMember(x => x.Children, otp => otp.Ignore());
 
-            CreateMap<DtoCategoryUpdate, Category>()
+            CreateMap<CategoryPatchFieldDto, Category>()
                 .ForMember(x => x.Id, y => y.Ignore())
                 .ForMember(x => x.Name, otp =>
                 { otp.PreCondition(s => !string.IsNullOrWhiteSpace(s.Name)); otp.MapFrom(s => s.Name.Trim()); })

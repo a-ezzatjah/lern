@@ -3,7 +3,7 @@ using ServiceContract.DTO.DtoSaleOptionColor;
 
 namespace ServiceContract.DTO.DtoProductSaleOption
 {
-    public class DtoAddProductSaleOption
+    public class ProductSaleOptionCreateDto
     {
         public string Title { get; set; } = null!;
         public EnumSaleType SaleType { get; set; }
@@ -22,6 +22,6 @@ namespace ServiceContract.DTO.DtoProductSaleOption
         public decimal? PerUnitLength { get; set; }
         public decimal? PerUnitWidth { get; set; }
         public decimal? PerUnitHeight { get; set; }
-        public List<DtoAddSaleOptionColor> SaleOptionColors { get; set; } = new();
+        public List<SaleOptionColorCreateDto> SaleOptionColors { get; set; } = new();
     }
 }

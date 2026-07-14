@@ -3,7 +3,7 @@ using ServiceContract.DTO.DtoSaleOptionColor;
 
 namespace ServiceContract.DTO.DtoProductSaleOption
 {
-    public class DtoProductSaleOptionView
+    public class ProductSaleOptionDetailDto
     {
         public int Id { get; set; }
         public string Title { get; set; } = null!;
@@ -12,6 +12,6 @@ namespace ServiceContract.DTO.DtoProductSaleOption
         public string? ImageUrl { get; set; }
         public string? UnitName { get; set; }
         public string? InputLabel { get; set; }
-        public List<DtoSaleOptionColorView> SaleOptionColors { get; set; } = new();
+        public List<SaleOptionColorDetailDto> SaleOptionColors { get; set; } = new();
     }
 }

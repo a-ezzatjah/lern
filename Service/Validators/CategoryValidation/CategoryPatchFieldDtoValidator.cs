@@ -10,13 +10,13 @@ using ServiceContract.DTO.DtoCategory;
 
 namespace Service.Validators.CategoryValidation
 {
-    public class DtoCategoryUpdateValidation : AbstractValidator<DtoCategoryUpdate>
+    public class CategoryPatchFieldDtoValidator : AbstractValidator<CategoryPatchFieldDto>
     {
 
-      private readonly ShopDbContext _shopDbContext;
+        private readonly ShopDbContext _shopDbContext;
 
 
-        public DtoCategoryUpdateValidation(ShopDbContext shopDbContext)
+        public CategoryPatchFieldDtoValidator(ShopDbContext shopDbContext)
         {
 
             _shopDbContext = shopDbContext;
@@ -31,7 +31,7 @@ namespace Service.Validators.CategoryValidation
             RuleFor(x => x.Name)
                 .NotNull().WithMessage("نام دسته بندی وارد نشده است")
                 .NotEmpty().WithMessage("نام دسته بندی وارد نشده است")
-                .MustAsync(async (model,name, CancellationToken) => 
+                .MustAsync(async (model, name, CancellationToken) =>
                 { return !await _shopDbContext.Categories.AnyAsync(s => s.Name == name && s.Id != model.Id); })
                 .WithMessage("نام دسته بندی تکراری میباشد")
                 .MaximumLength(50).WithMessage("تعداد کاراکتر های نام دسته بیش از حد مجاز میباشد");
@@ -41,7 +41,7 @@ namespace Service.Validators.CategoryValidation
             RuleFor(x => x.Slug)
               .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("اسلاگ نمیتواند خالی باشد")
               .MaximumLength(50).WithMessage("اسلاگ نباید بیشتر از 50 کاراکتر باشد")
-              .MustAsync(async (model,slug, CancellationToken) =>
+              .MustAsync(async (model, slug, CancellationToken) =>
               { return !await _shopDbContext.Categories.AnyAsync(s => s.Slug == slug && s.Id != model.Id); })
               .WithMessage("اسلاگ تکراری میباشد");
 
@@ -58,8 +58,8 @@ namespace Service.Validators.CategoryValidation
 
 
             RuleFor(x => x.SortOrder)
-           .GreaterThanOrEqualTo(0)
-           .WithMessage("ترتیب نمایش نمی‌تواند منفی باشد");
+                 .GreaterThanOrEqualTo(0)
+                 .WithMessage("ترتیب نمایش نمی‌تواند منفی باشد");
 
 
 

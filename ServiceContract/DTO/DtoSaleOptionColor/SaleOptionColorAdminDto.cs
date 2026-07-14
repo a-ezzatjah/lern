@@ -1,6 +1,6 @@
 ﻿namespace ServiceContract.DTO.DtoSaleOptionColor
 {
-    public class DtoProductAdminSaleOptionColor
+    public class SaleOptionColorAdminDto
     {
 
         public int Id { get; set; }

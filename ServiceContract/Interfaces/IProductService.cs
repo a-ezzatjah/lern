@@ -13,19 +13,19 @@ namespace ServiceContract.Interfaces
 {
     public interface IProductService
     {
-        public Task<DtoResponse<DtoProductAdminList>> AddProductAsync(DtoproductAdd model);
+        public Task<ServiceResponseDto<ProductAdminListItemDto>> AddProductAsync(ProductCreateDto model);
 
-        public Task<DtoProductDetail?> GetByIdAsync(int productId);
+        public Task<ProductDetailDto?> GetByIdAsync(int productId);
 
         public Task<Product?> GetEntityByIdAsync(int product);
 
-        public Task<PageResult<DtoProductAdminList>> GetFilterAsync(ProductQuery query);
+        public Task<PageResult<ProductAdminListItemDto>> GetFilterAsync(ProductQuery query);
 
-        public Task<DtoProductAdminList?> GetAdminByIdAsync(int productId);
+        public Task<ProductAdminListItemDto?> GetAdminByIdAsync(int productId);
 
 
-        public Task<DtoResponse<DtoProductAdminList>> UpdateAsync(DtoProductUpdate model);
+        public Task<ServiceResponseDto<ProductAdminListItemDto>> UpdateAsync(ProductPatchFieldDto model);
 
-        public Task<DtoResponse<bool>> DeleteAsync(int productid);
+        public Task<ServiceResponseDto<bool>> DeleteAsync(int productid);
     }
 }

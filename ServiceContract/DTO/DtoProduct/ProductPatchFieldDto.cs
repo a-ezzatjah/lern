@@ -8,17 +8,20 @@ using ServiceContract.DTO.DtoProductSaleOption;
 
 namespace ServiceContract.DTO.DtoProduct
 {
-    public class DtoproductAdd
+    public class ProductPatchFieldDto
     {
-        public string Name { get; set; } = null!;
-        public string Slug { get; set; } = null!;
+        public int Id { get; set; }
 
+        public string? Name { get; set; }
+        public string? Slug { get; set; }
         public string? Description { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
         public decimal? DiscountValue { get; set; }
         public DisconTypeEnum? DiscountType { get; set; }
-        public bool IsActive { get; set; } = true;
-        public List<int> CategoryIds { get; set; } = new();
-        public List<DtoAddProductSaleOption> SaleOptions { get; set; } = new();
 
+        public List<int> CategoryIds { get; set; } = new();
+        public List<ProductSaleOptionPatchFieldDto>? SaleOptions { get; set; } 
     }
 }

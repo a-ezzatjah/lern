@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServiceContract.DTO.DtoCommit
 {
-    public class DtoImportExcel
+    public class ExcelImportDto
     {
        
             public string Name { get; set; }

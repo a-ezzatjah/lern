@@ -8,7 +8,7 @@ using ServiceContract.DTO.DtoProductSaleOption;
 
 namespace ServiceContract.DTO.DtoProduct
 {
-    public class DtoProductDetail
+    public class ProductDetailDto
     {
 
 
@@ -25,7 +25,7 @@ namespace ServiceContract.DTO.DtoProduct
 
         public List<int> CategoryIds { get; set; } = new();
         public List<string> CategoryNames { get; set; } = new();
-        public List<DtoProductSaleOptionView> SaleOptions { get; set; } = new();
+        public List<ProductSaleOptionDetailDto> SaleOptions { get; set; } = new();
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

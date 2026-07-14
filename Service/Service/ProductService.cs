@@ -27,8 +27,8 @@ namespace Service.Service
     {
         private readonly IMapper _mapper;
         private readonly ShopDbContext _shopDbContext;
-        private readonly IValidator<DtoproductAdd> _validations;
-        private readonly IValidator<DtoProductUpdate> _updateValidator;
+        private readonly IValidator<ProductCreateDto> _validations;
+        private readonly IValidator<ProductPatchFieldDto> _updateValidator;
 
 
 
@@ -36,8 +36,8 @@ namespace Service.Service
         public ProductService(
             ShopDbContext shopDbContext,
             IMapper mapper,
-            IValidator<DtoproductAdd> validationRules,
-            IValidator<DtoProductUpdate> updateValidator)
+            IValidator<ProductCreateDto> validationRules,
+            IValidator<ProductPatchFieldDto> updateValidator)
         {
             _shopDbContext = shopDbContext;
             _mapper = mapper;
@@ -48,24 +48,24 @@ namespace Service.Service
 
 
 
-        public async Task<DtoResponse<DtoProductAdminList>> AddProductAsync(DtoproductAdd model)
+        public async Task<ServiceResponseDto<ProductAdminListItemDto>> AddProductAsync(ProductCreateDto model)
         {
             if (model == null)
-                return DtoResponse<DtoProductAdminList>.Fail("داده نامعتبر است");
+                return ServiceResponseDto<ProductAdminListItemDto>.Fail("داده نامعتبر است");
 
             var validationResult = await _validations.ValidateAsync(model);
 
             if (!validationResult.IsValid)
             {
                 var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
-                return DtoResponse<DtoProductAdminList>.Fail(error);
+                return ServiceResponseDto<ProductAdminListItemDto>.Fail(error);
             }
 
             var normalizedName = model.Name.Trim();
             var productExists = await _shopDbContext.Products.AnyAsync(x => x.Name.ToLower() == normalizedName.ToLower());
             if (productExists)
             {
-                return DtoResponse<DtoProductAdminList>.Fail("محصول تکراری می‌باشد");
+                return ServiceResponseDto<ProductAdminListItemDto>.Fail("محصول تکراری می‌باشد");
             }
 
             var product = _mapper.Map<Product>(model);
@@ -81,12 +81,12 @@ namespace Service.Service
             await _shopDbContext.SaveChangesAsync();
 
             var result = await _shopDbContext.Products.Where(x => x.Id == product.Id)
-                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
+                .ProjectTo<ProductAdminListItemDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
             return result != null
-      ? DtoResponse<DtoProductAdminList>.Success(result)
-      : DtoResponse<DtoProductAdminList>.Fail("خطا در بازخوانی اطلاعات...");
+      ? ServiceResponseDto<ProductAdminListItemDto>.Success(result)
+      : ServiceResponseDto<ProductAdminListItemDto>.Fail("خطا در بازخوانی اطلاعات...");
 
 
 
@@ -99,17 +99,17 @@ namespace Service.Service
 
 
 
-        public async Task<DtoResponse<DtoProductAdminList>> UpdateAsync(DtoProductUpdate model)
+        public async Task<ServiceResponseDto<ProductAdminListItemDto>> UpdateAsync(ProductPatchFieldDto model)
         {
             if (model == null)
-                return DtoResponse<DtoProductAdminList>.Fail("داده نامعتبر است");
+                return ServiceResponseDto<ProductAdminListItemDto>.Fail("داده نامعتبر است");
 
             var validationResult = await _updateValidator.ValidateAsync(model);
 
             if (!validationResult.IsValid)
             {
                 var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
-                return DtoResponse<DtoProductAdminList>.Fail(error);
+                return ServiceResponseDto<ProductAdminListItemDto>.Fail(error);
             }
 
 var product = await _shopDbContext.Products
@@ -119,7 +119,7 @@ var product = await _shopDbContext.Products
                 .FirstOrDefaultAsync(x=>x.Id == model.Id);
             if (product == null)
             {
-                return DtoResponse<DtoProductAdminList>.Fail("محصول موجود نمی‌باشد");
+                return ServiceResponseDto<ProductAdminListItemDto>.Fail("محصول موجود نمی‌باشد");
             }
 
             _mapper.Map(model, product);
@@ -144,12 +144,12 @@ var product = await _shopDbContext.Products
             await _shopDbContext.SaveChangesAsync();
 
             var result = await _shopDbContext.Products.Where(x => x.Id == product.Id)
-                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
+                .ProjectTo<ProductAdminListItemDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
             return result != null
-                ? DtoResponse<DtoProductAdminList>.Success(result)
-                : DtoResponse<DtoProductAdminList>.Fail("خطا در بازخوانی اطلاعات...");
+                ? ServiceResponseDto<ProductAdminListItemDto>.Success(result)
+                : ServiceResponseDto<ProductAdminListItemDto>.Fail("خطا در بازخوانی اطلاعات...");
         }
 
 
@@ -159,18 +159,18 @@ var product = await _shopDbContext.Products
 
 
 
-        public async Task<DtoResponse<bool>> DeleteAsync(int productId)
+        public async Task<ServiceResponseDto<bool>> DeleteAsync(int productId)
         {
             var product = await GetEntityByIdAsync(productId);
             if (product == null)
             {
-                return DtoResponse<bool>.Fail("محصول مورد نظر یافت نشد");
+                return ServiceResponseDto<bool>.Fail("محصول مورد نظر یافت نشد");
             }
 
             _shopDbContext.Products.Remove(product);
             await _shopDbContext.SaveChangesAsync();
 
-            return DtoResponse<bool>.Success();
+            return ServiceResponseDto<bool>.Success();
         }
 
 
@@ -189,7 +189,7 @@ var product = await _shopDbContext.Products
 
 
 
-        public async Task<DtoProductAdminList?> GetAdminByIdAsync(int productId)
+        public async Task<ProductAdminListItemDto?> GetAdminByIdAsync(int productId)
         {
             return await _shopDbContext.Products
                 .AsNoTracking()
@@ -198,7 +198,7 @@ var product = await _shopDbContext.Products
                 .Include(x => x.SaleOptions)
                     .ThenInclude(x => x.SaleOptionColors)
                 .Where(x => x.Id == productId)
-                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
+                .ProjectTo<ProductAdminListItemDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
         }
 
@@ -218,7 +218,7 @@ var product = await _shopDbContext.Products
 
 
 
-        public async Task<DtoProductDetail?> GetByIdAsync(int productId)
+        public async Task<ProductDetailDto?> GetByIdAsync(int productId)
         {
             return await _shopDbContext.Products
                 .AsNoTracking()
@@ -227,7 +227,7 @@ var product = await _shopDbContext.Products
                 .Include(x => x.SaleOptions)
                     .ThenInclude(x => x.SaleOptionColors)
                 .Where(x => x.Id == productId)
-                .ProjectTo<DtoProductDetail>(_mapper.ConfigurationProvider)
+                .ProjectTo<ProductDetailDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
         }
 
@@ -263,7 +263,7 @@ var product = await _shopDbContext.Products
 
 
 
-        public async Task<PageResult<DtoProductAdminList>> GetFilterAsync(ProductQuery query)
+        public async Task<PageResult<ProductAdminListItemDto>> GetFilterAsync(ProductQuery query)
         {
             IQueryable<Product> productQuery = _shopDbContext.Products.OrderByDescending(x => x.Id).AsNoTracking();
 
@@ -357,13 +357,13 @@ var product = await _shopDbContext.Products
                 .Take(query.PageSize);
 
             var items = await productQuery
-                .ProjectTo<DtoProductAdminList>(_mapper.ConfigurationProvider)
+                .ProjectTo<ProductAdminListItemDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
               
 
 
-            return new PageResult<DtoProductAdminList>
+            return new PageResult<ProductAdminListItemDto>
             {
                 Items = items,
                 TotalCount = totalCount,

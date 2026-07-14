@@ -35,12 +35,12 @@ namespace Service.Service
 
 
 
-        public async Task<DtoResponse<DtoProductAdminSaleOption>> AddProductSaleOptionAsync(DtoAddProductSaleOption model)
+        public async Task<ServiceResponseDto<ProductSaleOptionAdminDto>> AddProductSaleOptionAsync(ProductSaleOptionCreateDto model)
         {
 
             if (model == null)
             {
-                DtoResponse<DtoProductAdminSaleOption>.Fail("حالت فروش  وارد نشده است");
+                ServiceResponseDto<ProductSaleOptionAdminDto>.Fail("حالت فروش  وارد نشده است");
             }
 
             var productsaleoption = _mapper.Map<ProductSaleOption>(model);
@@ -49,31 +49,31 @@ namespace Service.Service
             _shopdbcontext.Add(productsaleoption);
            await _shopdbcontext.SaveChangesAsync();
 
-            var result = _mapper.Map<DtoProductAdminSaleOption>(productsaleoption);
-            return DtoResponse<DtoProductAdminSaleOption>.Success(result);
+            var result = _mapper.Map<ProductSaleOptionAdminDto>(productsaleoption);
+            return ServiceResponseDto<ProductSaleOptionAdminDto>.Success(result);
 
         }
 
       
 
 
-        public async Task<DtoResponse<bool>> DeleteProductSaleOptionAsync(int id)
+        public async Task<ServiceResponseDto<bool>> DeleteProductSaleOptionAsync(int id)
         {
             var productsaleoption = await _shopdbcontext.ProductSaleOptions.FirstOrDefaultAsync(x => x.Id == id);
 
             if(productsaleoption == null)
             {
-                return DtoResponse<bool>.Fail("گزینه فروش موجود نمیباشد");
+                return ServiceResponseDto<bool>.Fail("گزینه فروش موجود نمیباشد");
             }
 
             _shopdbcontext.ProductSaleOptions.Remove(productsaleoption);
             await _shopdbcontext.SaveChangesAsync();
-           return DtoResponse<bool>.Success(true);
+           return ServiceResponseDto<bool>.Success(true);
 
         }
 
 
-        //public DtoResponse<DtoProductAdminSaleOption> GetProductSaleOptionByIdAsync(int id)
+        //public ServiceResponseDto<ProductSaleOptionAdminDto> GetProductSaleOptionByIdAsync(int id)
         //{
         //    // فعلا نمیخواد چون توی productservise میگیریم 
 
@@ -81,16 +81,16 @@ namespace Service.Service
 
 
 
-        public async Task<DtoResponse<DtoProductAdminSaleOption>> UpdateProductSaleOptionAsync(UpdateDtoProductSaleOption model)
+        public async Task<ServiceResponseDto<ProductSaleOptionAdminDto>> UpdateProductSaleOptionAsync(ProductSaleOptionPatchFieldDto model)
         {
             if (model == null)
             {
-                DtoResponse<DtoProductAdminSaleOption>.Fail("آپیدیت وارد نشده است");
+                ServiceResponseDto<ProductSaleOptionAdminDto>.Fail("آپیدیت وارد نشده است");
             }
 
             if (model.Id == null)
             {
-                DtoResponse<DtoProductAdminSaleOption>.Fail("آپیدیت وارد نشده است");
+                ServiceResponseDto<ProductSaleOptionAdminDto>.Fail("آپیدیت وارد نشده است");
             }
 
             var productsaleoption =await _shopdbcontext.ProductSaleOptions.Include(x => x.SaleOptionColors).FirstOrDefaultAsync(x => x.Id == model.Id);
@@ -112,9 +112,9 @@ namespace Service.Service
 
             await _shopdbcontext.SaveChangesAsync();
 
-            var result = _mapper.Map<DtoProductAdminSaleOption>(productsaleoption);
+            var result = _mapper.Map<ProductSaleOptionAdminDto>(productsaleoption);
 
-           return  DtoResponse<DtoProductAdminSaleOption>.Success(result);
+           return  ServiceResponseDto<ProductSaleOptionAdminDto>.Success(result);
 
 
 

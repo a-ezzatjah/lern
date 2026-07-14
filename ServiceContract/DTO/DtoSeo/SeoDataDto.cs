@@ -1,6 +1,6 @@
 namespace ServiceContract.DTO.DtoSeo
 {
-    public class DtoSeoData
+    public class SeoDataDto
     {
         public string? MetaTitle { get; set; }
         public string? MetaDescription { get; set; }

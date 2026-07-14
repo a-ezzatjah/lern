@@ -25,7 +25,7 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<CategoryMappingProfile>();
 });
 builder.Services.AddDbContext<ShopDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionstring")));
-builder.Services.AddValidatorsFromAssemblyContaining<DtoProductAddValidation>();
+builder.Services.AddValidatorsFromAssemblyContaining<ProductCreateDtoValidator>();
 
 var app = builder.Build();
 

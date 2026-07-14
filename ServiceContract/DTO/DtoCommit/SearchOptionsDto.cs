@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServiceContract.DTO.DtoCommit
 {
-    public class DtoSearchOption
+    public class SearchOptionsDto
     {
         public string Key { get; set; } = null!;
 

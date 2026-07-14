@@ -25,7 +25,7 @@ namespace lern.Controller
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(DtoproductAdd model)
+        public async Task<IActionResult> AddAsync(ProductCreateDto model)
         {
             var result = await _productService.AddProductAsync(model);
             if (!result.Succeeded) return BadRequest(result.Errors ?? new List<string> { result.Errormessage ?? "خطا" });

@@ -1,7 +1,8 @@
 namespace ServiceContract.DTO.DtoSaleOptionColor
 {
-    public class DtoAddSaleOptionColor
+    public class SaleOptionColorDetailDto
     {
+        public int Id { get; set; }
         public string Color { get; set; } = null!;
         public decimal? Price { get; set; }
         public string? HexCode { get; set; }

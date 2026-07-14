@@ -12,11 +12,11 @@ using ServiceContract.DTO.DtoProduct;
 
 namespace Service.Validators.ProductValodation
 {
-    public class DtoProductAddValidation : AbstractValidator<DtoproductAdd>
+    public class ProductCreateDtoValidator : AbstractValidator<ProductCreateDto>
     {
         private readonly ShopDbContext _shopDbContext;
 
-        public DtoProductAddValidation(ShopDbContext shopDbContext)
+        public ProductCreateDtoValidator(ShopDbContext shopDbContext)
         {
 
             _shopDbContext = shopDbContext;
@@ -31,6 +31,7 @@ namespace Service.Validators.ProductValodation
                 .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("اسلاگ الزامی میباشد")
                 .MustAsync(async (slug, cancellationToken) =>
                     !await _shopDbContext.Products.AnyAsync(x => x.Slug == slug, cancellationToken))
+                    .WithMessage("اسلاگ وارد شده تکراری میباشد")
                 .MaximumLength(50).WithMessage("مقادیر حروف بیش از حد مجاز میباشد");
 
 
