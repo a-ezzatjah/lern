@@ -10,18 +10,19 @@ namespace ServiceContract.DTO.DtoProduct
 {
     public class ProductPatchFieldDto
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
-        public string? Name { get; set; }
-        public string? Slug { get; set; }
-        public string? Description { get; set; }
+        public PatchField<string?> Name { get; set; } = null!;
 
-        public bool IsActive { get; set; } = true;
+        public PatchField<string?> Slug { get; set; } = null!;
+        public PatchField<string?> Description { get; set; } = null!;
 
-        public decimal? DiscountValue { get; set; }
+        public PatchField<bool> IsActive { get; set; } = new();
+
+        public PatchField<decimal?> DiscountValue { get; set; } 
         public DisconTypeEnum? DiscountType { get; set; }
 
-        public List<int> CategoryIds { get; set; } = new();
-        public List<ProductSaleOptionPatchFieldDto>? SaleOptions { get; set; } 
+        public  PatchField<List<int>> CategoryIds { get; set; } = new();
+        public PatchField<List<ProductSaleOptionPatchFieldDto>>? SaleOptions { get; set; } 
     }
 }

@@ -126,19 +126,28 @@ var product = await _shopDbContext.Products
 
             _shopDbContext.ProductCategories.RemoveRange(product.ProductCategories);
 
+               if(model.CategoryIds.IsChanged)
+            {
+                product.ProductCategories = model.CategoryIds.value!
+                    .Distinct()
+                    .Select(categoryId => new ProductCategory
+                    {
+                        ProductId = product.Id,
+                        CategoryId = categoryId
+                    })
+                    .ToList();
 
-            product.ProductCategories = model.CategoryIds
-                .Distinct()
-                .Select(categoryId => new ProductCategory
-                {
-                    ProductId = product.Id,
-                    CategoryId = categoryId
-                })
-                .ToList();
 
-            _shopDbContext.ProductSaleOptions.RemoveRange(product.SaleOptions);
-            product.SaleOptions = _mapper.Map<List<ProductSaleOption>>(model.SaleOptions);
+            }
 
+                
+
+
+            
+
+
+
+           
 
             product.UpdatedAt = DateTime.UtcNow;
             await _shopDbContext.SaveChangesAsync();
