@@ -28,7 +28,7 @@ namespace Service.Mapping
 
              CreateMap<SeoDataDto,SeoData>();
 
-            CreateMap<ProductSaleOptionPatchFieldDto, ProductSaleOption>()
+            CreateMap<ProductSaleOptionUpdateDto, ProductSaleOption>()
                 .ForMember(x => x.Id, otp => otp.Ignore())
                 .ForMember(x => x.ProductId, otp => otp.Ignore())
                 .ForMember(x => x.Product, otp => otp.Ignore())
@@ -39,25 +39,27 @@ namespace Service.Mapping
                 .ForMember(x => x.SaleOptionId, otp => otp.Ignore())
                 .ForMember(x => x.ProductSaleOption, otp => otp.Ignore());
 
-            CreateMap<SaleOptionColorPatchFieldDto, SaleOptionColor>()
+            CreateMap<SaleOptionColorUpdateDto, SaleOptionColor>()
                 .ForMember(x => x.Id, otp => otp.Ignore())
                 .ForMember(x => x.SaleOptionId, otp => otp.Ignore())
                 .ForMember(x => x.ProductSaleOption, otp => otp.Ignore());
 
             CreateMap<ProductSaleOption, ProductSaleOptionDetailDto>();
+            CreateMap<ProductSaleOption, ProductSaleOptionUpdateDto>();
 
             CreateMap<SaleOptionColor, SaleOptionColorDetailDto>();
+            CreateMap<SaleOptionColor, SaleOptionColorUpdateDto>();
 
-            CreateMap<ProductSaleOption, ProductSaleOptionAdminDto>()
+            CreateMap<ProductSaleOption, ProductSaleOptionListItemDto>()
                 .ForMember(x => x.Colors, otp => otp.MapFrom(s => s.SaleOptionColors));
 
-            CreateMap<SaleOptionColor, SaleOptionColorAdminDto>();
+            CreateMap<SaleOptionColor, SaleOptionColorListItemDto>();
 
-            CreateMap<Product, ProductAdminListItemDto>()
+            CreateMap<Product, ProductListItemDto>()
                 .ForMember(x => x.CategoriesCount, otp => otp.MapFrom(s => s.ProductCategories.Count))
                 .ForMember(x => x.SaleOptionsCount, otp => otp.MapFrom(s => s.SaleOptions.Count))
-                .ForMember(x => x.CategoriesName, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.Category.Name)))
-                .ForMember(x => x.SaleOptionTitle, otp => otp.MapFrom(s => s.SaleOptions.Select(pc => pc.Title)))
+                .ForMember(x => x.CategoryNames, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.Category.Name)))
+                .ForMember(x => x.SaleOptionTitles, otp => otp.MapFrom(s => s.SaleOptions.Select(pc => pc.Title)))
                 .ForMember(x => x.SaleOptions, otp => otp.MapFrom(s => s.SaleOptions));
 
             CreateMap<Product, ProductDetailDto>()
@@ -65,11 +67,13 @@ namespace Service.Mapping
                 .ForMember(x => x.CategoryNames, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.Category.Name)));
                 
             
-            CreateMap<ProductPatchFieldDto, Product>()
+            CreateMap<Product, ProductUpdateDto>()
+                .ForMember(x => x.CategoryIds, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.CategoryId)));
+
+            CreateMap<ProductUpdateDto, Product>()
                 .ForMember(x => x.Id, y => y.Ignore())
-                .ForMember(x => x.Name, otp => { otp.PreCondition(s => !string.IsNullOrWhiteSpace(s.Name)); otp.MapFrom(s => s.Name!.Trim()); })
-                .ForMember(x => x.Slug, otp => { otp.PreCondition(s => !string.IsNullOrWhiteSpace(s.Slug)); otp.MapFrom(s => s.Slug!.Trim()); })
-                .ForMember(x => x.Description, otp => { otp.PreCondition(s => s.Description != null); otp.MapFrom(s => s.Description); })
+                .ForMember(x => x.Name, otp => otp.MapFrom(s => s.Name.Trim()))
+                .ForMember(x => x.Slug, otp => otp.MapFrom(s => s.Slug.Trim()))
                 .ForMember(x => x.ProductCategories, otp => otp.Ignore())
                 .ForMember(x => x.SaleOptions, otp => otp.Ignore())
                 .ForMember(x => x.Seo, otp => otp.Ignore())

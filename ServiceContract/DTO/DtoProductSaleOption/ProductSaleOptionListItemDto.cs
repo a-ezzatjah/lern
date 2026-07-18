@@ -7,7 +7,7 @@ using ServiceContract.DTO.DtoSaleOptionColor;
 
 namespace ServiceContract.DTO.DtoProductSaleOption
 {
-    public class ProductSaleOptionAdminDto
+    public class ProductSaleOptionListItemDto
     {
 
         public int Id { get; set; }
@@ -18,7 +18,7 @@ namespace ServiceContract.DTO.DtoProductSaleOption
 
         public string? ImageUrl { get; set; }
 
-        public List<SaleOptionColorAdminDto> Colors { get; set; } = new();
+        public List<SaleOptionColorListItemDto> Colors { get; set; } = new();
 
 
 

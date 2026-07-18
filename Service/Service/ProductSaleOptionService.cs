@@ -18,12 +18,12 @@ namespace Service.Service
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponseDto<ProductSaleOptionAdminDto>> AddProductSaleOptionAsync(
+        public async Task<ServiceResponseDto<ProductSaleOptionListItemDto>> AddProductSaleOptionAsync(
             ProductSaleOptionCreateDto model)
         {
             if (model == null)
             {
-                return ServiceResponseDto<ProductSaleOptionAdminDto>.Fail("حالت فروش وارد نشده است");
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("حالت فروش وارد نشده است");
             }
 
             var productSaleOption = _mapper.Map<ProductSaleOption>(model);
@@ -31,11 +31,11 @@ namespace Service.Service
             _shopDbContext.ProductSaleOptions.Add(productSaleOption);
             await _shopDbContext.SaveChangesAsync();
 
-            var result = _mapper.Map<ProductSaleOptionAdminDto>(productSaleOption);
-            return ServiceResponseDto<ProductSaleOptionAdminDto>.Success(result);
+            var result = _mapper.Map<ProductSaleOptionListItemDto>(productSaleOption);
+            return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
         }
 
-        public async Task<ServiceResponseDto<ProductSaleOptionAdminDto>> GetProductSaleOptionByIdAsync(int id)
+        public async Task<ServiceResponseDto<ProductSaleOptionListItemDto>> GetProductSaleOptionByIdAsync(int id)
         {
             var productSaleOption = await _shopDbContext.ProductSaleOptions
                 .AsNoTracking()
@@ -44,11 +44,11 @@ namespace Service.Service
 
             if (productSaleOption == null)
             {
-                return ServiceResponseDto<ProductSaleOptionAdminDto>.Fail("گزینه فروش موجود نمی‌باشد");
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("گزینه فروش موجود نمی‌باشد");
             }
 
-            var result = _mapper.Map<ProductSaleOptionAdminDto>(productSaleOption);
-            return ServiceResponseDto<ProductSaleOptionAdminDto>.Success(result);
+            var result = _mapper.Map<ProductSaleOptionListItemDto>(productSaleOption);
+            return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
         }
 
         public async Task<ServiceResponseDto<bool>> DeleteProductSaleOptionAsync(int id)
@@ -67,17 +67,17 @@ namespace Service.Service
             return ServiceResponseDto<bool>.Success(true);
         }
 
-        public async Task<ServiceResponseDto<ProductSaleOptionAdminDto>> UpdateProductSaleOptionAsync(
-            ProductSaleOptionPatchFieldDto model)
+        public async Task<ServiceResponseDto<ProductSaleOptionListItemDto>> UpdateProductSaleOptionAsync(
+            ProductSaleOptionUpdateDto model)
         {
             if (model == null)
             {
-                return ServiceResponseDto<ProductSaleOptionAdminDto>.Fail("اطلاعات ویرایش وارد نشده است");
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("اطلاعات ویرایش وارد نشده است");
             }
 
             if (model.Id < 1)
             {
-                return ServiceResponseDto<ProductSaleOptionAdminDto>.Fail("شناسه گزینه فروش معتبر نیست");
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("شناسه گزینه فروش معتبر نیست");
             }
 
             var productSaleOption = await _shopDbContext.ProductSaleOptions
@@ -86,7 +86,7 @@ namespace Service.Service
 
             if (productSaleOption == null)
             {
-                return ServiceResponseDto<ProductSaleOptionAdminDto>.Fail("گزینه فروش موجود نمی‌باشد");
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("گزینه فروش موجود نمی‌باشد");
             }
 
             _mapper.Map(model, productSaleOption);
@@ -107,8 +107,8 @@ namespace Service.Service
 
             await _shopDbContext.SaveChangesAsync();
 
-            var result = _mapper.Map<ProductSaleOptionAdminDto>(productSaleOption);
-            return ServiceResponseDto<ProductSaleOptionAdminDto>.Success(result);
+            var result = _mapper.Map<ProductSaleOptionListItemDto>(productSaleOption);
+            return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
         }
     }
 }

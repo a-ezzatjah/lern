@@ -3,7 +3,7 @@ using ServiceContract.DTO.DtoSaleOptionColor;
 
 namespace ServiceContract.DTO.DtoProductSaleOption
 {
-    public class ProductSaleOptionPatchFieldDto
+    public class ProductSaleOptionUpdateDto
     {
         public int Id { get; set; }
         public string Title { get; set; } = null!;
@@ -23,6 +23,6 @@ namespace ServiceContract.DTO.DtoProductSaleOption
         public decimal? PerUnitLength { get; set; }
         public decimal? PerUnitWidth { get; set; }
         public decimal? PerUnitHeight { get; set; }
-        public List<SaleOptionColorPatchFieldDto>? SaleOptionColors { get; set; } 
+        public List<SaleOptionColorUpdateDto> SaleOptionColors { get; set; } = new();
     }
 }

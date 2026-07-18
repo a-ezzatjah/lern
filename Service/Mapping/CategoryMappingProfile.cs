@@ -19,15 +19,15 @@ namespace Service.Mapping
                 .ForMember(s=>s.Slug, otp => otp.MapFrom(s => s.Slug != null ? s.Slug.Trim() : null));
 
 
-            CreateMap<Category, CategoryAdminListItemDto>()
+            CreateMap<Category, CategoryListItemDto>()
                 .ForMember(x => x.ParentName, otp => otp.MapFrom(s => s.Parent != null ? s.Parent.Name : null))
-                .ForMember(x => x.CildrenCount, otp => otp.MapFrom(s => s.Children.Count));
+                .ForMember(x => x.ChildrenCount, otp => otp.MapFrom(s => s.Children.Count));
 
             CreateMap<Category, CategoryTreeItemDto>()
                 .ForMember(x => x.SortOrder, otp => otp.MapFrom(s => s.SortOrder ?? 0))
                 .ForMember(x => x.Children, otp => otp.Ignore());
 
-            CreateMap<CategoryPatchFieldDto, Category>()
+            CreateMap<CategoryUpdateDto, Category>()
                 .ForMember(x => x.Id, y => y.Ignore())
                 .ForMember(x => x.Name, otp =>
                 { otp.PreCondition(s => !string.IsNullOrWhiteSpace(s.Name)); otp.MapFrom(s => s.Name.Trim()); })

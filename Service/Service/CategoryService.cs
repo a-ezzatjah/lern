@@ -24,14 +24,14 @@ namespace Service.Service
         private readonly ShopDbContext _shopDbContext;
         private readonly IMapper _mapper;
         private readonly IValidator<CategoryCreateDto> _addvalidation;
-        private readonly IValidator<CategoryPatchFieldDto> _updatevalidation;
+        private readonly IValidator<CategoryUpdateDto> _updatevalidation;
         private readonly IMemoryCache _cache;
         private const string CategoriesTreeCacheKey = "categories_tree";
 
 
 
         public CategoryService(ShopDbContext shopDbContext, IMapper mapper, IValidator<CategoryCreateDto> addDtoCategory
-            , IValidator<CategoryPatchFieldDto> dtoCategoryUpdate, IMemoryCache memoryCache)
+            , IValidator<CategoryUpdateDto> dtoCategoryUpdate, IMemoryCache memoryCache)
         {
 
             _shopDbContext = shopDbContext;
@@ -60,12 +60,12 @@ namespace Service.Service
 
 
 
-        public async Task<ServiceResponseDto<CategoryAdminListItemDto>> AddCategoryAsync(CategoryCreateDto model)
+        public async Task<ServiceResponseDto<CategoryListItemDto>> AddCategoryAsync(CategoryCreateDto model)
         {
 
             if (model == null)
             {
-                return ServiceResponseDto<CategoryAdminListItemDto>.Fail("دسته بندی ساخته نشده است");
+                return ServiceResponseDto<CategoryListItemDto>.Fail("دسته بندی ساخته نشده است");
             }
             ;
 
@@ -74,7 +74,7 @@ namespace Service.Service
             {
 
                 var error = validation.Errors.Select(x => x.ErrorMessage).ToList();
-                return ServiceResponseDto<CategoryAdminListItemDto>.Fail(error);
+                return ServiceResponseDto<CategoryListItemDto>.Fail(error);
 
             }
 
@@ -86,7 +86,7 @@ namespace Service.Service
             await _shopDbContext.SaveChangesAsync();
 
             var result = await _shopDbContext.Categories.Where(x => x.Id == categorise.Id)
-                 .Select(x => new CategoryAdminListItemDto
+                 .Select(x => new CategoryListItemDto
                  {
                      Id = x.Id,
                      Name = x.Name,
@@ -94,7 +94,7 @@ namespace Service.Service
                      ParentId = x.ParentId,
                      SortOrder = x.SortOrder,
                      ParentName = x.Parent != null ? x.Parent.Name : null,
-                     CildrenCount = x.Children.Count(),
+                     ChildrenCount = x.Children.Count(),
                  }
                  ).FirstOrDefaultAsync();
 
@@ -102,11 +102,11 @@ namespace Service.Service
 
             if (result == null)
             {
-                return ServiceResponseDto<CategoryAdminListItemDto>.Fail("دسته‌بندی ساخته شد ولی بازیابی نتیجه ناموفق بود");
+                return ServiceResponseDto<CategoryListItemDto>.Fail("دسته‌بندی ساخته شد ولی بازیابی نتیجه ناموفق بود");
             }
 
 
-            return ServiceResponseDto<CategoryAdminListItemDto>.Success(result);
+            return ServiceResponseDto<CategoryListItemDto>.Success(result);
 
 
         }
@@ -134,12 +134,12 @@ namespace Service.Service
 
 
 
-        public async Task<ServiceResponseDto<CategoryAdminListItemDto>> UpdateCategoryAsync(CategoryPatchFieldDto model)
+        public async Task<ServiceResponseDto<CategoryListItemDto>> UpdateCategoryAsync(CategoryUpdateDto model)
         {
 
             if (model == null)
             {
-                return ServiceResponseDto<CategoryAdminListItemDto>.Fail("مقدار وجود ندارد");
+                return ServiceResponseDto<CategoryListItemDto>.Fail("مقدار وجود ندارد");
             }
 
             var validation = await _updatevalidation.ValidateAsync(model);
@@ -147,7 +147,7 @@ namespace Service.Service
             {
 
                 var error = validation.Errors.Select(x => x.ErrorMessage).ToList();
-                return ServiceResponseDto<CategoryAdminListItemDto>.Fail(error);
+                return ServiceResponseDto<CategoryListItemDto>.Fail(error);
 
             }
 
@@ -158,7 +158,7 @@ namespace Service.Service
 
             if (category == null)
             {
-                return ServiceResponseDto<CategoryAdminListItemDto>.Fail("دسته‌بندی پیدا نشد");
+                return ServiceResponseDto<CategoryListItemDto>.Fail("دسته‌بندی پیدا نشد");
             }
 
 
@@ -169,22 +169,22 @@ namespace Service.Service
             _cache.Remove(CategoriesTreeCacheKey);
 
             var result =  await _shopDbContext.Categories.Where(x=>x.Id == model.Id)
-                .Select(x=> new CategoryAdminListItemDto {
+                .Select(x=> new CategoryListItemDto {
                     Id = x.Id,
                     Name = x.Name,
                     Slug = x.Slug,
                     ParentId = x.ParentId,
                     SortOrder = x.SortOrder,
                     ParentName = x.Parent != null ? x.Parent.Name : null,
-                    CildrenCount = x.Children.Count(),
+                    ChildrenCount = x.Children.Count(),
                 }).FirstOrDefaultAsync();
 
             if (result == null)
             {
-                return ServiceResponseDto<CategoryAdminListItemDto>.Fail("ویرایش انجام شد ولی بازیابی نتیجه ناموفق بود");
+                return ServiceResponseDto<CategoryListItemDto>.Fail("ویرایش انجام شد ولی بازیابی نتیجه ناموفق بود");
             }
 
-            return ServiceResponseDto<CategoryAdminListItemDto>.Success(result);
+            return ServiceResponseDto<CategoryListItemDto>.Success(result);
 
 
         }
@@ -288,7 +288,7 @@ namespace Service.Service
 
 
 
-        public async Task<PageResult<CategoryAdminListItemDto>> GetAllAsync(CategoryQuery query)
+        public async Task<PageResult<CategoryListItemDto>> GetAllAsync(CategoryQuery query)
         {
             IQueryable<Category> category = _shopDbContext.Categories
                 .OrderBy(x => x.SortOrder)
@@ -310,9 +310,9 @@ namespace Service.Service
 
             category = category.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize);
 
-            var item = await category.ProjectTo<CategoryAdminListItemDto>(_mapper.ConfigurationProvider).ToListAsync();
+            var item = await category.ProjectTo<CategoryListItemDto>(_mapper.ConfigurationProvider).ToListAsync();
 
-            return new PageResult<CategoryAdminListItemDto>()
+            return new PageResult<CategoryListItemDto>()
             {
                 Items = item,
                 TotalCount = totalcategory,

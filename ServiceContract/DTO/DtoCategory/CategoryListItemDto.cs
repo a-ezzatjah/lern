@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServiceContract.DTO.DtoCategory
 {
-    public class CategoryAdminListItemDto
+    public class CategoryListItemDto
     {
 
 
@@ -18,7 +18,7 @@ namespace ServiceContract.DTO.DtoCategory
         public string? ParentName { get; set; }
         public int? SortOrder { get; set; }
 
-        public int CildrenCount { get; set; }
+        public int ChildrenCount { get; set; }
 
 
 

@@ -1,6 +1,6 @@
 namespace ServiceContract.DTO.DtoSaleOptionColor
 {
-    public class SaleOptionColorPatchFieldDto
+    public class SaleOptionColorUpdateDto
     {
         public int Id { get; set; }
         public string Color { get; set; } = null!;

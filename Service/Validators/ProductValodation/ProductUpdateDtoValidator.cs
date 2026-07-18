@@ -9,13 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using ServiceContract.DTO.DtoProduct;
 namespace Service.Validators.ProductValodation
 {
-   public  class ProductPatchFieldDtoValidator : AbstractValidator<ProductPatchFieldDto>
+   public class ProductUpdateDtoValidator : AbstractValidator<ProductUpdateDto>
     {
 
         private readonly ShopDbContext _shopDbContext;
 
 
-        public ProductPatchFieldDtoValidator(ShopDbContext shopDbContext)
+        public ProductUpdateDtoValidator(ShopDbContext shopDbContext)
         {
 
             _shopDbContext = shopDbContext;

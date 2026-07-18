@@ -13,13 +13,13 @@ namespace ServiceContract.Interfaces
     public interface ICategoryService
     {
 
-        public Task<ServiceResponseDto<CategoryAdminListItemDto>> AddCategoryAsync(CategoryCreateDto model);
+        public Task<ServiceResponseDto<CategoryListItemDto>> AddCategoryAsync(CategoryCreateDto model);
 
-        public Task<ServiceResponseDto<CategoryAdminListItemDto>> UpdateCategoryAsync(CategoryPatchFieldDto model);
+        public Task<ServiceResponseDto<CategoryListItemDto>> UpdateCategoryAsync(CategoryUpdateDto model);
 
         public Task<ServiceResponseDto<bool>> DeleteCategoryAsync(int CategoryId);
 
-        public Task<PageResult<CategoryAdminListItemDto>> GetAllAsync(CategoryQuery query);
+        public Task<PageResult<CategoryListItemDto>> GetAllAsync(CategoryQuery query);
 
         public Task<List<CategoryTreeItemDto>> GetTreeAsync();
 

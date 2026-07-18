@@ -11,7 +11,7 @@ namespace ServiceContract.DTO.DtoCommit
     {
         public bool Succeeded { get; set; }
 
-        public string? Errormessage { get; set; }
+        public string? ErrorMessage { get; set; }
 
         public List<string>? Errors { get; set; }
 
@@ -20,7 +20,7 @@ namespace ServiceContract.DTO.DtoCommit
 
         public static ServiceResponseDto<T> Success(T data) => new ServiceResponseDto<T> { Data = data, Succeeded = true };
         public static ServiceResponseDto<T> Success() => new ServiceResponseDto<T> { Succeeded = true };
-        public static ServiceResponseDto<T> Fail(string error) => new ServiceResponseDto<T> { Errormessage = error, Succeeded = false };
+        public static ServiceResponseDto<T> Fail(string error) => new ServiceResponseDto<T> { ErrorMessage = error, Succeeded = false };
         public static ServiceResponseDto<T> Fail(List<string> error) => new ServiceResponseDto<T> { Errors = error, Succeeded = false };
 
     }

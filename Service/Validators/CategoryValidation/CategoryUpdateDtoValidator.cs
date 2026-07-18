@@ -10,13 +10,13 @@ using ServiceContract.DTO.DtoCategory;
 
 namespace Service.Validators.CategoryValidation
 {
-    public class CategoryPatchFieldDtoValidator : AbstractValidator<CategoryPatchFieldDto>
+    public class CategoryUpdateDtoValidator : AbstractValidator<CategoryUpdateDto>
     {
 
         private readonly ShopDbContext _shopDbContext;
 
 
-        public CategoryPatchFieldDtoValidator(ShopDbContext shopDbContext)
+        public CategoryUpdateDtoValidator(ShopDbContext shopDbContext)
         {
 
             _shopDbContext = shopDbContext;
