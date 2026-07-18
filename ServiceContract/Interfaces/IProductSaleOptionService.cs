@@ -12,13 +12,13 @@ namespace ServiceContract.Interfaces
     public interface IProductSaleOptionService
     {
 
-        public ServiceResponseDto<ProductSaleOptionAdminDto> AddProductSaleOptionAsync(ProductSaleOptionCreateDto model);
+        Task<ServiceResponseDto<ProductSaleOptionAdminDto>> AddProductSaleOptionAsync(ProductSaleOptionCreateDto model);
 
-        public ServiceResponseDto<ProductSaleOptionAdminDto> GetProductSaleOptionByIdAsync(int id);
+        Task<ServiceResponseDto<ProductSaleOptionAdminDto>> GetProductSaleOptionByIdAsync(int id);
 
-        public ServiceResponseDto<ProductSaleOptionAdminDto> DeleteProductSaleOptionAsync(int id);
+        Task<ServiceResponseDto<bool>> DeleteProductSaleOptionAsync(int id);
 
-        public ServiceResponseDto<ProductSaleOptionAdminDto> UpdateProductSaleOptionAsync(ProductSaleOptionPatchFieldDto model);
+        Task<ServiceResponseDto<ProductSaleOptionAdminDto>> UpdateProductSaleOptionAsync(ProductSaleOptionPatchFieldDto model);
 
         
 

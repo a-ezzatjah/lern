@@ -32,7 +32,7 @@ namespace Service.Mapping
                 .ForMember(x => x.Id, otp => otp.Ignore())
                 .ForMember(x => x.ProductId, otp => otp.Ignore())
                 .ForMember(x => x.Product, otp => otp.Ignore())
-                .ForMember(x => x.SaleOptionColors, otp => otp.MapFrom(s => s.SaleOptionColors));
+                .ForMember(x => x.SaleOptionColors, otp => otp.Ignore());
 
             CreateMap<SaleOptionColorCreateDto, SaleOptionColor>()
                 .ForMember(x => x.Id, otp => otp.Ignore())

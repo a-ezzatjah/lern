@@ -69,8 +69,8 @@ namespace Service.Service
             }
 
             var product = _mapper.Map<Product>(model);
-            
-           
+
+
             product.CreatedAt = DateTime.UtcNow;
             product.ProductCategories = model.CategoryIds
                 .Distinct()
@@ -112,11 +112,9 @@ namespace Service.Service
                 return ServiceResponseDto<ProductAdminListItemDto>.Fail(error);
             }
 
-var product = await _shopDbContext.Products
-                .Include(x=>x.ProductCategories)
-                .Include(x => x.SaleOptions)
-                    .ThenInclude(x => x.SaleOptionColors)
-                .FirstOrDefaultAsync(x=>x.Id == model.Id);
+            var product = await _shopDbContext.Products
+                            .Include(x => x.ProductCategories)
+                            .FirstOrDefaultAsync(x => x.Id == model.Id);
             if (product == null)
             {
                 return ServiceResponseDto<ProductAdminListItemDto>.Fail("محصول موجود نمی‌باشد");
@@ -124,30 +122,16 @@ var product = await _shopDbContext.Products
 
             _mapper.Map(model, product);
 
-            _shopDbContext.ProductCategories.RemoveRange(product.ProductCategories);
+            _shopDbContext.ProductCategories.RemoveRange();
 
-               if(model.CategoryIds.IsChanged)
-            {
-                product.ProductCategories = model.CategoryIds.value!
-                    .Distinct()
-                    .Select(categoryId => new ProductCategory
-                    {
-                        ProductId = product.Id,
-                        CategoryId = categoryId
-                    })
-                    .ToList();
-
-
-            }
-
-                
-
-
-            
-
-
-
-           
+            product.ProductCategories = model.CategoryIds
+                   .Distinct()
+                   .Select(categoryId => new ProductCategory
+                   {
+                       ProductId = product.Id,
+                       CategoryId = categoryId
+                   })
+                   .ToList();
 
             product.UpdatedAt = DateTime.UtcNow;
             await _shopDbContext.SaveChangesAsync();
@@ -160,12 +144,6 @@ var product = await _shopDbContext.Products
                 ? ServiceResponseDto<ProductAdminListItemDto>.Success(result)
                 : ServiceResponseDto<ProductAdminListItemDto>.Fail("خطا در بازخوانی اطلاعات...");
         }
-
-
-
-
-
-
 
 
         public async Task<ServiceResponseDto<bool>> DeleteAsync(int productId)
@@ -296,7 +274,7 @@ var product = await _shopDbContext.Products
                 else if (query.SearchType == EnumProductSearchType.Slug)
                 {
                     productQuery = productQuery.Where(x => x.Slug.Contains(query.SearchText));
-                }  
+                }
                 else if (query.SearchType == EnumProductSearchType.CategoryName)
                 {
                     productQuery = productQuery.Where(x => x.ProductCategories.Any(s => s.Category.Name.Contains(query.SearchText)));
@@ -305,7 +283,7 @@ var product = await _shopDbContext.Products
                 {
                     productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.Title.Contains(query.SearchText)));
                 }
-                else if(query.SearchType == EnumProductSearchType.Color)
+                else if (query.SearchType == EnumProductSearchType.Color)
                 {
                     productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.SaleOptionColors.Any(y => y.Color.Contains(query.SearchText))));
                 }
@@ -315,7 +293,7 @@ var product = await _shopDbContext.Products
                     {
                         productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.SaleOptionColors.Any(y => y.Price == price)));
                     }
-                   
+
                 }
 
             }
@@ -369,7 +347,7 @@ var product = await _shopDbContext.Products
                 .ProjectTo<ProductAdminListItemDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-              
+
 
 
             return new PageResult<ProductAdminListItemDto>

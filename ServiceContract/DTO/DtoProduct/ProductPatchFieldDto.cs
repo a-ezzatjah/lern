@@ -22,7 +22,7 @@ namespace ServiceContract.DTO.DtoProduct
         public PatchField<decimal?> DiscountValue { get; set; } 
         public DisconTypeEnum? DiscountType { get; set; }
 
-        public  PatchField<List<int>> CategoryIds { get; set; } = new();
+        public  List<int> CategoryIds { get; set; } = new();
         public PatchField<List<ProductSaleOptionPatchFieldDto>>? SaleOptions { get; set; } 
     }
 }
