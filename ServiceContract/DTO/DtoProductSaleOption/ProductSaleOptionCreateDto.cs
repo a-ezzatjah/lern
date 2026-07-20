@@ -6,6 +6,7 @@ namespace ServiceContract.DTO.DtoProductSaleOption
     public class ProductSaleOptionCreateDto
     {
         public string Title { get; set; } = null!;
+        public int ProductId { get; set; }
         public EnumSaleType SaleType { get; set; }
         public decimal? BasePrice { get; set; }
         public string? ImageUrl { get; set; }
@@ -22,6 +23,5 @@ namespace ServiceContract.DTO.DtoProductSaleOption
         public decimal? PerUnitLength { get; set; }
         public decimal? PerUnitWidth { get; set; }
         public decimal? PerUnitHeight { get; set; }
-        public List<SaleOptionColorCreateDto> SaleOptionColors { get; set; } = new();
     }
 }

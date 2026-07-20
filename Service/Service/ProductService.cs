@@ -114,8 +114,6 @@ namespace Service.Service
 
             var product = await _shopDbContext.Products
                             .Include(x => x.ProductCategories)
-                            .Include(x => x.SaleOptions)
-                                .ThenInclude(x => x.SaleOptionColors)
                             .FirstOrDefaultAsync(x => x.Id == model.Id);
             if (product == null)
             {
@@ -135,25 +133,7 @@ namespace Service.Service
                    })
                    .ToList();
 
-            _shopDbContext.ProductSaleOptions.RemoveRange(product.SaleOptions);
-            product.SaleOptions = model.SaleOptions
-                .Select(saleOption =>
-                {
-                    var entity = _mapper.Map<ProductSaleOption>(saleOption);
-                    entity.Id = 0;
-                    entity.ProductId = product.Id;
-                    entity.SaleOptionColors = saleOption.SaleOptionColors
-                        .Select(color =>
-                        {
-                            var colorEntity = _mapper.Map<SaleOptionColor>(color);
-                            colorEntity.Id = 0;
-                            return colorEntity;
-                        })
-                        .ToList();
-                    return entity;
-                })
-                .ToList();
-
+            
             product.UpdatedAt = DateTime.UtcNow;
             await _shopDbContext.SaveChangesAsync();
 
@@ -165,6 +145,14 @@ namespace Service.Service
                 ? ServiceResponseDto<ProductListItemDto>.Success(result)
                 : ServiceResponseDto<ProductListItemDto>.Fail("خطا در بازخوانی اطلاعات...");
         }
+
+
+
+
+
+
+
+
 
 
         public async Task<ServiceResponseDto<bool>> DeleteAsync(int productId)

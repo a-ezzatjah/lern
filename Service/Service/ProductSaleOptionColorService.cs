@@ -37,7 +37,7 @@ namespace Service.Service
 
 
 
-        ServiceResponseDto<SaleOptionColorDetailDto> IProductSaleOptionColorService.CreateProdactColor(SaleOptionColorCreateDto model)
+        public ServiceResponseDto<SaleOptionColorDetailDto> CreateProdactColor(SaleOptionColorCreateDto model)
         {
 
             if (model == null)
@@ -71,7 +71,7 @@ namespace Service.Service
 
         }
 
-        ServiceResponseDto<SaleOptionColorDetailDto> IProductSaleOptionColorService.DeleteProdactColor(int ProductColorid)
+        public ServiceResponseDto<SaleOptionColorDetailDto> DeleteProdactColor(int ProductColorid)
         {
             var productcolor = _shopDbContext.SaleOptionColors.FirstOrDefault(x => x.Id == ProductColorid);
 
@@ -92,7 +92,7 @@ namespace Service.Service
 
 
 
-        ServiceResponseDto<SaleOptionColorDetailDto> IProductSaleOptionColorService.UpdateProductColor(SaleOptionColorUpdateDto model)
+        public ServiceResponseDto<SaleOptionColorDetailDto> UpdateProductColor(SaleOptionColorUpdateDto model)
         {
 
             if (model == null)

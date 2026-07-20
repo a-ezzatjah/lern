@@ -55,30 +55,6 @@ namespace Service.Validators.ProductValodation
            }).When(x => x.CategoryIds != null && x.CategoryIds.Any())
              .WithMessage("یک یا چند دسته‌بندی معتبر نیستند");
 
-            RuleForEach(x => x.SaleOptions).ChildRules(option =>
-            {
-                option.RuleFor(x => x.Title)
-                    .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("عنوان حالت فروش الزامی میباشد");
-
-                option.RuleFor(x => x.BasePrice)
-                    .GreaterThan(0).WithMessage("قیمت پایه حالت فروش باید بیشتر از صفر باشد");
-
-                option.RuleFor(x => x.Step)
-                    .GreaterThan(0).WithMessage("گام تعداد باید بیشتر از صفر باشد");
-
-                option.RuleForEach(x => x.SaleOptionColors).ChildRules(color =>
-                {
-                    color.RuleFor(x => x.Color)
-                        .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("نام رنگ الزامی میباشد");
-
-                    color.RuleFor(x => x.Price)
-                        .GreaterThanOrEqualTo(0).WithMessage("قیمت رنگ نمی‌تواند منفی باشد");
-                });
-            });
-
-
-
-
             //          private async Task<bool> BeUniqueName(string? name, CancellationToken cancellationToken)
             //    {
             //        if (string.IsNullOrWhiteSpace(name))

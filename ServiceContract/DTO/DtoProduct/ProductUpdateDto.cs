@@ -13,6 +13,5 @@ namespace ServiceContract.DTO.DtoProduct
         public decimal? DiscountValue { get; set; }
         public DisconTypeEnum? DiscountType { get; set; }
         public List<int> CategoryIds { get; set; } = new();
-        public List<ProductSaleOptionUpdateDto> SaleOptions { get; set; } = new();
     }
 }

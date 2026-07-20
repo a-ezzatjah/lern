@@ -23,6 +23,5 @@ namespace ServiceContract.DTO.DtoProductSaleOption
         public decimal? PerUnitLength { get; set; }
         public decimal? PerUnitWidth { get; set; }
         public decimal? PerUnitHeight { get; set; }
-        public List<SaleOptionColorUpdateDto> SaleOptionColors { get; set; } = new();
     }
 }

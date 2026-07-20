@@ -18,6 +18,22 @@ namespace Service.Service
             _mapper = mapper;
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public async Task<ServiceResponseDto<ProductSaleOptionListItemDto>> AddProductSaleOptionAsync(
             ProductSaleOptionCreateDto model)
         {
@@ -35,11 +51,24 @@ namespace Service.Service
             return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public async Task<ServiceResponseDto<ProductSaleOptionListItemDto>> GetProductSaleOptionByIdAsync(int id)
         {
             var productSaleOption = await _shopDbContext.ProductSaleOptions
                 .AsNoTracking()
-                .Include(x => x.SaleOptionColors)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (productSaleOption == null)
@@ -50,6 +79,15 @@ namespace Service.Service
             var result = _mapper.Map<ProductSaleOptionListItemDto>(productSaleOption);
             return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
         }
+
+
+
+
+
+
+
+
+
 
         public async Task<ServiceResponseDto<bool>> DeleteProductSaleOptionAsync(int id)
         {
@@ -67,6 +105,22 @@ namespace Service.Service
             return ServiceResponseDto<bool>.Success(true);
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public async Task<ServiceResponseDto<ProductSaleOptionListItemDto>> UpdateProductSaleOptionAsync(
             ProductSaleOptionUpdateDto model)
         {
@@ -81,7 +135,6 @@ namespace Service.Service
             }
 
             var productSaleOption = await _shopDbContext.ProductSaleOptions
-                .Include(x => x.SaleOptionColors)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
 
             if (productSaleOption == null)
@@ -91,19 +144,7 @@ namespace Service.Service
 
             _mapper.Map(model, productSaleOption);
 
-            if (model.SaleOptionColors != null)
-            {
-                _shopDbContext.SaleOptionColors.RemoveRange(productSaleOption.SaleOptionColors);
-                productSaleOption.SaleOptionColors = model.SaleOptionColors
-                    .Select(x => new SaleOptionColor
-                    {
-                        Color = x.Color,
-                        HexCode = x.HexCode,
-                        ImageUrl = x.ImageUrl,
-                        Price = x.Price
-                    })
-                    .ToList();
-            }
+          
 
             await _shopDbContext.SaveChangesAsync();
 

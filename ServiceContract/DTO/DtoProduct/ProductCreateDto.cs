@@ -18,7 +18,6 @@ namespace ServiceContract.DTO.DtoProduct
         public DisconTypeEnum? DiscountType { get; set; }
         public bool IsActive { get; set; } = true;
         public List<int> CategoryIds { get; set; } = new();
-        public List<ProductSaleOptionCreateDto> SaleOptions { get; set; } = new();
 
     }
 }
