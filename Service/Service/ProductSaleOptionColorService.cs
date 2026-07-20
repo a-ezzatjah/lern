@@ -37,7 +37,16 @@ namespace Service.Service
 
 
 
-        public ServiceResponseDto<SaleOptionColorDetailDto> CreateProdactColor(SaleOptionColorCreateDto model)
+
+
+
+
+
+
+
+
+
+      public  ServiceResponseDto<SaleOptionColorDetailDto>CreateProdactColor(SaleOptionColorCreateDto model)
         {
 
             if (model == null)
@@ -45,25 +54,27 @@ namespace Service.Service
                return ServiceResponseDto<SaleOptionColorDetailDto>.Fail("اطلاعات ساخت موحود نمیباشد");
             }
 
-            var productcolor = new SaleOptionColor();
+            var ProductColor = new SaleOptionColor();
 
-            productcolor.Color = model.Color;
-            productcolor.HexCode = model.HexCode;
-            productcolor.Price = model.Price;
-            productcolor.ImageUrl = model.ImageUrl;
+            ProductColor.SaleOptionId = model.SaleOptionId;
+            ProductColor.Color = model.Color;
+            ProductColor.HexCode = model.HexCode;
+            ProductColor.Price = model.Price;
+            ProductColor.ImageUrl = model.ImageUrl;
 
 
-            _shopDbContext.SaleOptionColors.Add(productcolor);
+            _shopDbContext.SaleOptionColors.Add(ProductColor);
             _shopDbContext.SaveChanges();
 
 
 
             var result = new SaleOptionColorDetailDto();
 
-            result.Color = productcolor.Color;
-            result.HexCode = productcolor.HexCode;
-            result.Price = productcolor.Price;
-            result.ImageUrl = productcolor.ImageUrl;
+            
+            result.Color = ProductColor.Color;
+            result.HexCode = ProductColor.HexCode;
+            result.Price = ProductColor.Price;
+            result.ImageUrl = ProductColor.ImageUrl;
 
 
             return ServiceResponseDto<SaleOptionColorDetailDto>.Success(result);
@@ -71,7 +82,25 @@ namespace Service.Service
 
         }
 
-        public ServiceResponseDto<SaleOptionColorDetailDto> DeleteProdactColor(int ProductColorid)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       public ServiceResponseDto<SaleOptionColorDetailDto>DeleteProdactColor(int ProductColorid)
         {
             var productcolor = _shopDbContext.SaleOptionColors.FirstOrDefault(x => x.Id == ProductColorid);
 
@@ -92,7 +121,14 @@ namespace Service.Service
 
 
 
-        public ServiceResponseDto<SaleOptionColorDetailDto> UpdateProductColor(SaleOptionColorUpdateDto model)
+
+
+
+
+
+
+
+         public ServiceResponseDto<SaleOptionColorDetailDto> UpdateProductColor(SaleOptionColorUpdateDto model)
         {
 
             if (model == null)
@@ -120,6 +156,8 @@ namespace Service.Service
 
             var result = new SaleOptionColorDetailDto();
 
+            result.Id = ProductColor.Id;
+            result.SaleOptionId = ProductColor.SaleOptionId;
             result.Color = ProductColor.Color;
             result.HexCode = ProductColor.HexCode;
             result.Price = ProductColor.Price;
