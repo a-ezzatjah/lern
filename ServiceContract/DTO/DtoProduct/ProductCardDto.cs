@@ -14,7 +14,7 @@ public class ProductCardDto
     public decimal? MinPrice { get; set; } 
     public decimal? MaxPrice { get; set; } 
 
-    public decimal? BasePrise { get; set; } 
+    public decimal? BasePrice { get; set; } 
     
     public bool IsAvailable { get; set; } // مجموع موجودی تمام Variantها > 0
 
