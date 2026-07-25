@@ -22,5 +22,8 @@ namespace Entities
         public string? HexCode { get; set; }
 
         public string? ImageUrl { get; set; }
+
+        public ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
+
     }
 }

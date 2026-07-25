@@ -1,0 +1,4197 @@
+﻿===== C:\Users\aliwo\source\repos\lern\Entities\Category.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities
+{
+    public class Category
+    {
+
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
+        public int? ParentId { get; set; }
+        public Category? Parent { get; set; }
+        public int? SortOrder { get; set; }
+        public SeoData? Seo { get; set; }
+        public ICollection<Category> Children { get; set; } = new List<Category>();
+        public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\Enums\DisconTypeEnum.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DTO
+{
+    public enum DisconTypeEnum
+    {
+        percent=1,
+        price
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\Enums\EnumProductSearchType.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ServiceContract.Enums
+{
+    public enum EnumProductSearchType
+    {
+        All = 1,
+        Slug = 2,
+        Name = 3,
+        CategoryName = 4,
+        SaleOptionTitle = 6,
+        Color = 7,
+        price = 8
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\Enums\EnumProductSortType.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ServiceContract.Enums
+{
+    public enum EnumProductSortType
+    {
+
+        Id=1,
+
+        slug=2,
+
+        Name=3,
+
+        Price=4,
+
+        HasDiscount=5,
+
+        DiscountValue=6,
+
+        CategoryName=7,
+
+        SaleOptionTitle=8,
+    
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\Enums\EnumSaleType.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities.Enums
+{
+   public  enum EnumSaleType
+    {
+
+    Pack = 1,
+    Meter = 2,
+    Toop = 3,
+    
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\Enums\OrderEnum.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DTO
+{
+    public enum OrderEnum
+    {
+        ASC,
+
+        DESC
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\Migrations\20260711180808_ConfigureDecimalPrecisions.cs =====
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Entities.Migrations
+{
+    /// <inheritdoc />
+    public partial class ConfigureDecimalPrecisions : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AlterColumn<decimal>(
+                name: "Step",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: false,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)");
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "PerUnitWidth",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "PerUnitWeight",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "PerUnitLength",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "PerUnitHeight",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "MinQuantity",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "MaxQuantity",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "FixedWidth",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "FixedWeight",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "FixedLength",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "FixedHeight",
+                table: "ProductSaleOptions",
+                type: "decimal(18,3)",
+                precision: 18,
+                scale: 3,
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)",
+                oldNullable: true);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AlterColumn<decimal>(
+                name: "Step",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: false,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "PerUnitWidth",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "PerUnitWeight",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "PerUnitLength",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "PerUnitHeight",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "MinQuantity",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "MaxQuantity",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "FixedWidth",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "FixedWeight",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "FixedLength",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<decimal>(
+                name: "FixedHeight",
+                table: "ProductSaleOptions",
+                type: "decimal(18,2)",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,3)",
+                oldPrecision: 18,
+                oldScale: 3,
+                oldNullable: true);
+        }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\Migrations\20260711180808_ConfigureDecimalPrecisions.Designer.cs =====
+// <auto-generated />
+using System;
+using Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+#nullable disable
+
+namespace Entities.Migrations
+{
+    [DbContext(typeof(ShopDbContext))]
+    [Migration("20260711180808_ConfigureDecimalPrecisions")]
+    partial class ConfigureDecimalPrecisions
+    {
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.26")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Entities.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("categories", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DiscountType")
+                        .HasColumnType("int")
+                        .HasColumnName("DisconType");
+
+                    b.Property<decimal?>("DiscountValue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("Discount");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("products", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.ProductCategory", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("ProductCategories", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.ProductSaleOption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("BasePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("FixedHeight")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("FixedLength")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("FixedWeight")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("FixedWidth")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("InputLabel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("MaxQuantity")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("MinQuantity")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("PerUnitHeight")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("PerUnitLength")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("PerUnitWeight")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("PerUnitWidth")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SaleType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Step")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UnitName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductSaleOptions", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.SaleOptionColor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("HexCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SaleOptionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SaleOptionId");
+
+                    b.ToTable("SaleOptionColors", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.Category", b =>
+                {
+                    b.HasOne("Entities.Category", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.OwnsOne("Entities.SeoData", "Seo", b1 =>
+                        {
+                            b1.Property<int>("CategoryId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("CanonicalUrl")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("CanonicalUrl");
+
+                            b1.Property<DateTime>("CreatedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<bool>("FollowPage")
+                                .HasColumnType("bit")
+                                .HasColumnName("FollowPage");
+
+                            b1.Property<bool>("IndexPage")
+                                .HasColumnType("bit")
+                                .HasColumnName("IndexPage");
+
+                            b1.Property<string>("MetaDescription")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("MetaDescription");
+
+                            b1.Property<string>("MetaKeywords")
+                                .HasMaxLength(300)
+                                .HasColumnType("nvarchar(300)")
+                                .HasColumnName("MetaKeywords");
+
+                            b1.Property<string>("MetaTitle")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("MetaTitle");
+
+                            b1.Property<string>("OgDescription")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("OgDescription");
+
+                            b1.Property<string>("OgImageUrl")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("OgImageUrl");
+
+                            b1.Property<string>("OgTitle")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("OgTitle");
+
+                            b1.Property<DateTime?>("UpdatedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.HasKey("CategoryId");
+
+                            b1.ToTable("categories");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CategoryId");
+                        });
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("Seo");
+                });
+
+            modelBuilder.Entity("Entities.Product", b =>
+                {
+                    b.OwnsOne("Entities.SeoData", "Seo", b1 =>
+                        {
+                            b1.Property<int>("ProductId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("CanonicalUrl")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("CanonicalUrl");
+
+                            b1.Property<DateTime>("CreatedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<bool>("FollowPage")
+                                .HasColumnType("bit")
+                                .HasColumnName("FollowPage");
+
+                            b1.Property<bool>("IndexPage")
+                                .HasColumnType("bit")
+                                .HasColumnName("IndexPage");
+
+                            b1.Property<string>("MetaDescription")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("MetaDescription");
+
+                            b1.Property<string>("MetaKeywords")
+                                .HasMaxLength(300)
+                                .HasColumnType("nvarchar(300)")
+                                .HasColumnName("MetaKeywords");
+
+                            b1.Property<string>("MetaTitle")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("MetaTitle");
+
+                            b1.Property<string>("OgDescription")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("OgDescription");
+
+                            b1.Property<string>("OgImageUrl")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("OgImageUrl");
+
+                            b1.Property<string>("OgTitle")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("OgTitle");
+
+                            b1.Property<DateTime?>("UpdatedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.HasKey("ProductId");
+
+                            b1.ToTable("products");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId");
+                        });
+
+                    b.Navigation("Seo");
+                });
+
+            modelBuilder.Entity("Entities.ProductCategory", b =>
+                {
+                    b.HasOne("Entities.Category", "Category")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entities.Product", "Product")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Entities.ProductSaleOption", b =>
+                {
+                    b.HasOne("Entities.Product", "Product")
+                        .WithMany("SaleOptions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Entities.SaleOptionColor", b =>
+                {
+                    b.HasOne("Entities.ProductSaleOption", "ProductSaleOption")
+                        .WithMany("SaleOptionColors")
+                        .HasForeignKey("SaleOptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductSaleOption");
+                });
+
+            modelBuilder.Entity("Entities.Category", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("ProductCategories");
+                });
+
+            modelBuilder.Entity("Entities.Product", b =>
+                {
+                    b.Navigation("ProductCategories");
+
+                    b.Navigation("SaleOptions");
+                });
+
+            modelBuilder.Entity("Entities.ProductSaleOption", b =>
+                {
+                    b.Navigation("SaleOptionColors");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\Migrations\ShopDbContextModelSnapshot.cs =====
+// <auto-generated />
+using System;
+using Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+#nullable disable
+
+namespace Entities.Migrations
+{
+    [DbContext(typeof(ShopDbContext))]
+    partial class ShopDbContextModelSnapshot : ModelSnapshot
+    {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.26")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Entities.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("categories", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DiscountType")
+                        .HasColumnType("int")
+                        .HasColumnName("DisconType");
+
+                    b.Property<decimal?>("DiscountValue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("Discount");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("products", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.ProductCategory", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("ProductCategories", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.ProductSaleOption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("BasePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("FixedHeight")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("FixedLength")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("FixedWeight")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("FixedWidth")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("InputLabel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("MaxQuantity")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("MinQuantity")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("PerUnitHeight")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("PerUnitLength")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("PerUnitWeight")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("PerUnitWidth")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SaleType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Step")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UnitName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductSaleOptions", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.SaleOptionColor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("HexCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SaleOptionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SaleOptionId");
+
+                    b.ToTable("SaleOptionColors", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.Category", b =>
+                {
+                    b.HasOne("Entities.Category", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.OwnsOne("Entities.SeoData", "Seo", b1 =>
+                        {
+                            b1.Property<int>("CategoryId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("CanonicalUrl")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("CanonicalUrl");
+
+                            b1.Property<DateTime>("CreatedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<bool>("FollowPage")
+                                .HasColumnType("bit")
+                                .HasColumnName("FollowPage");
+
+                            b1.Property<bool>("IndexPage")
+                                .HasColumnType("bit")
+                                .HasColumnName("IndexPage");
+
+                            b1.Property<string>("MetaDescription")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("MetaDescription");
+
+                            b1.Property<string>("MetaKeywords")
+                                .HasMaxLength(300)
+                                .HasColumnType("nvarchar(300)")
+                                .HasColumnName("MetaKeywords");
+
+                            b1.Property<string>("MetaTitle")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("MetaTitle");
+
+                            b1.Property<string>("OgDescription")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("OgDescription");
+
+                            b1.Property<string>("OgImageUrl")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("OgImageUrl");
+
+                            b1.Property<string>("OgTitle")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("OgTitle");
+
+                            b1.Property<DateTime?>("UpdatedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.HasKey("CategoryId");
+
+                            b1.ToTable("categories");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CategoryId");
+                        });
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("Seo");
+                });
+
+            modelBuilder.Entity("Entities.Product", b =>
+                {
+                    b.OwnsOne("Entities.SeoData", "Seo", b1 =>
+                        {
+                            b1.Property<int>("ProductId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("CanonicalUrl")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("CanonicalUrl");
+
+                            b1.Property<DateTime>("CreatedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<bool>("FollowPage")
+                                .HasColumnType("bit")
+                                .HasColumnName("FollowPage");
+
+                            b1.Property<bool>("IndexPage")
+                                .HasColumnType("bit")
+                                .HasColumnName("IndexPage");
+
+                            b1.Property<string>("MetaDescription")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("MetaDescription");
+
+                            b1.Property<string>("MetaKeywords")
+                                .HasMaxLength(300)
+                                .HasColumnType("nvarchar(300)")
+                                .HasColumnName("MetaKeywords");
+
+                            b1.Property<string>("MetaTitle")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("MetaTitle");
+
+                            b1.Property<string>("OgDescription")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("OgDescription");
+
+                            b1.Property<string>("OgImageUrl")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("OgImageUrl");
+
+                            b1.Property<string>("OgTitle")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("OgTitle");
+
+                            b1.Property<DateTime?>("UpdatedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.HasKey("ProductId");
+
+                            b1.ToTable("products");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId");
+                        });
+
+                    b.Navigation("Seo");
+                });
+
+            modelBuilder.Entity("Entities.ProductCategory", b =>
+                {
+                    b.HasOne("Entities.Category", "Category")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entities.Product", "Product")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Entities.ProductSaleOption", b =>
+                {
+                    b.HasOne("Entities.Product", "Product")
+                        .WithMany("SaleOptions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Entities.SaleOptionColor", b =>
+                {
+                    b.HasOne("Entities.ProductSaleOption", "ProductSaleOption")
+                        .WithMany("SaleOptionColors")
+                        .HasForeignKey("SaleOptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductSaleOption");
+                });
+
+            modelBuilder.Entity("Entities.Category", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("ProductCategories");
+                });
+
+            modelBuilder.Entity("Entities.Product", b =>
+                {
+                    b.Navigation("ProductCategories");
+
+                    b.Navigation("SaleOptions");
+                });
+
+            modelBuilder.Entity("Entities.ProductSaleOption", b =>
+                {
+                    b.Navigation("SaleOptionColors");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\Product.cs =====
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DTO;
+
+namespace Entities
+{
+    public class Product
+    {
+
+        [Key]
+
+        public int Id { get; set; }
+      
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
+        public string? Description { get; set; }
+        public bool IsActive { get; set; } = true;
+
+        [Column("Discount")]
+        public decimal? DiscountValue { get; set; }
+
+        [Column("DisconType")]
+        public DisconTypeEnum? DiscountType { get; set; }
+
+        [NotMapped]
+        public bool HasDiscount => DiscountValue.HasValue && DiscountValue.Value > 0;
+
+        public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+
+        public ICollection<ProductSaleOption> SaleOptions { get; set; } = new List<ProductSaleOption>();
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+
+        public SeoData? Seo { get; set; }
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\ProductCategory.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities
+{
+    public class ProductCategory
+    {
+
+        public int ProductId { get; set; }
+        public Product Product { get; set; } = null!;
+        public int CategoryId { get; set; }
+        public Category Category { get; set; } = null!;
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\ProductImage.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities
+{
+    public class ProductImage
+    {
+        public int Id { get; set; }
+
+        public int ProductId { get; set; }
+        public Product Product { get; set; }
+
+        // اختیاری: اگر عکس متعلق به یک رنگ یا تنوع خاص است
+        public int? VariantId { get; set; }
+        public ProductVariant Variant { get; set; }
+
+        public string ImageUrl { get; set; }
+        public string AltText { get; set; }
+
+        public int SortOrder { get; set; } // برای مشخص کردن ترتیب نمایش در گالری (0, 1, 2...)
+        public bool IsPrimary { get; set; } // آیا عکس اصلی/کارت محصول است؟
+
+
+
+
+
+
+
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\ProductSaleOption.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entities.Enums;
+
+namespace Entities
+{
+    public class ProductSaleOption
+    {
+
+        public int Id { get; set; }
+
+        public int ProductId { get; set; }
+        public Product Product { get; set; } = null!;
+
+        public string Title { get; set; } = null!;
+        public EnumSaleType SaleType { get; set; }
+
+        public decimal? BasePrice {get;set;}
+
+        public string? ImageUrl { get; set; }
+
+
+        public string? UnitName { get; set; }
+        public string? InputLabel { get; set; }
+
+        public decimal? MinQuantity { get; set; }
+        public decimal? MaxQuantity { get; set; }
+        public decimal Step { get; set; } = 1;
+
+        public decimal? FixedWeight { get; set; }
+        public decimal? FixedLength { get; set; }
+        public decimal? FixedWidth { get; set; }
+        public decimal? FixedHeight { get; set; }
+
+        public decimal? PerUnitWeight { get; set; }
+        public decimal? PerUnitLength { get; set; }
+        public decimal? PerUnitWidth { get; set; }
+        public decimal? PerUnitHeight { get; set; }
+
+        public ICollection<SaleOptionColor> SaleOptionColors { get; set;} = new List<SaleOptionColor>();
+       
+    }
+
+
+}
+
+
+===== C:\Users\aliwo\source\repos\lern\Entities\ProductVariant.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities
+{
+    public class ProductVariant
+    {
+        public int Id { get; set; }
+
+        public int ProductId { get; set; }
+        public Product product { get; set; }
+
+        public int ProductSaleOptionId { get; set; }
+        public ProductSaleOption ProductSaleOption { get; set; }
+
+        public int SaleOptionColorId { get; set; }
+        public SaleOptionColor optionColor { get; set; }
+
+
+        // اطلاعات انبارداری و قیمت
+        public string Sku { get; set; } // شناسه انبارداری یکتا (مثلا FABRIC-METRIC-RED)
+        public decimal Price { get; set; } // قیمت این تنوع خاص
+        public int StockQuantity { get; set; } // موجودی واقعی فیزیکی در انبار
+        public int ReservedQuantity { get; set; } // موجودی رزرو شده (مثلاً در سبد خریدهای معلق)
+
+
+
+        public int AvailableQuantity => StockQuantity - ReservedQuantity;
+
+
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\SaleOptionColor.cs =====
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities
+{
+    public class SaleOptionColor
+    {
+        public int Id { get; set; }
+
+        [MaxLength(50)]
+        public string Color { get; set; } = null!;
+
+        public int SaleOptionId { get; set; }
+        public ProductSaleOption ProductSaleOption { get; set; } = null!;
+
+        public decimal? Price { get; set; }  // قیمت مخصوص این رنگ
+
+        public string? HexCode { get; set; }
+
+        public string? ImageUrl { get; set; }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\SeoData.cs =====
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities
+{
+    public class SeoData
+    {
+    
+
+        public string? MetaTitle { get; set; }
+        public string? MetaDescription { get; set; }
+        public string? MetaKeywords { get; set; }
+
+        public string? CanonicalUrl { get; set; }
+        public string? OgTitle { get; set; }
+        public string? OgDescription { get; set; }
+        public string? OgImageUrl { get; set; }
+
+        public bool IndexPage { get; set; } = true;
+        public bool FollowPage { get; set; } = true;
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Entities\ShopDbContext.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DTO;
+using Microsoft.EntityFrameworkCore;
+
+namespace Entities
+{
+    public class ShopDbContext : DbContext
+    {
+        public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options)
+        {
+
+
+        }
+
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<ProductSaleOption> ProductSaleOptions { get; set; }
+        public DbSet<SaleOptionColor> SaleOptionColors { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Product>().ToTable("products");
+            modelBuilder.Entity<Category>().ToTable("categories");
+            modelBuilder.Entity<ProductCategory>().ToTable("ProductCategories");
+            modelBuilder.Entity<ProductSaleOption>().ToTable("ProductSaleOptions");
+            modelBuilder.Entity<SaleOptionColor>().ToTable("SaleOptionColors");
+
+            // ProductCategory composite key
+            modelBuilder.Entity<ProductCategory>().HasKey(x => new { x.ProductId, x.CategoryId });
+            modelBuilder.Entity<ProductCategory>()
+                .HasOne(x => x.Product)
+                .WithMany(x => x.ProductCategories)
+                .HasForeignKey(x => x.ProductId);
+            modelBuilder.Entity<ProductCategory>()
+                .HasOne(x => x.Category)
+                .WithMany(x => x.ProductCategories)
+                .HasForeignKey(x => x.CategoryId);
+
+            // Category self-referencing
+            modelBuilder.Entity<Category>()
+                .HasOne(x => x.Parent)
+                .WithMany(x => x.Children)
+                .HasForeignKey(x => x.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+// Product Ã¢â€ â€™ SeoData (Owned Entity)
+            modelBuilder.Entity<Product>()
+                .OwnsOne(p => p.Seo, seo =>
+                {
+                   
+                    seo.Property(s => s.MetaTitle).HasMaxLength(200).HasColumnName("MetaTitle");
+                    seo.Property(s => s.MetaDescription).HasMaxLength(500).HasColumnName("MetaDescription");
+                    seo.Property(s => s.MetaKeywords).HasMaxLength(300).HasColumnName("MetaKeywords");
+                    seo.Property(s => s.CanonicalUrl).HasMaxLength(500).HasColumnName("CanonicalUrl");
+                    seo.Property(s => s.OgTitle).HasMaxLength(200).HasColumnName("OgTitle");
+                    seo.Property(s => s.OgDescription).HasMaxLength(500).HasColumnName("OgDescription");
+                    seo.Property(s => s.OgImageUrl).HasMaxLength(500).HasColumnName("OgImageUrl");
+                    seo.Property(s => s.IndexPage).HasColumnName("IndexPage");
+                    seo.Property(s => s.FollowPage).HasColumnName("FollowPage");
+                });
+
+
+            // Category Ã¢â€ â€™ SeoData (Owned Entity)
+
+            modelBuilder.Entity<Category>()
+               .OwnsOne(c => c.Seo, seo =>
+               {
+                   seo.Property(s => s.MetaTitle).HasMaxLength(200).HasColumnName("MetaTitle");
+                   seo.Property(s => s.MetaDescription).HasMaxLength(500).HasColumnName("MetaDescription");
+                   seo.Property(s => s.MetaKeywords).HasMaxLength(300).HasColumnName("MetaKeywords");
+                   seo.Property(s => s.CanonicalUrl).HasMaxLength(500).HasColumnName("CanonicalUrl");
+                   seo.Property(s => s.OgTitle).HasMaxLength(200).HasColumnName("OgTitle");
+                   seo.Property(s => s.OgDescription).HasMaxLength(500).HasColumnName("OgDescription");
+                   seo.Property(s => s.OgImageUrl).HasMaxLength(500).HasColumnName("OgImageUrl");
+                   seo.Property(s => s.IndexPage).HasColumnName("IndexPage");
+                   seo.Property(s => s.FollowPage).HasColumnName("FollowPage");
+               });
+
+
+
+
+            // Product Ã¢â€ â€™ ProductSaleOption
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.ImageUrl)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<ProductSaleOption>()
+                .HasOne(pso => pso.Product)
+                .WithMany(p => p.SaleOptions)
+                .HasForeignKey(pso => pso.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Decimal precision
+            modelBuilder.Entity<Product>()
+                .Property(p => p.DiscountValue).HasPrecision(18, 2);
+
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.BasePrice).HasPrecision(18, 2);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.MinQuantity).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.MaxQuantity).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.Step).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.FixedWeight).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.FixedLength).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.FixedWidth).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.FixedHeight).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.PerUnitWeight).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.PerUnitLength).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.PerUnitWidth).HasPrecision(18, 3);
+            modelBuilder.Entity<ProductSaleOption>()
+                .Property(pso => pso.PerUnitHeight).HasPrecision(18, 3);
+            // ProductSaleOption Ã¢â€ â€™ SaleOptionColor
+            modelBuilder.Entity<SaleOptionColor>()
+                .Property(soc => soc.ImageUrl)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<SaleOptionColor>()
+                .Property(soc => soc.HexCode)
+                .HasMaxLength(20);
+            modelBuilder.Entity<SaleOptionColor>()
+                .Property(soc => soc.Price).HasPrecision(18, 2);
+
+            modelBuilder.Entity<SaleOptionColor>()
+                .HasOne(soc => soc.ProductSaleOption)
+                .WithMany(pso => pso.SaleOptionColors)
+                .HasForeignKey(soc => soc.SaleOptionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Product constraints
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Name).IsRequired().HasMaxLength(200);
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Slug).IsRequired().HasMaxLength(200);
+            modelBuilder.Entity<Product>()
+                .HasIndex(p => p.Name).IsUnique();
+            modelBuilder.Entity<Product>()
+                .HasIndex(p => p.Slug).IsUnique();
+
+            // Category constraints
+            modelBuilder.Entity<Category>()
+                .Property(c => c.Name).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.Name).IsUnique();
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.Slug).IsUnique();
+        }
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\lern\Controller\ProductController.cs =====
+using Microsoft.AspNetCore.Mvc;
+using ServiceContract.DTO.DtoProduct;
+using ServiceContract.Interfaces;
+
+namespace lern.Controller
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ProductController : ControllerBase
+    {
+        private readonly IProductService _productService;
+
+        public ProductController(IProductService productService)
+        {
+            _productService = productService;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            var result = await _productService.GetByIdAsync(id);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddAsync(ProductCreateDto model)
+        {
+            var result = await _productService.AddProductAsync(model);
+            if (!result.Succeeded) return BadRequest(result.Errors ?? new List<string> { result.ErrorMessage ?? "Ø®Ø·Ø§" });
+            return Ok(result.Data);
+        }
+
+        [HttpGet("{id}/edit")]
+        public async Task<IActionResult> GetForUpdateAsync(int id)
+        {
+            var model = await _productService.GetForUpdateAsync(id);
+            return model == null ? NotFound() : Ok(model);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsync(int id, ProductUpdateDto model)
+        {
+            if (id != model.Id)
+                return BadRequest("Ø´Ù†Ø§Ø³Ù‡ Ù…Ø³ÛŒØ± Ø¨Ø§ Ø´Ù†Ø§Ø³Ù‡ Ù…Ø¯Ù„ ÛŒÚ©Ø³Ø§Ù† Ù†ÛŒØ³Øª");
+
+            var result = await _productService.UpdateAsync(model);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors ?? new List<string> { result.ErrorMessage ?? "Ø®Ø·Ø§" });
+
+            return Ok(result.Data);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var result = await _productService.DeleteAsync(id);
+            if (!result.Succeeded) return BadRequest(result.Errors ?? new List<string> { result.ErrorMessage ?? "Ø®Ø·Ø§" });
+            return Ok();
+        }
+    }
+}
+
+
+
+
+
+
+===== C:\Users\aliwo\source\repos\lern\lern\Program.cs =====
+using Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Service.Mapping;
+using ServiceContract.Interfaces;
+using FluentValidation;
+using DTO;
+using Service.Service;
+using Service.Validators.ProductValodation;
+
+
+var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductSaleOptionService, ProductSaleOptionService>();
+builder.Services.AddScoped<IProductSaleOptionColorService, ProductSaleOptionColorService>();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<ProductMappingProfile>();
+    cfg.AddProfile<CategoryMappingProfile>();
+});
+builder.Services.AddDbContext<ShopDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionstring")));
+builder.Services.AddValidatorsFromAssemblyContaining<ProductCreateDtoValidator>();
+
+var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+app.MapControllers();
+
+app.Run();
+
+
+===== C:\Users\aliwo\source\repos\lern\Service\Mapping\CategoryMappingProfile.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using Entities;
+using ServiceContract.DTO.DtoCategory;
+
+namespace Service.Mapping
+{
+    public class CategoryMappingProfile : Profile
+    {
+
+        public CategoryMappingProfile()
+        {
+            CreateMap<CategoryCreateDto, Category>()
+                .ForMember(s => s.Name, otp => otp.MapFrom(s => s.Name != null ? s.Name.Trim() : null))
+                .ForMember(s=>s.Slug, otp => otp.MapFrom(s => s.Slug != null ? s.Slug.Trim() : null));
+
+
+            CreateMap<Category, CategoryListItemDto>()
+                .ForMember(x => x.ParentName, otp => otp.MapFrom(s => s.Parent != null ? s.Parent.Name : null))
+                .ForMember(x => x.ChildrenCount, otp => otp.MapFrom(s => s.Children.Count));
+
+            CreateMap<Category, CategoryTreeItemDto>()
+                .ForMember(x => x.SortOrder, otp => otp.MapFrom(s => s.SortOrder ?? 0))
+                .ForMember(x => x.Children, otp => otp.Ignore());
+
+            CreateMap<CategoryUpdateDto, Category>()
+                .ForMember(x => x.Id, y => y.Ignore())
+                .ForMember(x => x.Name, otp =>
+                { otp.PreCondition(s => !string.IsNullOrWhiteSpace(s.Name)); otp.MapFrom(s => s.Name.Trim()); })
+                .ForMember(x => x.Slug, otp =>
+                { otp.PreCondition(s => !string.IsNullOrWhiteSpace(s.Slug)); otp.MapFrom(s => s.Slug.Trim()); });
+
+
+
+        }
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Mapping\ProductMappingProfile.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using Entities;
+using ServiceContract.DTO.DtoProduct;
+using ServiceContract.DTO.DtoProductSaleOption;
+using ServiceContract.DTO.DtoSaleOptionColor;
+using ServiceContract.DTO.DtoSeo;
+
+namespace Service.Mapping
+{
+    public class ProductMappingProfile : Profile
+    {
+        public ProductMappingProfile()
+        {
+            CreateMap<ProductCreateDto, Product>()
+                .ForMember(x => x.Name, otp => otp.MapFrom(s => s.Name.Trim()))
+                .ForMember(x => x.Slug, otp => otp.MapFrom(s => s.Slug.Trim()))
+                .ForMember(x => x.ProductCategories, otp => otp.Ignore())
+                .ForMember(x => x.Seo, otp => otp.Ignore())
+                .ForMember(x => x.CreatedAt, otp => otp.Ignore())
+                .ForMember(x => x.UpdatedAt, otp => otp.Ignore());
+
+            CreateMap<ProductSaleOptionCreateDto, ProductSaleOption>();
+
+             CreateMap<SeoDataDto,SeoData>();
+
+            CreateMap<ProductSaleOptionUpdateDto, ProductSaleOption>()
+                .ForMember(x => x.Id, otp => otp.Ignore())
+                .ForMember(x => x.ProductId, otp => otp.Ignore())
+                .ForMember(x => x.Product, otp => otp.Ignore())
+                .ForMember(x => x.SaleOptionColors, otp => otp.Ignore());
+
+            CreateMap<SaleOptionColorCreateDto, SaleOptionColor>()
+                .ForMember(x => x.Id, otp => otp.Ignore())
+                .ForMember(x => x.SaleOptionId, otp => otp.Ignore())
+                .ForMember(x => x.ProductSaleOption, otp => otp.Ignore());
+
+            CreateMap<SaleOptionColorUpdateDto, SaleOptionColor>()
+                .ForMember(x => x.Id, otp => otp.Ignore())
+                .ForMember(x => x.SaleOptionId, otp => otp.Ignore())
+                .ForMember(x => x.ProductSaleOption, otp => otp.Ignore());
+
+            CreateMap<ProductSaleOption, ProductSaleOptionDetailDto>();
+            CreateMap<ProductSaleOption, ProductSaleOptionUpdateDto>();
+
+            CreateMap<SaleOptionColor, SaleOptionColorDetailDto>();
+            CreateMap<SaleOptionColor, SaleOptionColorUpdateDto>();
+
+            CreateMap<ProductSaleOption, ProductSaleOptionListItemDto>()
+                .ForMember(x => x.Colors, otp => otp.MapFrom(s => s.SaleOptionColors));
+
+            CreateMap<SaleOptionColor, SaleOptionColorListItemDto>();
+
+            CreateMap<Product, ProductListItemDto>()
+                .ForMember(x => x.CategoriesCount, otp => otp.MapFrom(s => s.ProductCategories.Count))
+                .ForMember(x => x.SaleOptionsCount, otp => otp.MapFrom(s => s.SaleOptions.Count))
+                .ForMember(x => x.CategoryNames, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.Category.Name)))
+                .ForMember(x => x.SaleOptionTitles, otp => otp.MapFrom(s => s.SaleOptions.Select(pc => pc.Title)))
+                .ForMember(x => x.SaleOptions, otp => otp.MapFrom(s => s.SaleOptions));
+
+            CreateMap<Product, ProductDetailDto>()
+                .ForMember(x => x.CategoryIds, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.CategoryId)))
+                .ForMember(x => x.CategoryNames, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.Category.Name)));
+                
+            
+            CreateMap<Product, ProductUpdateDto>()
+                .ForMember(x => x.CategoryIds, otp => otp.MapFrom(s => s.ProductCategories.Select(pc => pc.CategoryId)));
+
+            CreateMap<ProductUpdateDto, Product>()
+                .ForMember(x => x.Id, y => y.Ignore())
+                .ForMember(x => x.Name, otp => otp.MapFrom(s => s.Name.Trim()))
+                .ForMember(x => x.Slug, otp => otp.MapFrom(s => s.Slug.Trim()))
+                .ForMember(x => x.ProductCategories, otp => otp.Ignore())
+                .ForMember(x => x.SaleOptions, otp => otp.Ignore())
+                .ForMember(x => x.Seo, otp => otp.Ignore())
+                .ForMember(x => x.CreatedAt, otp => otp.Ignore())
+                .ForMember(x => x.UpdatedAt, otp => otp.Ignore());
+        }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Mapping\SaleOptionMappingProfile.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+
+namespace Service.Mapping
+{
+   public  class SaleOptionMappingProfile : Profile
+    {
+
+        public SaleOptionMappingProfile()
+        {
+
+            CreateMap<>
+
+
+
+
+
+
+        }
+
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Service\CategoryService.cs =====
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Entities;
+using FluentValidation;
+using FluentValidation.Validators;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using ServiceContract.Common;
+using ServiceContract.DTO.DtoCategory;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.Interfaces;
+using ServiceContract.Queries;
+
+namespace Service.Service
+{
+    public class CategoryService : ICategoryService
+    {
+        private readonly ShopDbContext _shopDbContext;
+        private readonly IMapper _mapper;
+        private readonly IValidator<CategoryCreateDto> _addvalidation;
+        private readonly IValidator<CategoryUpdateDto> _updatevalidation;
+        private readonly IMemoryCache _cache;
+        private const string CategoriesTreeCacheKey = "categories_tree";
+
+
+
+        public CategoryService(ShopDbContext shopDbContext, IMapper mapper, IValidator<CategoryCreateDto> addDtoCategory
+            , IValidator<CategoryUpdateDto> dtoCategoryUpdate, IMemoryCache memoryCache)
+        {
+
+            _shopDbContext = shopDbContext;
+            _mapper = mapper;
+            _addvalidation = addDtoCategory;
+            _updatevalidation = dtoCategoryUpdate;
+            _cache = memoryCache;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<ServiceResponseDto<CategoryListItemDto>> AddCategoryAsync(CategoryCreateDto model)
+        {
+
+            if (model == null)
+            {
+                return ServiceResponseDto<CategoryListItemDto>.Fail("دسته بندی ساخته نشده است");
+            }
+            ;
+
+            var validation = await _addvalidation.ValidateAsync(model);
+            if (!validation.IsValid)
+            {
+
+                var error = validation.Errors.Select(x => x.ErrorMessage).ToList();
+                return ServiceResponseDto<CategoryListItemDto>.Fail(error);
+
+            }
+
+
+            var categorise = _mapper.Map<Category>(model);
+
+            _shopDbContext.Categories.Add(categorise);
+
+            await _shopDbContext.SaveChangesAsync();
+
+            var result = await _shopDbContext.Categories.Where(x => x.Id == categorise.Id)
+                 .Select(x => new CategoryListItemDto
+                 {
+                     Id = x.Id,
+                     Name = x.Name,
+                     Slug = x.Slug,
+                     ParentId = x.ParentId,
+                     SortOrder = x.SortOrder,
+                     ParentName = x.Parent != null ? x.Parent.Name : null,
+                     ChildrenCount = x.Children.Count(),
+                 }
+                 ).FirstOrDefaultAsync();
+
+            _cache.Remove(CategoriesTreeCacheKey);
+
+            if (result == null)
+            {
+                return ServiceResponseDto<CategoryListItemDto>.Fail("دسته‌بندی ساخته شد ولی بازیابی نتیجه ناموفق بود");
+            }
+
+
+            return ServiceResponseDto<CategoryListItemDto>.Success(result);
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<ServiceResponseDto<CategoryListItemDto>> UpdateCategoryAsync(CategoryUpdateDto model)
+        {
+
+            if (model == null)
+            {
+                return ServiceResponseDto<CategoryListItemDto>.Fail("مقدار وجود ندارد");
+            }
+
+            var validation = await _updatevalidation.ValidateAsync(model);
+            if (!validation.IsValid)
+            {
+
+                var error = validation.Errors.Select(x => x.ErrorMessage).ToList();
+                return ServiceResponseDto<CategoryListItemDto>.Fail(error);
+
+            }
+
+
+
+            var category = await _shopDbContext.Categories.FirstOrDefaultAsync(x => x.Id == model.Id);
+
+
+            if (category == null)
+            {
+                return ServiceResponseDto<CategoryListItemDto>.Fail("دسته‌بندی پیدا نشد");
+            }
+
+
+            _mapper.Map(model, category);
+
+            await _shopDbContext.SaveChangesAsync();
+
+            _cache.Remove(CategoriesTreeCacheKey);
+
+            var result =  await _shopDbContext.Categories.Where(x=>x.Id == model.Id)
+                .Select(x=> new CategoryListItemDto {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Slug = x.Slug,
+                    ParentId = x.ParentId,
+                    SortOrder = x.SortOrder,
+                    ParentName = x.Parent != null ? x.Parent.Name : null,
+                    ChildrenCount = x.Children.Count(),
+                }).FirstOrDefaultAsync();
+
+            if (result == null)
+            {
+                return ServiceResponseDto<CategoryListItemDto>.Fail("ویرایش انجام شد ولی بازیابی نتیجه ناموفق بود");
+            }
+
+            return ServiceResponseDto<CategoryListItemDto>.Success(result);
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<ServiceResponseDto<bool>> DeleteCategoryAsync(int CategoryId)
+        {
+
+
+            var Category = await _shopDbContext.Categories.FirstOrDefaultAsync(x => x.Id == CategoryId);
+
+
+            if (Category == null)
+            {
+                return ServiceResponseDto<bool>.Fail("دسته‌بندی پیدا نشد");
+            }
+
+            var hasChildren = await _shopDbContext.Categories.AnyAsync(x => x.ParentId == CategoryId);
+            if (hasChildren)
+            {
+                return ServiceResponseDto<bool>.Fail("این دسته زیرمجموعه دارد و قابل حذف نیست");
+
+            }
+
+            var hasProducts = await _shopDbContext.ProductCategories.AnyAsync(x => x.CategoryId == CategoryId);
+
+            if (hasProducts)
+            {
+                return ServiceResponseDto<bool>.Fail("این دسته به محصول متصل است و قابل حذف نیست");
+            }
+
+
+
+            _shopDbContext.Remove(Category);
+
+            await _shopDbContext.SaveChangesAsync();
+
+            _cache.Remove(CategoriesTreeCacheKey);
+
+            return ServiceResponseDto<bool>.Success();
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<PageResult<CategoryListItemDto>> GetAllAsync(CategoryQuery query)
+        {
+            IQueryable<Category> category = _shopDbContext.Categories
+                .OrderBy(x => x.SortOrder)
+                .ThenBy(x => x.Id)
+                .AsNoTracking();
+
+            query ??= new CategoryQuery();
+            query.Page = Math.Max(query.Page, 1);
+            query.PageSize = Math.Clamp(query.PageSize, 1, 100);
+
+
+            if (!string.IsNullOrWhiteSpace(query.SearchText))
+            {
+                category = category.Where(x => x.Name.Contains(query.SearchText));
+            }
+
+
+            var totalcategory = await category.CountAsync();
+
+            category = category.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize);
+
+            var item = await category.ProjectTo<CategoryListItemDto>(_mapper.ConfigurationProvider).ToListAsync();
+
+            return new PageResult<CategoryListItemDto>()
+            {
+                Items = item,
+                TotalCount = totalcategory,
+                Page = query.Page,
+                PageSize = query.PageSize
+            };
+
+
+        }
+
+
+
+
+
+        public async Task<List<CategoryTreeItemDto>> GetTreeAsync()
+        {
+
+            return await _cache.GetOrCreateAsync(CategoriesTreeCacheKey, async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
+
+                var all = await _shopDbContext.Categories.AsNoTracking()
+                    .ProjectTo<CategoryTreeItemDto>(_mapper.ConfigurationProvider).ToListAsync();
+                return BuildTree(all, null);
+            }) ?? new List<CategoryTreeItemDto>();
+
+
+
+        }
+
+
+
+        private List<CategoryTreeItemDto> BuildTree(List<CategoryTreeItemDto> allcategory, int? parentid, int depth = 0)
+        {
+
+            if (depth > 20) return new List<CategoryTreeItemDto>();
+
+            return allcategory.Where(x => x.ParentId == parentid)
+                              .OrderBy(x => x.SortOrder)
+                              .Select(x => new CategoryTreeItemDto
+                              {
+                                  Id = x.Id,
+                                  Name = x.Name,
+                                  ParentId = x.ParentId,
+                                  Slug = x.Slug,
+                                  SortOrder = x.SortOrder,
+                                  Children = BuildTree(allcategory, x.Id, depth + 1)
+                              }).ToList();
+
+        }
+
+
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Service\ProductSaleOptionColorService.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using Entities;
+using Microsoft.EntityFrameworkCore;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.DTO.DtoSaleOptionColor;
+using ServiceContract.Interfaces;
+
+namespace Service.Service
+{
+    public class ProductSaleOptionColorService : IProductSaleOptionColorService
+    {
+
+        private readonly ShopDbContext _shopDbContext;
+
+        private readonly IMapper _mapper;
+
+
+
+
+        public ProductSaleOptionColorService(ShopDbContext shopDbContext , IMapper mapper)
+        {
+
+            _shopDbContext = shopDbContext;
+
+            _mapper = mapper;
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      public  ServiceResponseDto<SaleOptionColorDetailDto>CreateProdactColor(SaleOptionColorCreateDto model)
+        {
+
+            if (model == null)
+            {
+               return ServiceResponseDto<SaleOptionColorDetailDto>.Fail("اطلاعات ساخت موحود نمیباشد");
+            }
+
+            var ProductColor = new SaleOptionColor();
+
+            ProductColor.SaleOptionId = model.SaleOptionId;
+            ProductColor.Color = model.Color;
+            ProductColor.HexCode = model.HexCode;
+            ProductColor.Price = model.Price;
+            ProductColor.ImageUrl = model.ImageUrl;
+
+
+            _shopDbContext.SaleOptionColors.Add(ProductColor);
+            _shopDbContext.SaveChanges();
+
+
+
+            var result = new SaleOptionColorDetailDto();
+
+            
+            result.Color = ProductColor.Color;
+            result.HexCode = ProductColor.HexCode;
+            result.Price = ProductColor.Price;
+            result.ImageUrl = ProductColor.ImageUrl;
+
+
+            return ServiceResponseDto<SaleOptionColorDetailDto>.Success(result);
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       public ServiceResponseDto<SaleOptionColorDetailDto>DeleteProdactColor(int ProductColorid)
+        {
+            var productcolor = _shopDbContext.SaleOptionColors.FirstOrDefault(x => x.Id == ProductColorid);
+
+            if (productcolor == null)
+            {
+                return ServiceResponseDto<SaleOptionColorDetailDto>.Fail("محصول موجود نمیباشد");
+            }
+
+
+            _shopDbContext.SaleOptionColors.Remove(productcolor);
+
+            _shopDbContext.SaveChanges();
+
+            return ServiceResponseDto<SaleOptionColorDetailDto>.Success();
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+         public ServiceResponseDto<SaleOptionColorDetailDto> UpdateProductColor(SaleOptionColorUpdateDto model)
+        {
+
+            if (model == null)
+            {
+                return ServiceResponseDto<SaleOptionColorDetailDto>.Fail("اطلاعات ساخت موحود نمیباشد");
+            }
+
+
+            var ProductColor = _shopDbContext.SaleOptionColors.FirstOrDefault(x => x.Id == model.Id);
+
+            if (ProductColor == null)
+            {
+                return ServiceResponseDto<SaleOptionColorDetailDto>.Fail("رنگ موردنظر یافت نشد");
+            }
+
+            ProductColor.Color = model.Color;
+            ProductColor.Price = model.Price;
+            ProductColor.ImageUrl = model.ImageUrl;
+            ProductColor.HexCode = model.HexCode;
+
+
+            _shopDbContext.SaveChanges();
+
+
+
+            var result = new SaleOptionColorDetailDto();
+
+            result.Id = ProductColor.Id;
+            result.SaleOptionId = ProductColor.SaleOptionId;
+            result.Color = ProductColor.Color;
+            result.HexCode = ProductColor.HexCode;
+            result.Price = ProductColor.Price;
+            result.ImageUrl = ProductColor.ImageUrl;
+
+            return ServiceResponseDto<SaleOptionColorDetailDto>.Success(result);
+
+
+
+
+
+
+        }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Service\ProductSaleOptionService.cs =====
+using AutoMapper;
+using Entities;
+using Microsoft.EntityFrameworkCore;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.DTO.DtoProductSaleOption;
+using ServiceContract.Interfaces;
+
+namespace Service.Service
+{
+    public class ProductSaleOptionService : IProductSaleOptionService
+    {
+        private readonly IMapper _mapper;
+        private readonly ShopDbContext _shopDbContext;
+
+        public ProductSaleOptionService(ShopDbContext shopDbContext, IMapper mapper)
+        {
+            _shopDbContext = shopDbContext;
+            _mapper = mapper;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<ServiceResponseDto<ProductSaleOptionListItemDto>> AddProductSaleOptionAsync(
+            ProductSaleOptionCreateDto model)
+        {
+            if (model == null)
+            {
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("Ø­Ø§Ù„Øª ÙØ±ÙˆØ´ ÙˆØ§Ø±Ø¯ Ù†Ø´Ø¯Ù‡ Ø§Ø³Øª");
+            }
+
+            var productSaleOption = _mapper.Map<ProductSaleOption>(model);
+
+            _shopDbContext.ProductSaleOptions.Add(productSaleOption);
+            await _shopDbContext.SaveChangesAsync();
+
+            var result = _mapper.Map<ProductSaleOptionListItemDto>(productSaleOption);
+            return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<ServiceResponseDto<ProductSaleOptionListItemDto>> GetProductSaleOptionByIdAsync(int id)
+        {
+            var productSaleOption = await _shopDbContext.ProductSaleOptions
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (productSaleOption == null)
+            {
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("Ú¯Ø²ÛŒÙ†Ù‡ ÙØ±ÙˆØ´ Ù…ÙˆØ¬ÙˆØ¯ Ù†Ù…ÛŒâ€ŒØ¨Ø§Ø´Ø¯");
+            }
+
+            var result = _mapper.Map<ProductSaleOptionListItemDto>(productSaleOption);
+            return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
+        }
+
+
+
+
+
+
+
+
+
+
+        public async Task<ServiceResponseDto<bool>> DeleteProductSaleOptionAsync(int id)
+        {
+            var productSaleOption = await _shopDbContext.ProductSaleOptions
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (productSaleOption == null)
+            {
+                return ServiceResponseDto<bool>.Fail("Ú¯Ø²ÛŒÙ†Ù‡ ÙØ±ÙˆØ´ Ù…ÙˆØ¬ÙˆØ¯ Ù†Ù…ÛŒâ€ŒØ¨Ø§Ø´Ø¯");
+            }
+
+            _shopDbContext.ProductSaleOptions.Remove(productSaleOption);
+            await _shopDbContext.SaveChangesAsync();
+
+            return ServiceResponseDto<bool>.Success(true);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<ServiceResponseDto<ProductSaleOptionListItemDto>> UpdateProductSaleOptionAsync(
+            ProductSaleOptionUpdateDto model)
+        {
+            if (model == null)
+            {
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("Ø§Ø·Ù„Ø§Ø¹Ø§Øª ÙˆÛŒØ±Ø§ÛŒØ´ ÙˆØ§Ø±Ø¯ Ù†Ø´Ø¯Ù‡ Ø§Ø³Øª");
+            }
+
+            if (model.Id < 1)
+            {
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("Ø´Ù†Ø§Ø³Ù‡ Ú¯Ø²ÛŒÙ†Ù‡ ÙØ±ÙˆØ´ Ù…Ø¹ØªØ¨Ø± Ù†ÛŒØ³Øª");
+            }
+
+            var productSaleOption = await _shopDbContext.ProductSaleOptions
+                .FirstOrDefaultAsync(x => x.Id == model.Id);
+
+            if (productSaleOption == null)
+            {
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("Ú¯Ø²ÛŒÙ†Ù‡ ÙØ±ÙˆØ´ Ù…ÙˆØ¬ÙˆØ¯ Ù†Ù…ÛŒâ€ŒØ¨Ø§Ø´Ø¯");
+            }
+
+            _mapper.Map(model, productSaleOption);
+
+          
+
+            await _shopDbContext.SaveChangesAsync();
+
+            var result = _mapper.Map<ProductSaleOptionListItemDto>(productSaleOption);
+            return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
+        }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Service\ProductService.cs =====
+
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq.Expressions;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using DTO;
+using Entities;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Service.Mapping;
+using Service.Validators;
+using ServiceContract.Common;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.DTO.DtoProduct;
+using ServiceContract.DTO.DtoProductSaleOption;
+using ServiceContract.DTO.DtoSaleOptionColor;
+using ServiceContract.Enums;
+using ServiceContract.Interfaces;
+using ServiceContract.Quaries;
+using ServiceContract.Queries;
+
+namespace Service.Service
+{
+    public class ProductService : IProductService
+    {
+        private readonly IMapper _mapper;
+        private readonly ShopDbContext _shopDbContext;
+        private readonly IValidator<ProductCreateDto> _validations;
+        private readonly IValidator<ProductUpdateDto> _updateValidator;
+
+
+
+
+        public ProductService(
+            ShopDbContext shopDbContext,
+            IMapper mapper,
+            IValidator<ProductCreateDto> validationRules,
+            IValidator<ProductUpdateDto> updateValidator)
+        {
+            _shopDbContext = shopDbContext;
+            _mapper = mapper;
+            _validations = validationRules;
+            _updateValidator = updateValidator;
+        }
+
+
+
+
+        public async Task<ServiceResponseDto<ProductListItemDto>> AddProductAsync(ProductCreateDto model)
+        {
+            if (model == null)
+                return ServiceResponseDto<ProductListItemDto>.Fail("Ø¯Ø§Ø¯Ù‡ Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª");
+
+            var validationResult = await _validations.ValidateAsync(model);
+
+            if (!validationResult.IsValid)
+            {
+                var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
+                return ServiceResponseDto<ProductListItemDto>.Fail(error);
+            }
+
+            var normalizedName = model.Name.Trim();
+            var productExists = await _shopDbContext.Products.AnyAsync(x => x.Name.ToLower() == normalizedName.ToLower());
+            if (productExists)
+            {
+                return ServiceResponseDto<ProductListItemDto>.Fail("Ù…Ø­ØµÙˆÙ„ ØªÚ©Ø±Ø§Ø±ÛŒ Ù…ÛŒâ€ŒØ¨Ø§Ø´Ø¯");
+            }
+
+            var product = _mapper.Map<Product>(model);
+
+
+            product.CreatedAt = DateTime.UtcNow;
+            product.ProductCategories = model.CategoryIds
+                .Distinct()
+                .Select(categoryId => new ProductCategory { Product = product, CategoryId = categoryId })
+                .ToList();
+
+            _shopDbContext.Products.Add(product);
+            await _shopDbContext.SaveChangesAsync();
+
+            var result = await _shopDbContext.Products.Where(x => x.Id == product.Id)
+                .ProjectTo<ProductListItemDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+
+            return result != null
+      ? ServiceResponseDto<ProductListItemDto>.Success(result)
+      : ServiceResponseDto<ProductListItemDto>.Fail("Ø®Ø·Ø§ Ø¯Ø± Ø¨Ø§Ø²Ø®ÙˆØ§Ù†ÛŒ Ø§Ø·Ù„Ø§Ø¹Ø§Øª...");
+
+
+
+        }
+
+
+
+
+
+
+
+
+        public async Task<ServiceResponseDto<ProductListItemDto>> UpdateAsync(ProductUpdateDto model)
+        {
+            if (model == null)
+                return ServiceResponseDto<ProductListItemDto>.Fail("Ø¯Ø§Ø¯Ù‡ Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª");
+
+            var validationResult = await _updateValidator.ValidateAsync(model);
+
+            if (!validationResult.IsValid)
+            {
+                var error = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
+                return ServiceResponseDto<ProductListItemDto>.Fail(error);
+            }
+
+            var product = await _shopDbContext.Products
+                            .Include(x => x.ProductCategories)
+                            .FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (product == null)
+            {
+                return ServiceResponseDto<ProductListItemDto>.Fail("Ù…Ø­ØµÙˆÙ„ Ù…ÙˆØ¬ÙˆØ¯ Ù†Ù…ÛŒâ€ŒØ¨Ø§Ø´Ø¯");
+            }
+
+            _mapper.Map(model, product);
+
+            _shopDbContext.ProductCategories.RemoveRange(product.ProductCategories);
+
+            product.ProductCategories = model.CategoryIds
+                   .Distinct()
+                   .Select(categoryId => new ProductCategory
+                   {
+                       ProductId = product.Id,
+                       CategoryId = categoryId
+                   })
+                   .ToList();
+
+            
+            product.UpdatedAt = DateTime.UtcNow;
+            await _shopDbContext.SaveChangesAsync();
+
+            var result = await _shopDbContext.Products.Where(x => x.Id == product.Id)
+                .ProjectTo<ProductListItemDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+
+            return result != null
+                ? ServiceResponseDto<ProductListItemDto>.Success(result)
+                : ServiceResponseDto<ProductListItemDto>.Fail("Ø®Ø·Ø§ Ø¯Ø± Ø¨Ø§Ø²Ø®ÙˆØ§Ù†ÛŒ Ø§Ø·Ù„Ø§Ø¹Ø§Øª...");
+        }
+
+
+
+
+
+
+
+
+
+
+        public async Task<ServiceResponseDto<bool>> DeleteAsync(int productId)
+        {
+            var product = await GetEntityByIdAsync(productId);
+            if (product == null)
+            {
+                return ServiceResponseDto<bool>.Fail("Ù…Ø­ØµÙˆÙ„ Ù…ÙˆØ±Ø¯ Ù†Ø¸Ø± ÛŒØ§ÙØª Ù†Ø´Ø¯");
+            }
+
+            _shopDbContext.Products.Remove(product);
+            await _shopDbContext.SaveChangesAsync();
+
+            return ServiceResponseDto<bool>.Success();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<ProductListItemDto?> GetListItemByIdAsync(int productId)
+        {
+            return await _shopDbContext.Products
+                .AsNoTracking()
+                .Include(x => x.ProductCategories)
+                    .ThenInclude(x => x.Category)
+                .Include(x => x.SaleOptions)
+                    .ThenInclude(x => x.SaleOptionColors)
+                .Where(x => x.Id == productId)
+                .ProjectTo<ProductListItemDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<ProductUpdateDto?> GetForUpdateAsync(int productId)
+        {
+            return await _shopDbContext.Products
+                .AsNoTracking()
+                .Where(x => x.Id == productId)
+                .ProjectTo<ProductUpdateDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<ProductDetailDto?> GetByIdAsync(int productId)
+        {
+            return await _shopDbContext.Products
+                .AsNoTracking()
+                .Include(x => x.ProductCategories)
+                    .ThenInclude(x => x.Category)
+                .Include(x => x.SaleOptions)
+                    .ThenInclude(x => x.SaleOptionColors)
+                .Where(x => x.Id == productId)
+                .ProjectTo<ProductDetailDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+        }
+
+
+
+
+
+        public Task<Product?> GetEntityByIdAsync(int productId)
+        {
+            return _shopDbContext.Products.FirstOrDefaultAsync(x => x.Id == productId);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<PageResult<ProductListItemDto>> GetFilterAsync(ProductQuery query)
+        {
+            IQueryable<Product> productQuery = _shopDbContext.Products.OrderByDescending(x => x.Id).AsNoTracking();
+
+            query ??= new ProductQuery();
+            query.Page = Math.Max(query.Page, 1);
+            query.PageSize = Math.Clamp(query.PageSize, 1, 100);
+
+
+            if (!string.IsNullOrWhiteSpace(query.SearchText))
+            {
+                if (query.SearchType == EnumProductSearchType.All)
+                {
+                    productQuery = productQuery.Where(x =>
+                        x.Name.Contains(query.SearchText) ||
+                        x.Description != null && x.Description.Contains(query.SearchText));
+                }
+                else if (query.SearchType == EnumProductSearchType.Name)
+                {
+                    productQuery = productQuery.Where(x => x.Name.Contains(query.SearchText));
+                }
+                else if (query.SearchType == EnumProductSearchType.Slug)
+                {
+                    productQuery = productQuery.Where(x => x.Slug.Contains(query.SearchText));
+                }
+                else if (query.SearchType == EnumProductSearchType.CategoryName)
+                {
+                    productQuery = productQuery.Where(x => x.ProductCategories.Any(s => s.Category.Name.Contains(query.SearchText)));
+                }
+                else if (query.SearchType == EnumProductSearchType.SaleOptionTitle)
+                {
+                    productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.Title.Contains(query.SearchText)));
+                }
+                else if (query.SearchType == EnumProductSearchType.Color)
+                {
+                    productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.SaleOptionColors.Any(y => y.Color.Contains(query.SearchText))));
+                }
+                else if (query.SearchType == EnumProductSearchType.price)
+                {
+                    if (decimal.TryParse(query.SearchText, out var price))
+                    {
+                        productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.SaleOptionColors.Any(y => y.Price == price)));
+                    }
+
+                }
+
+            }
+
+            if (query.HasDiscount.HasValue)
+            {
+                productQuery = query.HasDiscount.Value
+                    ? productQuery.Where(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0)
+                    : productQuery.Where(x => !x.DiscountValue.HasValue || x.DiscountValue.Value <= 0);
+            }
+            if (query.CreatedFrom.HasValue)
+            {
+                productQuery = productQuery.Where(x => x.CreatedAt >= query.CreatedFrom.Value);
+            }
+
+            if (query.CreatedTo.HasValue)
+            {
+                var createdToExclusive = query.CreatedTo.Value.Date.AddDays(1);
+                productQuery = productQuery.Where(x => x.CreatedAt < createdToExclusive);
+            }
+
+            productQuery = (query.SortType, query.Order) switch
+            {
+                (EnumProductSortType.Id, OrderEnum.ASC) => productQuery.OrderBy(x => x.Id),
+                (EnumProductSortType.Id, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Id),
+                (EnumProductSortType.slug, OrderEnum.ASC) => productQuery.OrderBy(x => x.Slug).ThenBy(x => x.Id),
+                (EnumProductSortType.slug, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Slug).ThenByDescending(x => x.Id),
+                (EnumProductSortType.Name, OrderEnum.ASC) => productQuery.OrderBy(x => x.Name).ThenBy(x => x.Id),
+                (EnumProductSortType.Name, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Name).ThenByDescending(x => x.Id),
+                (EnumProductSortType.Price, OrderEnum.ASC) => productQuery.OrderBy(x => x.SaleOptions.Min(s => s.BasePrice)).ThenBy(x => x.Id),
+                (EnumProductSortType.Price, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.SaleOptions.Min(s => s.BasePrice)).ThenByDescending(x => x.Id),
+                (EnumProductSortType.HasDiscount, OrderEnum.ASC) => productQuery.OrderBy(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0).ThenBy(x => x.Id),
+                (EnumProductSortType.HasDiscount, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0).ThenByDescending(x => x.Id),
+                (EnumProductSortType.DiscountValue, OrderEnum.ASC) => productQuery.OrderBy(x => x.DiscountValue).ThenBy(x => x.Id),
+                (EnumProductSortType.DiscountValue, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.DiscountValue).ThenByDescending(x => x.Id),
+                (EnumProductSortType.CategoryName, OrderEnum.ASC) => productQuery.OrderBy(x => x.ProductCategories.Select(pc => pc.Category.Name).FirstOrDefault()).ThenBy(x => x.Id),
+                (EnumProductSortType.CategoryName, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.ProductCategories.Select(pc => pc.Category.Name).FirstOrDefault()).ThenByDescending(x => x.Id),
+                (EnumProductSortType.SaleOptionTitle, OrderEnum.ASC) => productQuery.OrderBy(x => x.SaleOptions.Select(s => s.Title).FirstOrDefault()).ThenBy(x => x.Id),
+                (EnumProductSortType.SaleOptionTitle, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.SaleOptions.Select(s => s.Title).FirstOrDefault()).ThenByDescending(x => x.Id),
+                _ => productQuery.OrderBy(x => x.Id)
+            };
+
+
+            var totalCount = await productQuery.CountAsync();
+
+            productQuery = productQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize);
+
+            var items = await productQuery
+                .ProjectTo<ProductListItemDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+
+
+
+            return new PageResult<ProductListItemDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = query.Page,
+                PageSize = query.PageSize
+            };
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Validators\CategoryValidation\CategoryCreateDtoValidator.cs =====
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entities;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using ServiceContract.DTO.DtoCategory;
+
+namespace Service.Validators.CategoryValidation
+{
+    public class CategoryCreateDtoValidator : AbstractValidator<CategoryCreateDto>
+    {
+
+        private readonly ShopDbContext _shopDbContext;
+        public CategoryCreateDtoValidator(ShopDbContext shopDbContext)
+        {
+            _shopDbContext = shopDbContext;
+
+
+            RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("دسته بندی خالی میباشد")
+                .MaximumLength(50).WithMessage("تعداد کاراکتر های نام دسته بندی بیش از حد مجاز میباشد")
+                .MustAsync(async (x, CancellationToken) => { return !await _shopDbContext.Categories.AnyAsync(s => s.Name == x); })
+                .Must(x => !string.IsNullOrWhiteSpace(x))
+                .WithMessage("نام دسته بندی نمی‌تواند فقط فاصله باشد");
+
+
+            RuleFor(x => x.Slug)
+                .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("اسلاگ نمیتواند خالی باشد")
+                .MaximumLength(50).WithMessage("اسلاگ نباید بیشتر از 50 کاراکتر باشد")
+                .MustAsync(async (slug, CancellationToken) => { return !await _shopDbContext.Categories.AnyAsync(s => s.Slug == slug); })
+                .WithMessage("اسلاگ تکراری میباشد");
+
+
+
+            RuleFor(x => x.ParentId)
+                .MustAsync(async (x, CancellationToken) =>
+                { if (x == null) return true; return await _shopDbContext.Categories.AnyAsync(s => s.Id == x.Value); })
+                .WithMessage("آیدی برای دسته پدر وجود ندارد")
+            .GreaterThanOrEqualTo(1)
+            .When(x => x.ParentId.HasValue);
+
+
+            RuleFor(x => x.SortOrder)
+           .GreaterThanOrEqualTo(0)
+           .WithMessage("ترتیب نمایش نمی‌تواند منفی باشد");
+
+        }
+
+
+
+
+    }
+}
+
+
+
+
+===== C:\Users\aliwo\source\repos\lern\Service\Validators\CategoryValidation\CategoryUpdateDtoValidator.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entities;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using ServiceContract.DTO.DtoCategory;
+
+namespace Service.Validators.CategoryValidation
+{
+    public class CategoryUpdateDtoValidator : AbstractValidator<CategoryUpdateDto>
+    {
+
+        private readonly ShopDbContext _shopDbContext;
+
+
+        public CategoryUpdateDtoValidator(ShopDbContext shopDbContext)
+        {
+
+            _shopDbContext = shopDbContext;
+
+
+
+            RuleFor(x => x.Id)
+                .NotEmpty().WithMessage("مقدار آیدی وارد نشده است ")
+                .NotNull().WithMessage("مقدار آیدی معتبر نمیباشد")
+                .GreaterThanOrEqualTo(1).WithMessage("مقدارآیدی نا معتبر میباشد");
+
+            RuleFor(x => x.Name)
+                .NotNull().WithMessage("نام دسته بندی وارد نشده است")
+                .NotEmpty().WithMessage("نام دسته بندی وارد نشده است")
+                .MustAsync(async (model, name, CancellationToken) =>
+                { return !await _shopDbContext.Categories.AnyAsync(s => s.Name == name && s.Id != model.Id); })
+                .WithMessage("نام دسته بندی تکراری میباشد")
+                .MaximumLength(50).WithMessage("تعداد کاراکتر های نام دسته بیش از حد مجاز میباشد");
+
+
+
+            RuleFor(x => x.Slug)
+              .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("اسلاگ نمیتواند خالی باشد")
+              .MaximumLength(50).WithMessage("اسلاگ نباید بیشتر از 50 کاراکتر باشد")
+              .MustAsync(async (model, slug, CancellationToken) =>
+              { return !await _shopDbContext.Categories.AnyAsync(s => s.Slug == slug && s.Id != model.Id); })
+              .WithMessage("اسلاگ تکراری میباشد");
+
+
+
+
+            RuleFor(x => x.ParentId)
+                .MustAsync(async (x, CancellationToken) => { return await _shopDbContext.Categories.AnyAsync(s => s.Id == x); })
+                .When(x => x.ParentId.HasValue)
+                .NotEqual(x => x.Id)
+                .GreaterThanOrEqualTo(1).When(x => x.ParentId.HasValue);
+
+
+
+
+            RuleFor(x => x.SortOrder)
+                 .GreaterThanOrEqualTo(0)
+                 .WithMessage("ترتیب نمایش نمی‌تواند منفی باشد");
+
+
+
+        }
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Validators\ProductValodation\ProductCreateDtoValidator.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using DTO;
+using Entities;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using ServiceContract.DTO.DtoProduct;
+
+namespace Service.Validators.ProductValodation
+{
+    public class ProductCreateDtoValidator : AbstractValidator<ProductCreateDto>
+    {
+        private readonly ShopDbContext _shopDbContext;
+
+        public ProductCreateDtoValidator(ShopDbContext shopDbContext)
+        {
+
+            _shopDbContext = shopDbContext;
+
+
+
+            RuleFor(x => x.Name)
+                .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("Ù†Ø§Ù… Ù…Ø­ØµÙˆÙ„ Ø§Ù„Ø²Ø§Ù…ÛŒ Ù…ÛŒØ¨Ø§Ø´Ø¯")
+                .MaximumLength(100).WithMessage("ØªØ¹Ø¯Ø§Ø¯ Ú©Ø§Ø±Ø§Ú©ØªØ± Ù†Ø§Ù… Ø¨ÛŒØ´ØªØ± Ø§Ø² Ø­Ø¯ Ù…Ø¬Ø§Ø² Ù…ÛŒØ¨Ø§Ø´Ø¯");
+
+            RuleFor(x => x.Slug)
+                .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("Ø§Ø³Ù„Ø§Ú¯ Ø§Ù„Ø²Ø§Ù…ÛŒ Ù…ÛŒØ¨Ø§Ø´Ø¯")
+                .MustAsync(async (slug, cancellationToken) =>
+                    !await _shopDbContext.Products.AnyAsync(x => x.Slug == slug, cancellationToken))
+                    .WithMessage("Ø§Ø³Ù„Ø§Ú¯ ÙˆØ§Ø±Ø¯ Ø´Ø¯Ù‡ ØªÚ©Ø±Ø§Ø±ÛŒ Ù…ÛŒØ¨Ø§Ø´Ø¯")
+                .MaximumLength(50).WithMessage("Ù…Ù‚Ø§Ø¯ÛŒØ± Ø­Ø±ÙˆÙ Ø¨ÛŒØ´ Ø§Ø² Ø­Ø¯ Ù…Ø¬Ø§Ø² Ù…ÛŒØ¨Ø§Ø´Ø¯");
+
+
+            RuleFor(x => x.DiscountValue).GreaterThan(0).WithMessage("ØªØ®ÙÛŒÙ Ø¨Ø§ÛŒØ¯ Ø¨ÛŒØ´ØªØ± Ø§Ø² 0 Ø¨Ø§Ø´Ø¯")
+                .When(x => x.DiscountValue.HasValue);
+
+
+            RuleFor(x => x.CategoryIds)
+                 .NotEmpty().WithMessage("Ø¨Ø§ÛŒØ¯ Ø­ØªÙ…Ø§ ÛŒÚ© Ø¯Ø³ØªÙ‡ Ø¨Ù†Ø¯ÛŒ Ø§Ù†ØªØ®Ø§Ø¨ Ø´ÙˆØ¯")
+                 .NotNull().WithMessage("Ø¨Ø§ÛŒØ¯ Ø­ØªÙ…Ø§ ÛŒÚ© Ø¯Ø³ØªÙ‡ Ø¨Ù†Ø¯ÛŒ Ø§Ù†ØªØ®Ø§Ø¨ Ø´ÙˆØ¯");
+
+
+            RuleForEach(x => x.CategoryIds).GreaterThan(0).WithMessage("Ø´Ù†Ø§Ø³Ù‡ Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ Ù…Ø¹ØªØ¨Ø± Ù†ÛŒØ³Øª");
+
+            RuleFor(x => x.CategoryIds)
+           .MustAsync(async (categoryIds, cancellationToken) =>
+           {
+               var distinctIds = categoryIds.Distinct().ToList();
+               var count = await _shopDbContext.Categories.CountAsync(c => distinctIds.Contains(c.Id), cancellationToken);
+               return count == distinctIds.Count;
+           }).When(x => x.CategoryIds != null && x.CategoryIds.Any())
+             .WithMessage("ÛŒÚ© ÛŒØ§ Ú†Ù†Ø¯ Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ Ù…Ø¹ØªØ¨Ø± Ù†ÛŒØ³ØªÙ†Ø¯");
+
+            //          private async Task<bool> BeUniqueName(string? name, CancellationToken cancellationToken)
+            //    {
+            //        if (string.IsNullOrWhiteSpace(name))
+            //            return true;
+
+            //        return !await _context.Products
+            //            .AnyAsync(x => x.Name == name, cancellationToken);
+            //    }
+
+            //    private async Task<bool> BeUniqueSlug(string? slug, CancellationToken cancellationToken)
+            //    {
+            //        if (string.IsNullOrWhiteSpace(slug))
+            //            return true;
+
+            //        return !await _context.Products
+            //            .AnyAsync(x => x.Slug == slug, cancellationToken);
+            //    }
+
+            //    private async Task<bool> AllCategoriesExist(List<int> categoryIds, CancellationToken cancellationToken)
+            //    {
+            //        if (categoryIds == null || !categoryIds.Any())
+            //            return false;
+
+            //        var distinctIds = categoryIds.Distinct().ToList();
+
+            //        var count = await _context.Categories
+            //            .CountAsync(x => distinctIds.Contains(x.Id), cancellationToken);
+
+            //        return count == distinctIds.Count;
+            //    }
+            //}
+        }
+
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Validators\ProductValodation\ProductUpdateDtoValidator.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entities;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using ServiceContract.DTO.DtoProduct;
+namespace Service.Validators.ProductValodation
+{
+   public class ProductUpdateDtoValidator : AbstractValidator<ProductUpdateDto>
+    {
+
+        private readonly ShopDbContext _shopDbContext;
+
+
+        public ProductUpdateDtoValidator(ShopDbContext shopDbContext)
+        {
+
+            _shopDbContext = shopDbContext;
+
+            RuleFor(x => x.Name)
+                .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("Ù†Ø§Ù… Ù…Ø­ØµÙˆÙ„ Ù…Ø¹ØªØ¨Ø± Ù†Ù…ÛŒØ¨Ø§Ø´Ø¯")
+                .MustAsync(async (model, name, CancellationToken) =>
+                { return !await _shopDbContext.Products.AnyAsync(x => x.Name == name && x.Id != model.Id); });
+
+
+            RuleFor(x => x.Slug)
+               .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("Ø§Ø³Ù„Ø§Ú¯ Ù…Ø­ØµÙˆÙ„ Ù…Ø¹ØªØ¨Ø± Ù†Ù…ÛŒØ¨Ø§Ø´Ø¯")
+               .MustAsync(async (model, slug, CancellationToken) =>
+               { return !await _shopDbContext.Products.AnyAsync(x => x.Slug == slug && x.Id != model.Id); });
+
+
+
+            RuleFor(x => x.Id)
+                .NotNull().WithMessage("Ø´Ù†Ø§Ø³Ù‡ Ø§Ù„Ø²Ø§Ù…ÛŒ Ù…ÛŒØ¨Ø§Ø´Ø¯")
+                .GreaterThanOrEqualTo (1).WithMessage("Ø´Ù†Ø§Ø³Ù‡ Ù…Ø­ØµÙˆÙ„ Ù†Ø§ Ù…Ø¹ØªØ¨Ø± Ù‡Ø³Øª ");
+
+
+
+
+            RuleFor(x => x.DiscountValue)
+                .GreaterThanOrEqualTo(0).WithMessage("Ù…Ù‚Ø¯Ø§Ø± ØªØ®ÙÛŒÙ Ù†Ù…ÛŒâ€ŒØªÙˆØ§Ù†Ø¯ Ù…Ù†ÙÛŒ Ø¨Ø§Ø´Ø¯")
+                .When(x => x.DiscountValue.HasValue);
+
+            RuleFor(x => x.DiscountType)
+                .NotNull().WithMessage("Ù†ÙˆØ¹ ØªØ®ÙÛŒÙ Ø¨Ø§ÛŒØ¯ Ù…Ø´Ø®Øµ Ø´ÙˆØ¯")
+                .When(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0);
+
+            RuleFor(x => x.CategoryIds)
+                .NotEmpty().WithMessage("Ø­Ø¯Ø§Ù‚Ù„ ÛŒÚ© Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ Ø¨Ø§ÛŒØ¯ Ø§Ù†ØªØ®Ø§Ø¨ Ø´ÙˆØ¯");
+
+            RuleForEach(x => x.CategoryIds)
+                .GreaterThan(0).WithMessage("Ø´Ù†Ø§Ø³Ù‡ Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ Ù…Ø¹ØªØ¨Ø± Ù†ÛŒØ³Øª");
+
+
+
+            RuleFor(x => x.CategoryIds)
+                .MustAsync(async (categoryIds, cancellationToken) =>
+                {
+                    var distinctIds = categoryIds.Distinct().ToList();
+                    var count = await _shopDbContext.Categories.CountAsync(c => distinctIds.Contains(c.Id), cancellationToken);
+                    return count == distinctIds.Count;
+                });
+
+        }
+
+
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Validators\SaleOptionValidation\ProductSaleOptionCreateDtoValidator.cs =====
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using FluentValidation;
+using FluentValidation.Validators;
+using ServiceContract.DTO.DtoProductSaleOption;
+
+namespace Service.Validators.SaleOptionValidation
+{
+   public class ProductSaleOptionCreateDtoValidator : AbstractValidator<ProductSaleOptionCreateDto>
+    {
+
+        public ProductSaleOptionCreateDtoValidator()
+        {
+
+            RuleFor(x => x.Title).NotEmpty().WithMessage("حالت فروش وارد نشده است");
+
+
+        }
+            
+
+        
+
+
+
+
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\Service\Validators\SaleOptionValidation\ProductSaleOptionUpdateDtoValidator.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using FluentValidation;
+using ServiceContract.DTO.DtoProductSaleOption;
+
+namespace Service.Validators.SaleOptionValidation
+{
+    public class ProductSaleOptionUpdateDtoValidator : AbstractValidator<ProductSaleOptionUpdateDto>
+    {
+        public ProductSaleOptionUpdateDtoValidator()
+        {
+            RuleFor(x => x.Id)
+                .GreaterThanOrEqualTo(0).WithMessage("شناسه گزینه فروش معتبر نیست");
+
+            RuleFor(x => x.Title)
+                .NotEmpty().WithMessage("عنوان حالت فروش الزامی می‌باشد");
+
+            RuleFor(x => x.BasePrice)
+                .GreaterThan(0).When(x => x.BasePrice.HasValue)
+                .WithMessage("قیمت پایه باید بیشتر از صفر باشد");
+
+            RuleFor(x => x.Step)
+                .GreaterThan(0).WithMessage("گام تعداد باید بیشتر از صفر باشد");
+        }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\Common\PageResult.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ServiceContract.Common
+{
+    public class PageResult<T>
+    {
+        public List<T> Items { get; set; } = new();
+
+        public int TotalCount { get; set; }
+
+        public int Page { get; set; }
+
+        public int PageSize { get; set; }
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoCategory\CategoryCreateDto.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entities;
+
+namespace ServiceContract.DTO.DtoCategory
+{
+    public class CategoryCreateDto
+    {
+
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
+        public int? ParentId { get; set; }
+        public int? SortOrder { get; set; }
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoCategory\CategoryListItemDto.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ServiceContract.DTO.DtoCategory
+{
+    public class CategoryListItemDto
+    {
+
+
+        public int  Id { get; set; }
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
+        public int? ParentId { get; set; }
+
+        public string? ParentName { get; set; }
+        public int? SortOrder { get; set; }
+
+        public int ChildrenCount { get; set; }
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoCategory\CategoryTreeItemDto.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entities;
+
+namespace ServiceContract.DTO.DtoCategory
+{
+    public class CategoryTreeItemDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
+        public int? ParentId { get; set; }
+        public int SortOrder { get; set; }
+        public ICollection<CategoryTreeItemDto>? Children { get; set; }
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoCategory\CategoryUpdateDto.cs =====
+namespace ServiceContract.DTO.DtoCategory
+{
+    public class CategoryUpdateDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
+        public int? ParentId { get; set; }
+        public int? SortOrder { get; set; }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoCommit\ExcelImportDto.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ServiceContract.DTO.DtoCommit
+{
+    public class ExcelImportDto
+    {
+       
+            public string Name { get; set; }
+            public string Slug { get; set; }
+            public string Categories { get; set; }
+            public string SaleType { get; set; }
+            public decimal Price { get; set; }
+
+            public decimal? FixedWeight { get; set; }
+            public decimal? FixedLength { get; set; }
+            public decimal? FixedWidth { get; set; }
+            public decimal? FixedHeight { get; set; }
+
+            public decimal? PerUnitWeight { get; set; }
+            public decimal? PerUnitLength { get; set; }
+            public decimal? PerUnitWidth { get; set; }
+            public decimal? PerUnitHeight { get; set; }
+        
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoCommit\SearchOptionsDto.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ServiceContract.DTO.DtoCommit
+{
+    public class SearchOptionsDto
+    {
+        public string Key { get; set; } = null!;
+
+        public string Title { get; set; } = null!;
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoCommit\ServiceResponseDto.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+
+namespace ServiceContract.DTO.DtoCommit
+{
+    public class ServiceResponseDto<T>
+    {
+        public bool Succeeded { get; set; }
+
+        public string? ErrorMessage { get; set; }
+
+        public List<string>? Errors { get; set; }
+
+        public T? Data { get; set; }
+
+
+        public static ServiceResponseDto<T> Success(T data) => new ServiceResponseDto<T> { Data = data, Succeeded = true };
+        public static ServiceResponseDto<T> Success() => new ServiceResponseDto<T> { Succeeded = true };
+        public static ServiceResponseDto<T> Fail(string error) => new ServiceResponseDto<T> { ErrorMessage = error, Succeeded = false };
+        public static ServiceResponseDto<T> Fail(List<string> error) => new ServiceResponseDto<T> { Errors = error, Succeeded = false };
+
+    }
+
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoProduct\ProductCardDto.cs =====
+
+
+    
+public class ProductCardDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Slug { get; set; }
+    
+    // ØªØµÙˆÛŒØ± Ø§ØµÙ„ÛŒ Ù…Ø­ØµÙˆÙ„ (ØªØµÙˆÛŒØ±ÛŒ Ø§Ø² ProductImages Ú©Ù‡ IsPrimary Ø¢Ù† true Ø§Ø³Øª)
+    public string ?PrimaryImageUrl { get; set; } 
+    
+    // Ø§Ø±Ø²Ø§Ù†â€ŒØªØ±ÛŒÙ† Ù‚ÛŒÙ…Øª Ø¯Ø± Ø¨ÛŒÙ† ØªÙ…Ø§Ù… ØªÙ†ÙˆØ¹â€ŒÙ‡Ø§ÛŒ ÙØ¹Ø§Ù„ Ø§ÛŒÙ† Ù…Ø­ØµÙˆÙ„
+    public decimal? MinPrice { get; set; } 
+    public decimal? MaxPrice { get; set; } 
+
+    public decimal? BasePrice { get; set; } 
+    
+    public bool IsAvailable { get; set; } // Ù…Ø¬Ù…ÙˆØ¹ Ù…ÙˆØ¬ÙˆØ¯ÛŒ ØªÙ…Ø§Ù… VariantÙ‡Ø§ > 0
+
+
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoProduct\ProductCreateDto.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DTO;
+using ServiceContract.DTO.DtoProductSaleOption;
+
+namespace ServiceContract.DTO.DtoProduct
+{
+    public class ProductCreateDto
+    {
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
+
+        public string? Description { get; set; }
+        public decimal? DiscountValue { get; set; }
+        public DisconTypeEnum? DiscountType { get; set; }
+        public bool IsActive { get; set; } = true;
+        public List<int> CategoryIds { get; set; } = new();
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoProduct\ProductDetailDto.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DTO;
+using ServiceContract.DTO.DtoProductSaleOption;
+
+namespace ServiceContract.DTO.DtoProduct
+{
+    public class ProductDetailDto
+    {
+
+
+        public string? Name { get; set; }
+        public string? Slug { get; set; }
+        public string? Description { get; set; }
+
+        public bool IsActive { get; set; }
+
+        public decimal? DiscountValue { get; set; }
+        public DisconTypeEnum? DiscountType { get; set; }
+
+        public bool HasDiscount { get; set; }
+
+        public List<int> CategoryIds { get; set; } = new();
+        public List<string> CategoryNames { get; set; } = new();
+        public List<ProductSaleOptionDetailDto> SaleOptions { get; set; } = new();
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+
+
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoProduct\ProductListItemDto.cs =====
+using DTO;
+using ServiceContract.DTO.DtoProductSaleOption;
+
+namespace ServiceContract.DTO.DtoProduct
+{
+    public class ProductListItemDto
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
+
+        public bool IsActive { get; set; }
+
+
+        public decimal? DiscountValue { get; set; }
+        public DisconTypeEnum? DiscountType { get; set; }
+
+        public bool HasDiscount { get; set; }
+
+        public int CategoriesCount { get; set; }
+        public int SaleOptionsCount { get; set; }
+
+        public List<string> CategoryNames { get; set; } = new();
+        public List<string> SaleOptionTitles { get; set; } = new();
+        public List<ProductSaleOptionListItemDto> SaleOptions { get; set; } = new();
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoProduct\ProductUpdateDto.cs =====
+using DTO;
+using ServiceContract.DTO.DtoProductSaleOption;
+
+namespace ServiceContract.DTO.DtoProduct
+{
+    public class ProductUpdateDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
+        public string Slug { get; set; } = null!;
+        public string? Description { get; set; }
+        public bool IsActive { get; set; }
+        public decimal? DiscountValue { get; set; }
+        public DisconTypeEnum? DiscountType { get; set; }
+        public List<int> CategoryIds { get; set; } = new();
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoProductSaleOption\ProductSaleOptionCreateDto.cs =====
+using Entities.Enums;
+using ServiceContract.DTO.DtoSaleOptionColor;
+
+namespace ServiceContract.DTO.DtoProductSaleOption
+{
+    public class ProductSaleOptionCreateDto
+    {
+        public string Title { get; set; } = null!;
+        public int ProductId { get; set; }
+        public EnumSaleType SaleType { get; set; }
+        public decimal? BasePrice { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? InputLabel { get; set; }
+        public string? UnitName { get; set; }
+        public decimal? MinQuantity { get; set; }
+        public decimal? MaxQuantity { get; set; }
+        public decimal Step { get; set; } = 1;
+        public decimal? FixedWeight { get; set; }
+        public decimal? FixedLength { get; set; }
+        public decimal? FixedWidth { get; set; }
+        public decimal? FixedHeight { get; set; }
+        public decimal? PerUnitWeight { get; set; }
+        public decimal? PerUnitLength { get; set; }
+        public decimal? PerUnitWidth { get; set; }
+        public decimal? PerUnitHeight { get; set; }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoProductSaleOption\ProductSaleOptionDetailDto.cs =====
+using Entities.Enums;
+using ServiceContract.DTO.DtoSaleOptionColor;
+
+namespace ServiceContract.DTO.DtoProductSaleOption
+{
+    public class ProductSaleOptionDetailDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = null!;
+        public EnumSaleType SaleType { get; set; }
+        public decimal BasePrice { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? UnitName { get; set; }
+        public string? InputLabel { get; set; }
+        public List<SaleOptionColorDetailDto> SaleOptionColors { get; set; } = new();
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoProductSaleOption\ProductSaleOptionListItemDto.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ServiceContract.DTO.DtoSaleOptionColor;
+
+namespace ServiceContract.DTO.DtoProductSaleOption
+{
+    public class ProductSaleOptionListItemDto
+    {
+
+        public int Id { get; set; }
+
+        public string Title { get; set; } = null!;
+
+        public decimal? BasePrice { get; set; }
+
+        public string? ImageUrl { get; set; }
+
+        public List<SaleOptionColorListItemDto> Colors { get; set; } = new();
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoProductSaleOption\ProductSaleOptionUpdateDto.cs =====
+using Entities.Enums;
+using ServiceContract.DTO.DtoSaleOptionColor;
+
+namespace ServiceContract.DTO.DtoProductSaleOption
+{
+    public class ProductSaleOptionUpdateDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = null!;
+        public EnumSaleType SaleType { get; set; }
+        public decimal? BasePrice { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? InputLabel { get; set; }
+        public string? UnitName { get; set; }
+        public decimal? MinQuantity { get; set; }
+        public decimal? MaxQuantity { get; set; }
+        public decimal Step { get; set; } = 1;
+        public decimal? FixedWeight { get; set; }
+        public decimal? FixedLength { get; set; }
+        public decimal? FixedWidth { get; set; }
+        public decimal? FixedHeight { get; set; }
+        public decimal? PerUnitWeight { get; set; }
+        public decimal? PerUnitLength { get; set; }
+        public decimal? PerUnitWidth { get; set; }
+        public decimal? PerUnitHeight { get; set; }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoSaleOptionColor\SaleOptionColorCreateDto.cs =====
+namespace ServiceContract.DTO.DtoSaleOptionColor
+{
+    public class SaleOptionColorCreateDto
+    {
+        public int SaleOptionId { get; set; }
+        public string Color { get; set; } = null!;
+        public decimal? Price { get; set; }
+        public string? HexCode { get; set; }
+        public string? ImageUrl { get; set; }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoSaleOptionColor\SaleOptionColorDetailDto.cs =====
+namespace ServiceContract.DTO.DtoSaleOptionColor
+{
+    public class SaleOptionColorDetailDto
+    {
+        public int Id { get; set; }
+        public int SaleOptionId { get; set; }
+        public string Color { get; set; } = null!;
+        public decimal? Price { get; set; }
+        public string? HexCode { get; set; }
+        public string? ImageUrl { get; set; }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoSaleOptionColor\SaleOptionColorListItemDto.cs =====
+namespace ServiceContract.DTO.DtoSaleOptionColor
+{
+    public class SaleOptionColorListItemDto
+    {
+
+        public int Id { get; set; }
+
+        public string Color { get; set; } = null!;
+
+        public string? HexCode { get; set; }
+
+        public decimal? Price { get; set; }
+
+        public decimal FinalPrice { get; set; }
+
+        public string? ImageUrl { get; set; }
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoSaleOptionColor\SaleOptionColorUpdateDto.cs =====
+namespace ServiceContract.DTO.DtoSaleOptionColor
+{
+    public class SaleOptionColorUpdateDto
+    {
+        public int Id { get; set; }
+       
+        public string Color { get; set; } = null!;
+        public decimal? Price { get; set; }
+        public string? HexCode { get; set; }
+        public string? ImageUrl { get; set; }
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\DTO\DtoSeo\SeoDataDto.cs =====
+namespace ServiceContract.DTO.DtoSeo
+{
+    public class SeoDataDto
+    {
+        public string? MetaTitle { get; set; }
+        public string? MetaDescription { get; set; }
+        public string? MetaKeywords { get; set; }
+
+        public string? CanonicalUrl { get; set; }
+        public string? OgTitle { get; set; }
+        public string? OgDescription { get; set; }
+        public string? OgImageUrl { get; set; }
+
+        public bool IndexPage { get; set; } = true;
+        public bool FollowPage { get; set; } = true;
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\Interfaces\ICategoryService.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ServiceContract.Common;
+using ServiceContract.DTO.DtoCategory;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.Queries;
+
+namespace ServiceContract.Interfaces
+{
+    public interface ICategoryService
+    {
+
+        public Task<ServiceResponseDto<CategoryListItemDto>> AddCategoryAsync(CategoryCreateDto model);
+
+        public Task<ServiceResponseDto<CategoryListItemDto>> UpdateCategoryAsync(CategoryUpdateDto model);
+
+        public Task<ServiceResponseDto<bool>> DeleteCategoryAsync(int CategoryId);
+
+        public Task<PageResult<CategoryListItemDto>> GetAllAsync(CategoryQuery query);
+
+        public Task<List<CategoryTreeItemDto>> GetTreeAsync();
+
+
+
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\Interfaces\IProductSaleOptionColorService.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.DTO.DtoSaleOptionColor;
+using ServiceContract.Quaries;
+
+namespace ServiceContract.Interfaces
+{
+    public interface IProductSaleOptionColorService
+    {
+
+        public ServiceResponseDto<SaleOptionColorDetailDto> UpdateProductColor(SaleOptionColorUpdateDto model);
+
+        public ServiceResponseDto<SaleOptionColorDetailDto>CreateProdactColor(SaleOptionColorCreateDto model);
+
+
+        public ServiceResponseDto<SaleOptionColorDetailDto> DeleteProdactColor(int  ProductColorid);
+
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\Interfaces\IProductSaleOptionService.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.DTO.DtoProductSaleOption;
+
+namespace ServiceContract.Interfaces
+{
+    public interface IProductSaleOptionService
+    {
+
+        Task<ServiceResponseDto<ProductSaleOptionListItemDto>> AddProductSaleOptionAsync(ProductSaleOptionCreateDto model);
+
+        Task<ServiceResponseDto<ProductSaleOptionListItemDto>> GetProductSaleOptionByIdAsync(int id);
+
+        Task<ServiceResponseDto<bool>> DeleteProductSaleOptionAsync(int id);
+
+        Task<ServiceResponseDto<ProductSaleOptionListItemDto>> UpdateProductSaleOptionAsync(ProductSaleOptionUpdateDto model);
+
+        
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\Interfaces\IProductService.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entities;
+using ServiceContract.Common;
+using ServiceContract.DTO.DtoCommit;
+using ServiceContract.DTO.DtoProduct;
+using ServiceContract.Quaries;
+
+namespace ServiceContract.Interfaces
+{
+    public interface IProductService
+    {
+        public Task<ServiceResponseDto<ProductListItemDto>> AddProductAsync(ProductCreateDto model);
+
+        public Task<ProductDetailDto?> GetByIdAsync(int productId);
+
+        public Task<Product?> GetEntityByIdAsync(int product);
+
+        public Task<PageResult<ProductListItemDto>> GetFilterAsync(ProductQuery query);
+
+        public Task<ProductListItemDto?> GetListItemByIdAsync(int productId);
+
+        public Task<ProductUpdateDto?> GetForUpdateAsync(int productId);
+
+        public Task<ServiceResponseDto<ProductListItemDto>> UpdateAsync(ProductUpdateDto model);
+
+        public Task<ServiceResponseDto<bool>> DeleteAsync(int productid);
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\Queries\CategoryQuery.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ServiceContract.Queries
+{
+    public class CategoryQuery
+    {
+        public string? SearchText { get; set; }
+
+        public int PageSize { get; set; } = 10;
+
+        public int Page { get; set; } = 1;
+
+    }
+}
+
+===== C:\Users\aliwo\source\repos\lern\ServiceContract\Queries\ProductQuery.cs =====
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DTO;
+using ServiceContract.Enums;
+
+namespace ServiceContract.Quaries
+{
+    public class ProductQuery
+    {
+
+        public string? SearchText { get; set; }
+
+
+        [EnumDataType(typeof(EnumProductSearchType))]
+        public EnumProductSearchType SearchType { get; set; } = EnumProductSearchType.Name;
+
+        public bool? HasDiscount { get; set; }
+
+        public DateTime? CreatedFrom { get; set; }
+        public DateTime? CreatedTo { get; set; }
+
+
+
+
+        [EnumDataType(typeof(EnumProductSortType))]
+        public EnumProductSortType SortType { get; set; } = EnumProductSortType.Id;
+
+        [EnumDataType(typeof(OrderEnum))]
+        public OrderEnum Order { get; set; } = OrderEnum.ASC;
+
+        public int Page { get; set; } = 1;
+
+        public int PageSize { get; set; } = 10;
+
+
+    }
+}
+

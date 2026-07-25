@@ -27,12 +27,18 @@ namespace Entities
         [Column("DisconType")]
         public DisconTypeEnum? DiscountType { get; set; }
 
+        public DateTime? DiscountStartAt { get; set; }
+        public DateTime? DiscountEndAt { get; set; }
+
+
         [NotMapped]
         public bool HasDiscount => DiscountValue.HasValue && DiscountValue.Value > 0;
 
         public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
-
         public ICollection<ProductSaleOption> SaleOptions { get; set; } = new List<ProductSaleOption>();
+
+        public ICollection<ProductVariant> productVariants { get; set; } = new List<ProductVariant>();
+        public ICollection<ProductImage> productImages { get; set; } = new List<ProductImage>();
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

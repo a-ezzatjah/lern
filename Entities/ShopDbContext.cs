@@ -31,6 +31,7 @@ namespace Entities
             modelBuilder.Entity<ProductSaleOption>().ToTable("ProductSaleOptions");
             modelBuilder.Entity<SaleOptionColor>().ToTable("SaleOptionColors");
 
+
             // ProductCategory composite key
             modelBuilder.Entity<ProductCategory>().HasKey(x => new { x.ProductId, x.CategoryId });
             modelBuilder.Entity<ProductCategory>()
@@ -42,6 +43,7 @@ namespace Entities
                 .WithMany(x => x.ProductCategories)
                 .HasForeignKey(x => x.CategoryId);
 
+
             // Category self-referencing
             modelBuilder.Entity<Category>()
                 .HasOne(x => x.Parent)
@@ -49,7 +51,62 @@ namespace Entities
                 .HasForeignKey(x => x.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-// Product â†’ SeoData (Owned Entity)
+
+
+            // ProductSaleOption
+            modelBuilder.Entity<ProductSaleOption>()
+                .HasOne(pso => pso.Product)
+                .WithMany(p => p.SaleOptions)
+                .HasForeignKey(pso => pso.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+
+
+            // SaleOPtionColor
+            modelBuilder.Entity<SaleOptionColor>()
+             .HasOne(soc => soc.ProductSaleOption)
+             .WithMany(pso => pso.SaleOptionColors)
+             .HasForeignKey(soc => soc.SaleOptionId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+
+            // ProductVariant
+            modelBuilder.Entity<ProductVariant>()
+                .HasOne(x => x.product)
+                .WithMany(x => x.productVariants)
+                .HasForeignKey(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProductVariant>()
+                .HasOne(x => x.ProductSaleOption)
+                .WithMany(x => x.ProductVariants)
+                .HasForeignKey(x => x.ProductSaleOptionId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProductVariant>()
+                .HasOne(x=>x.saleoptioncolor)
+                .WithMany(x=>x.ProductVariants)
+                .HasForeignKey(x=>x.SaleOptionColorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+
+
+            // ProductImage
+            modelBuilder.Entity<ProductImage>()
+                .HasOne(x => x.Product)
+                .WithMany(x => x.productImages)
+                .HasForeignKey(x => x.ProductId);
+            modelBuilder.Entity<ProductImage>()
+                .HasOne(x => x.Variant)
+                .WithMany(x => x.ProductImages)
+                .HasForeignKey(x => x.VariantId);
+               
+                
+                
+
+
+
+
+            // Product â†’ SeoData (Owned Entity)
             modelBuilder.Entity<Product>()
                 .OwnsOne(p => p.Seo, seo =>
                 {
@@ -90,16 +147,10 @@ namespace Entities
                 .Property(pso => pso.ImageUrl)
                 .HasMaxLength(500);
 
-            modelBuilder.Entity<ProductSaleOption>()
-                .HasOne(pso => pso.Product)
-                .WithMany(p => p.SaleOptions)
-                .HasForeignKey(pso => pso.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             // Decimal precision
             modelBuilder.Entity<Product>()
                 .Property(p => p.DiscountValue).HasPrecision(18, 2);
-
             modelBuilder.Entity<ProductSaleOption>()
                 .Property(pso => pso.BasePrice).HasPrecision(18, 2);
             modelBuilder.Entity<ProductSaleOption>()
@@ -108,22 +159,7 @@ namespace Entities
                 .Property(pso => pso.MaxQuantity).HasPrecision(18, 3);
             modelBuilder.Entity<ProductSaleOption>()
                 .Property(pso => pso.Step).HasPrecision(18, 3);
-            modelBuilder.Entity<ProductSaleOption>()
-                .Property(pso => pso.FixedWeight).HasPrecision(18, 3);
-            modelBuilder.Entity<ProductSaleOption>()
-                .Property(pso => pso.FixedLength).HasPrecision(18, 3);
-            modelBuilder.Entity<ProductSaleOption>()
-                .Property(pso => pso.FixedWidth).HasPrecision(18, 3);
-            modelBuilder.Entity<ProductSaleOption>()
-                .Property(pso => pso.FixedHeight).HasPrecision(18, 3);
-            modelBuilder.Entity<ProductSaleOption>()
-                .Property(pso => pso.PerUnitWeight).HasPrecision(18, 3);
-            modelBuilder.Entity<ProductSaleOption>()
-                .Property(pso => pso.PerUnitLength).HasPrecision(18, 3);
-            modelBuilder.Entity<ProductSaleOption>()
-                .Property(pso => pso.PerUnitWidth).HasPrecision(18, 3);
-            modelBuilder.Entity<ProductSaleOption>()
-                .Property(pso => pso.PerUnitHeight).HasPrecision(18, 3);
+             
             // ProductSaleOption â†’ SaleOptionColor
             modelBuilder.Entity<SaleOptionColor>()
                 .Property(soc => soc.ImageUrl)
@@ -135,11 +171,7 @@ namespace Entities
             modelBuilder.Entity<SaleOptionColor>()
                 .Property(soc => soc.Price).HasPrecision(18, 2);
 
-            modelBuilder.Entity<SaleOptionColor>()
-                .HasOne(soc => soc.ProductSaleOption)
-                .WithMany(pso => pso.SaleOptionColors)
-                .HasForeignKey(soc => soc.SaleOptionId)
-                .OnDelete(DeleteBehavior.Cascade);
+         
 
             // Product constraints
             modelBuilder.Entity<Product>()
@@ -158,6 +190,20 @@ namespace Entities
                 .HasIndex(c => c.Name).IsUnique();
             modelBuilder.Entity<Category>()
                 .HasIndex(c => c.Slug).IsUnique();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
 
 

@@ -12,6 +12,7 @@ namespace Entities.Enums
     Pack = 1,
     Meter = 2,
     Toop = 3,
-    
+    Single = 4 
+
     }
 }

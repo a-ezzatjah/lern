@@ -25,13 +25,5 @@ namespace Entities
 
 
 
-
-
-
-
-
-
-
-
     }
 }
