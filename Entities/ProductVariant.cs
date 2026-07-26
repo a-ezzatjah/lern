@@ -11,14 +11,12 @@ namespace Entities
     {
         public int Id { get; set; }
 
-        public int ProductId { get; set; }
-        public Product product { get; set; }
-
+       
         public int ProductSaleOptionId { get; set; }
         public ProductSaleOption ProductSaleOption { get; set; }
 
-        public int ProductSaleOptionColorId { get; set; }
-        public ProductSaleOptionColor ProductSaleOptionColor { get; set; } = null!;
+        public int? ProductSaleOptionColorId { get; set; }
+        public ProductSaleOptionColor? saleoptioncolor { get; set; }
 
 
         // اطلاعات انبارداری و قیمت
@@ -32,9 +30,7 @@ namespace Entities
 
         public int StockQuantity { get; set; } // موجودی واقعی فیزیکی در انبار
         public int ReservedQuantity { get; set; } // موجودی رزرو شده (مثلاً در سبد خریدهای معلق)
-        public decimal? MinQuantity { get; set; }
-        public decimal? MaxQuantity { get; set; }
-        public decimal Step { get; set; } = 1;
+      
 
         public int AvailableQuantity => StockQuantity - ReservedQuantity;
 

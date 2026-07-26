@@ -18,28 +18,16 @@ namespace Entities
         public string Title { get; set; } = null!;
         public EnumSaleType SaleType { get; set; }
 
-        public decimal? BasePrice { get; set; }
-
-        public string? ImageUrl { get; set; }
 
         public string? UnitName { get; set; }
         public string? InputLabel { get; set; }
 
-        public decimal? MinQuantity { get; set; }
-        public decimal? MaxQuantity { get; set; }
-        public decimal Step { get; set; } = 1;
+        public int? MinQuantity { get; set; }
+        public int? MaxQuantity { get; set; }
+        public int Step { get; set; } = 1;
 
-        public decimal? FixedWeight { get; set; }
-        public decimal? FixedLength { get; set; }
-        public decimal? FixedWidth { get; set; }
-        public decimal? FixedHeight { get; set; }
 
-        public decimal? PerUnitWeight { get; set; }
-        public decimal? PerUnitLength { get; set; }
-        public decimal? PerUnitWidth { get; set; }
-        public decimal? PerUnitHeight { get; set; }
-
-        public ICollection<ProductSaleOptionColor> ProductSaleOptionColors { get; set; } = new List<ProductSaleOptionColor>();
+        public ICollection<ProductSaleOptionColor>? SaleOptionColors { get; set; }
         public ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
 
 
