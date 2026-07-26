@@ -10,12 +10,12 @@ namespace Entities
     {
         public int Id { get; set; }
 
-        public int ProductId { get; set; }
-        public Product Product { get; set; }
+        public int? ProductId { get; set; }
+        public Product? Product { get; set; }
 
         // اختیاری: اگر عکس متعلق به یک رنگ یا تنوع خاص است
         public int? VariantId { get; set; }
-        public ProductVariant Variant { get; set; }
+        public ProductVariant? Variant { get; set; }
 
         public string ImageUrl { get; set; }
         public string AltText { get; set; }

@@ -7,7 +7,7 @@ using AutoMapper;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using ServiceContract.DTO.DtoCommit;
-using ServiceContract.DTO.DtoSaleOptionColor;
+using ServiceContract.DTO.DtoProductSaleOptionColor;
 using ServiceContract.Interfaces;
 
 namespace Service.Service
@@ -46,29 +46,30 @@ namespace Service.Service
 
 
 
-      public  ServiceResponseDto<SaleOptionColorDetailDto>CreateProdactColor(SaleOptionColorCreateDto model)
+      public ServiceResponseDto<ProductSaleOptionColorDetailDto> CreateProductSaleOptionColor(
+          ProductSaleOptionColorCreateDto model)
         {
 
             if (model == null)
             {
-               return ServiceResponseDto<SaleOptionColorDetailDto>.Fail("اطلاعات ساخت موحود نمیباشد");
+               return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Fail("اطلاعات ساخت موحود نمیباشد");
             }
 
-            var ProductColor = new SaleOptionColor();
+            var ProductColor = new ProductSaleOptionColor();
 
-            ProductColor.SaleOptionId = model.SaleOptionId;
+            ProductColor.ProductSaleOptionId = model.ProductSaleOptionId;
             ProductColor.Color = model.Color;
             ProductColor.HexCode = model.HexCode;
             ProductColor.Price = model.Price;
             ProductColor.ImageUrl = model.ImageUrl;
 
 
-            _shopDbContext.SaleOptionColors.Add(ProductColor);
+            _shopDbContext.ProductSaleOptionColors.Add(ProductColor);
             _shopDbContext.SaveChanges();
 
 
 
-            var result = new SaleOptionColorDetailDto();
+            var result = new ProductSaleOptionColorDetailDto();
 
             
             result.Color = ProductColor.Color;
@@ -77,7 +78,7 @@ namespace Service.Service
             result.ImageUrl = ProductColor.ImageUrl;
 
 
-            return ServiceResponseDto<SaleOptionColorDetailDto>.Success(result);
+            return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Success(result);
 
 
         }
@@ -100,21 +101,23 @@ namespace Service.Service
 
 
 
-       public ServiceResponseDto<SaleOptionColorDetailDto>DeleteProdactColor(int ProductColorid)
+       public ServiceResponseDto<ProductSaleOptionColorDetailDto> DeleteProductSaleOptionColor(
+           int productSaleOptionColorId)
         {
-            var productcolor = _shopDbContext.SaleOptionColors.FirstOrDefault(x => x.Id == ProductColorid);
+            var productcolor = _shopDbContext.ProductSaleOptionColors.FirstOrDefault(
+                x => x.Id == productSaleOptionColorId);
 
             if (productcolor == null)
             {
-                return ServiceResponseDto<SaleOptionColorDetailDto>.Fail("محصول موجود نمیباشد");
+                return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Fail("محصول موجود نمیباشد");
             }
 
 
-            _shopDbContext.SaleOptionColors.Remove(productcolor);
+            _shopDbContext.ProductSaleOptionColors.Remove(productcolor);
 
             _shopDbContext.SaveChanges();
 
-            return ServiceResponseDto<SaleOptionColorDetailDto>.Success();
+            return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Success();
 
         }
 
@@ -128,20 +131,21 @@ namespace Service.Service
 
 
 
-         public ServiceResponseDto<SaleOptionColorDetailDto> UpdateProductColor(SaleOptionColorUpdateDto model)
+         public ServiceResponseDto<ProductSaleOptionColorDetailDto> UpdateProductSaleOptionColor(
+             ProductSaleOptionColorUpdateDto model)
         {
 
             if (model == null)
             {
-                return ServiceResponseDto<SaleOptionColorDetailDto>.Fail("اطلاعات ساخت موحود نمیباشد");
+                return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Fail("اطلاعات ساخت موحود نمیباشد");
             }
 
 
-            var ProductColor = _shopDbContext.SaleOptionColors.FirstOrDefault(x => x.Id == model.Id);
+            var ProductColor = _shopDbContext.ProductSaleOptionColors.FirstOrDefault(x => x.Id == model.Id);
 
             if (ProductColor == null)
             {
-                return ServiceResponseDto<SaleOptionColorDetailDto>.Fail("رنگ موردنظر یافت نشد");
+                return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Fail("رنگ موردنظر یافت نشد");
             }
 
             ProductColor.Color = model.Color;
@@ -154,16 +158,16 @@ namespace Service.Service
 
 
 
-            var result = new SaleOptionColorDetailDto();
+            var result = new ProductSaleOptionColorDetailDto();
 
             result.Id = ProductColor.Id;
-            result.SaleOptionId = ProductColor.SaleOptionId;
+            result.ProductSaleOptionId = ProductColor.ProductSaleOptionId;
             result.Color = ProductColor.Color;
             result.HexCode = ProductColor.HexCode;
             result.Price = ProductColor.Price;
             result.ImageUrl = ProductColor.ImageUrl;
 
-            return ServiceResponseDto<SaleOptionColorDetailDto>.Success(result);
+            return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Success(result);
 
 
 

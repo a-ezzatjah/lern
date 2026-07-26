@@ -1,5 +1,4 @@
 using Entities.Enums;
-using ServiceContract.DTO.DtoSaleOptionColor;
 
 namespace ServiceContract.DTO.DtoProductSaleOption
 {

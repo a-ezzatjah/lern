@@ -17,8 +17,8 @@ namespace Entities
         public int ProductSaleOptionId { get; set; }
         public ProductSaleOption ProductSaleOption { get; set; }
 
-        public int SaleOptionColorId { get; set; }
-        public SaleOptionColor saleoptioncolor { get; set; }
+        public int ProductSaleOptionColorId { get; set; }
+        public ProductSaleOptionColor ProductSaleOptionColor { get; set; } = null!;
 
 
         // اطلاعات انبارداری و قیمت

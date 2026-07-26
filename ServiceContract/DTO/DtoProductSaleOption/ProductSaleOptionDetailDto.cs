@@ -1,5 +1,5 @@
 using Entities.Enums;
-using ServiceContract.DTO.DtoSaleOptionColor;
+using ServiceContract.DTO.DtoProductSaleOptionColor;
 
 namespace ServiceContract.DTO.DtoProductSaleOption
 {
@@ -12,6 +12,6 @@ namespace ServiceContract.DTO.DtoProductSaleOption
         public string? ImageUrl { get; set; }
         public string? UnitName { get; set; }
         public string? InputLabel { get; set; }
-        public List<SaleOptionColorDetailDto> SaleOptionColors { get; set; } = new();
+        public List<ProductSaleOptionColorDetailDto> ProductSaleOptionColors { get; set; } = new();
     }
 }

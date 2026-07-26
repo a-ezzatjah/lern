@@ -37,8 +37,7 @@ namespace Entities
         public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
         public ICollection<ProductSaleOption> SaleOptions { get; set; } = new List<ProductSaleOption>();
 
-        public ICollection<ProductVariant> productVariants { get; set; } = new List<ProductVariant>();
-        public ICollection<ProductImage> productImages { get; set; } = new List<ProductImage>();
+        public ICollection<ProductImage>? productImages { get; set; } = new List<ProductImage>();
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

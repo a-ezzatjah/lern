@@ -15,7 +15,6 @@ using ServiceContract.Common;
 using ServiceContract.DTO.DtoCommit;
 using ServiceContract.DTO.DtoProduct;
 using ServiceContract.DTO.DtoProductSaleOption;
-using ServiceContract.DTO.DtoSaleOptionColor;
 using ServiceContract.Enums;
 using ServiceContract.Interfaces;
 using ServiceContract.Quaries;
@@ -192,7 +191,7 @@ namespace Service.Service
                 .Include(x => x.ProductCategories)
                     .ThenInclude(x => x.Category)
                 .Include(x => x.SaleOptions)
-                    .ThenInclude(x => x.SaleOptionColors)
+                    .ThenInclude(x => x.ProductSaleOptionColors)
                 .Where(x => x.Id == productId)
                 .ProjectTo<ProductListItemDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
@@ -230,7 +229,7 @@ namespace Service.Service
                 .Include(x => x.ProductCategories)
                     .ThenInclude(x => x.Category)
                 .Include(x => x.SaleOptions)
-                    .ThenInclude(x => x.SaleOptionColors)
+                    .ThenInclude(x => x.ProductSaleOptionColors)
                 .Where(x => x.Id == productId)
                 .ProjectTo<ProductDetailDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
@@ -303,13 +302,13 @@ namespace Service.Service
                 }
                 else if (query.SearchType == EnumProductSearchType.Color)
                 {
-                    productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.SaleOptionColors.Any(y => y.Color.Contains(query.SearchText))));
+                    productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.ProductSaleOptionColors.Any(y => y.Color.Contains(query.SearchText))));
                 }
                 else if (query.SearchType == EnumProductSearchType.price)
                 {
                     if (decimal.TryParse(query.SearchText, out var price))
                     {
-                        productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.SaleOptionColors.Any(y => y.Price == price)));
+                        productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.ProductSaleOptionColors.Any(y => y.Price == price)));
                     }
 
                 }

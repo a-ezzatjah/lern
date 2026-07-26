@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ServiceContract.DTO.DtoCommit;
-using ServiceContract.DTO.DtoSaleOptionColor;
+using ServiceContract.DTO.DtoProductSaleOptionColor;
 using ServiceContract.Quaries;
 
 namespace ServiceContract.Interfaces
@@ -12,12 +12,13 @@ namespace ServiceContract.Interfaces
     public interface IProductSaleOptionColorService
     {
 
-        public ServiceResponseDto<SaleOptionColorDetailDto> UpdateProductColor(SaleOptionColorUpdateDto model);
+        ServiceResponseDto<ProductSaleOptionColorDetailDto> UpdateProductSaleOptionColor(
+            ProductSaleOptionColorUpdateDto model);
 
-        public ServiceResponseDto<SaleOptionColorDetailDto>CreateProdactColor(SaleOptionColorCreateDto model);
+        ServiceResponseDto<ProductSaleOptionColorDetailDto> CreateProductSaleOptionColor(
+            ProductSaleOptionColorCreateDto model);
 
-
-        public ServiceResponseDto<SaleOptionColorDetailDto> DeleteProdactColor(int  ProductColorid);
+        ServiceResponseDto<ProductSaleOptionColorDetailDto> DeleteProductSaleOptionColor(int productSaleOptionColorId);
 
 
     }

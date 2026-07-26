@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ServiceContract.DTO.DtoSaleOptionColor;
+using ServiceContract.DTO.DtoProductSaleOptionColor;
 
 namespace ServiceContract.DTO.DtoProductSaleOption
 {
@@ -18,7 +18,7 @@ namespace ServiceContract.DTO.DtoProductSaleOption
 
         public string? ImageUrl { get; set; }
 
-        public List<SaleOptionColorListItemDto> Colors { get; set; } = new();
+        public List<ProductSaleOptionColorListItemDto> ProductSaleOptionColors { get; set; } = new();
 
 
 
