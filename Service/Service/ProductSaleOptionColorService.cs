@@ -42,10 +42,6 @@ namespace Service.Service
 
 
 
-
-
-
-
       public ServiceResponseDto<ProductSaleOptionColorDetailDto> CreateProductSaleOptionColor(
           ProductSaleOptionColorCreateDto model)
         {
@@ -82,7 +78,6 @@ namespace Service.Service
 
 
         }
-
 
 
 

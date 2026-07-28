@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Entities;
 using ServiceContract.DTO.DtoCommit;
 using ServiceContract.DTO.DtoProductVariant;
@@ -17,14 +17,69 @@ namespace Service.Service
             _mapper = mapper;
         }
 
-        public Task<ServiceResponseDto<ProductVariantDetailDto>> AddProductVariantAsync(ProductVariantCreateDto model)
+        public async Task<ServiceResponseDto<ProductVariantDetailDto>> AddProductVariantAsync(ProductVariantCreateDto model)
         {
-            throw new NotImplementedException();
+
+            if (model == null)
+            {
+               return  ServiceResponseDto<ProductVariantDetailDto>.Fail(" موارد به درستی وارد نشده است");
+            }
+
+           var saleoption = _shopDbContext.ProductSaleOptions.FirstOrDefault(x => x.Id == model.ProductSaleOptionId);
+
+            if(saleoption == null || saleoption.ProductId != model.ProductSaleOptionId)
+            {
+                return ServiceResponseDto<ProductVariantDetailDto>.Fail("گزینه فروش مورد نظر یافت نشد");
+            }
+
+          var Color = _shopDbContext.ProductSaleOptionColors.FirstOrDefault(x => x.Id == model.ProductSaleOptionColorId);
+
+          if(Color == null || Color.ProductSaleOptionId != model.ProductSaleOptionId)
+            {
+                return ServiceResponseDto<ProductVariantDetailDto>.Fail("رنگ مورد نظر یافت نشد");
+            }
+
+
+            var variant = new ProductVariant();
+
+            variant.Sku = model.Sku;
+            variant.ProductSaleOptionId = model.ProductSaleOptionId;
+            variant.ProductSaleOptionColorId = model.ProductSaleOptionColorId;
+            variant.Price = model.Price;
+            variant.DiscountValue = model.DiscountValue;
+            variant.DisconType = model.DisconType;
+            variant.DiscountStartAt = model.DiscountStartAt;
+            variant.DiscountEndAt = model.DiscountEndAt;
+            variant.StockQuantity = model.StockQuantity;
+            variant.ReservedQuantity = model.ReservedQuantity;
+
+            _shopDbContext.ProductVariants.Add(variant);
+            await _shopDbContext.SaveChangesAsync();
+
+            var result = new ProductVariantDetailDto
+            {
+                Id = variant.Id,
+                Sku = variant.Sku,
+                ProductSaleOptionId = variant.ProductSaleOptionId,
+                ProductSaleOptionColorId = variant.ProductSaleOptionColorId,
+                Price = variant.Price,
+                DiscountValue = variant.DiscountValue,
+                DisconType = variant.DisconType,
+                DiscountStartAt = variant.DiscountStartAt,
+                DiscountEndAt = variant.DiscountEndAt,
+                StockQuantity = variant.StockQuantity,
+                ReservedQuantity = variant.ReservedQuantity
+            };
+
+           return ServiceResponseDto<ProductVariantDetailDto>.Success(result); 
+
+
         }
 
         public Task<ServiceResponseDto<ProductVariantDetailDto>> GetProductVariantByIdAsync(int id)
         {
-            throw new NotImplementedException();
+                        throw new NotImplementedException();
+
         }
 
         public Task<ServiceResponseDto<IReadOnlyList<ProductVariantListItemDto>>> GetProductVariantsByProductIdAsync(

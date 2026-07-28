@@ -41,6 +41,20 @@ namespace Service.Service
             {
                 return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("حالت فروش وارد نشده است");
             }
+            
+            var product = await _shopDbContext.Products.FirstOrDefaultAsync(x=>x.Id == model.ProductId);
+            if(product == null|| product.Id != model.ProductId)
+            {
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("محصول مورد نظر یافت نشد");
+            }
+           
+           var Dublicate = await _shopDbContext.ProductSaleOptions.AnyAsync(x=>x.ProductId == model.ProductId && x.Title == model.Title);
+            if(Dublicate)
+            {
+                return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("گزینه فروش وارد شده تکراری است");
+            }
+            
+            
 
             var productSaleOption = _mapper.Map<ProductSaleOption>(model);
 
@@ -75,6 +89,7 @@ namespace Service.Service
             {
                 return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("گزینه فروش موجود نمی‌باشد");
             }
+          
 
             var result = _mapper.Map<ProductSaleOptionListItemDto>(productSaleOption);
             return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
@@ -98,6 +113,19 @@ namespace Service.Service
             {
                 return ServiceResponseDto<bool>.Fail("گزینه فروش موجود نمی‌باشد");
             }
+
+          var hasRelatedSaleOption = await _shopDbContext.ProductVariants.AnyAsync(x => x.ProductSaleOptionId == id);
+            if (hasRelatedSaleOption)
+            {
+                return ServiceResponseDto<bool>.Fail("گزینه فروش دارای واریانت مرتبط است و نمی‌توان آن را حذف کرد");
+            }
+
+        var hasRelatedColor = await _shopDbContext.ProductSaleOptionColors.AnyAsync(x => x.ProductSaleOptionId == id);
+            if (hasRelatedColor)
+            {
+                return ServiceResponseDto<bool>.Fail("گزینه فروش دارای رنگ مرتبط است و نمی‌توان آن را حذف کرد");
+            }
+
 
             _shopDbContext.ProductSaleOptions.Remove(productSaleOption);
             await _shopDbContext.SaveChangesAsync();
@@ -141,6 +169,28 @@ namespace Service.Service
             {
                 return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("گزینه فروش موجود نمی‌باشد");
             }
+
+            if(productSaleOption.ProductId != model.ProductId)
+            {
+                
+                var exists = await _shopDbContext.Products.AnyAsync(x=>x.Id == model.ProductId);
+
+                if(!exists)
+                {
+                    return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("محصول موجود نمیباشد است");
+                }
+
+               var Dependencies = await _shopDbContext.ProductVariants.AnyAsync(x=>x.ProductSaleOptionId == productSaleOption.Id)||
+                                  await _shopDbContext.ProductSaleOptionColors.AnyAsync(x=>x.ProductSaleOptionId == productSaleOption.Id);
+
+                if(Dependencies)
+                {
+                    return ServiceResponseDto<ProductSaleOptionListItemDto>.Fail("گزینه فروش دارای واریانت مرتبط است و نمی‌توان آن را تغییر داد");
+                }
+           
+
+            }
+            
 
             _mapper.Map(model, productSaleOption);
 

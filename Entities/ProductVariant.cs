@@ -13,7 +13,7 @@ namespace Entities
 
        
         public int ProductSaleOptionId { get; set; }
-        public ProductSaleOption ProductSaleOption { get; set; }
+        public ProductSaleOption ProductSaleOption { get; set; } =null!;
 
         public int? ProductSaleOptionColorId { get; set; }
         public ProductSaleOptionColor? saleoptioncolor { get; set; }
