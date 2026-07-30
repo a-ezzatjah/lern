@@ -15,6 +15,8 @@ namespace ServiceContract.Interfaces
 
         Task<ServiceResponseDto<ProductSaleOptionListItemDto>> GetProductSaleOptionByIdAsync(int id);
 
+        Task<ProductSaleOptionUpdateDto?> GetProductSaleOptionForUpdateAsync(int productSaleOptionId);
+
         Task<ServiceResponseDto<bool>> DeleteProductSaleOptionAsync(int id);
 
         Task<ServiceResponseDto<ProductSaleOptionListItemDto>> UpdateProductSaleOptionAsync(ProductSaleOptionUpdateDto model);

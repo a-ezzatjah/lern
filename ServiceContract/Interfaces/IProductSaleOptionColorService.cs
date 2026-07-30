@@ -11,6 +11,8 @@ namespace ServiceContract.Interfaces
 {
     public interface IProductSaleOptionColorService
     {
+        Task<ProductSaleOptionColorUpdateDto?> GetProductSaleOptionColorForUpdateAsync(
+            int productSaleOptionColorId);
 
         ServiceResponseDto<ProductSaleOptionColorDetailDto> UpdateProductSaleOptionColor(
             ProductSaleOptionColorUpdateDto model);

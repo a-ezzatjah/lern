@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Entities;
+using Microsoft.EntityFrameworkCore;
 using ServiceContract.DTO.DtoCommit;
 using ServiceContract.DTO.DtoProductVariant;
 using ServiceContract.Interfaces;
@@ -80,6 +82,15 @@ namespace Service.Service
         {
                         throw new NotImplementedException();
 
+        }
+
+        public async Task<ProductVariantUpdateDto?> GetProductVariantForUpdateAsync(int productVariantId)
+        {
+            return await _shopDbContext.ProductVariants
+                .AsNoTracking()
+                .Where(x => x.Id == productVariantId)
+                .ProjectTo<ProductVariantUpdateDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
         }
 
         public Task<ServiceResponseDto<IReadOnlyList<ProductVariantListItemDto>>> GetProductVariantsByProductIdAsync(

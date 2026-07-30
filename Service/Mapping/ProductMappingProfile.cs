@@ -7,8 +7,6 @@ using AutoMapper;
 using Entities;
 using ServiceContract.DTO.DtoProduct;
 using ServiceContract.DTO.DtoProductSaleOption;
-using ServiceContract.DTO.DtoProductVariant;
-using ServiceContract.DTO.DtoProductSaleOptionColor;
 using ServiceContract.DTO.DtoSeo;
 
 namespace Service.Mapping
@@ -33,46 +31,16 @@ namespace Service.Mapping
                 .ForMember(x => x.Id, otp => otp.Ignore())
                 .ForMember(x => x.ProductId, otp => otp.Ignore())
                 .ForMember(x => x.Product, otp => otp.Ignore())
-                .ForMember(x => x.ProductSaleOptionColors, otp => otp.Ignore());
-
-            CreateMap<ProductSaleOptionColorCreateDto, ProductSaleOptionColor>()
-                .ForMember(x => x.Id, otp => otp.Ignore())
-                .ForMember(x => x.ProductSaleOption, otp => otp.Ignore());
-
-            CreateMap<ProductSaleOptionColorUpdateDto, ProductSaleOptionColor>()
-                .ForMember(x => x.Id, otp => otp.Ignore())
-                .ForMember(x => x.ProductSaleOptionId, otp => otp.Ignore())
-                .ForMember(x => x.ProductSaleOption, otp => otp.Ignore());
+                .ForMember(x => x.SaleOptionColors, otp => otp.Ignore())
+                .ForMember(x => x.ProductVariants, otp => otp.Ignore());
 
             CreateMap<ProductSaleOption, ProductSaleOptionDetailDto>();
             CreateMap<ProductSaleOption, ProductSaleOptionUpdateDto>();
 
-            CreateMap<ProductSaleOptionColor, ProductSaleOptionColorDetailDto>();
-            CreateMap<ProductSaleOptionColor, ProductSaleOptionColorUpdateDto>();
-
             CreateMap<ProductSaleOption, ProductSaleOptionListItemDto>()
                 .ForMember(
                     x => x.ProductSaleOptionColors,
-                    otp => otp.MapFrom(s => s.ProductSaleOptionColors));
-
-            CreateMap<ProductSaleOptionColor, ProductSaleOptionColorListItemDto>();
-
-            CreateMap<ProductVariantCreateDto, ProductVariant>()
-                .ForMember(x => x.Id, otp => otp.Ignore())
-                .ForMember(x => x.product, otp => otp.Ignore())
-                .ForMember(x => x.ProductSaleOption, otp => otp.Ignore())
-                .ForMember(x => x.ProductSaleOptionColor, otp => otp.Ignore())
-                .ForMember(x => x.ProductImages, otp => otp.Ignore());
-
-            CreateMap<ProductVariantUpdateDto, ProductVariant>()
-                .ForMember(x => x.Id, otp => otp.Ignore())
-                .ForMember(x => x.product, otp => otp.Ignore())
-                .ForMember(x => x.ProductSaleOption, otp => otp.Ignore())
-                .ForMember(x => x.ProductSaleOptionColor, otp => otp.Ignore())
-                .ForMember(x => x.ProductImages, otp => otp.Ignore());
-
-            CreateMap<ProductVariant, ProductVariantDetailDto>();
-            CreateMap<ProductVariant, ProductVariantListItemDto>();
+                    otp => otp.MapFrom(s => s.SaleOptionColors));
 
             CreateMap<Product, ProductListItemDto>()
                 .ForMember(x => x.CategoriesCount, otp => otp.MapFrom(s => s.ProductCategories.Count))

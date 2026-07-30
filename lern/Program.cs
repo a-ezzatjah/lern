@@ -27,6 +27,9 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<ProductMappingProfile>();
     cfg.AddProfile<CategoryMappingProfile>();
+    cfg.AddProfile<ProductSaleOptionColorMappingProfile>();
+    cfg.AddProfile<ProductImageMappingProfile>();
+    cfg.AddProfile<ProductVariantMappingProfile>();
 });
 builder.Services.AddDbContext<ShopDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionstring")));
 builder.Services.AddValidatorsFromAssemblyContaining<ProductCreateDtoValidator>();

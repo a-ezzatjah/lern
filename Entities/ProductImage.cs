@@ -17,8 +17,8 @@ namespace Entities
         public int? VariantId { get; set; }
         public ProductVariant? Variant { get; set; }
 
-        public string ImageUrl { get; set; }
-        public string AltText { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? AltText { get; set; }
 
         public int SortOrder { get; set; } // برای مشخص کردن ترتیب نمایش در گالری (0, 1, 2...)
         public bool IsPrimary { get; set; } // آیا عکس اصلی/کارت محصول است؟

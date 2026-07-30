@@ -25,6 +25,9 @@ namespace Service.Validators.ProductValodation
 
             RuleFor(x => x.Name)
                 .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("نام محصول الزامی میباشد")
+                .MustAsync(async(Name,CancellationToken)=> 
+                !await _shopDbContext.Products.AnyAsync(x=>x.Name == Name,CancellationToken))
+                .WithMessage("نام وارد شده تکراری میباشد")
                 .MaximumLength(100).WithMessage("تعداد کاراکتر نام بیشتر از حد مجاز میباشد");
 
             RuleFor(x => x.Slug)

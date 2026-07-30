@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using ServiceContract.DTO.DtoCommit;
@@ -32,6 +33,16 @@ namespace Service.Service
 
         }
 
+
+        public async Task<ProductSaleOptionColorUpdateDto?> GetProductSaleOptionColorForUpdateAsync(
+            int productSaleOptionColorId)
+        {
+            return await _shopDbContext.ProductSaleOptionColors
+                .AsNoTracking()
+                .Where(x => x.Id == productSaleOptionColorId)
+                .ProjectTo<ProductSaleOptionColorUpdateDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+        }
 
 
 

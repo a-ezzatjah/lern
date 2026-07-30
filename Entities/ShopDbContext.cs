@@ -22,6 +22,7 @@ namespace Entities
         public DbSet<ProductSaleOption> ProductSaleOptions { get; set; }
         public DbSet<ProductSaleOptionColor> ProductSaleOptionColors { get; set; }
         public DbSet<ProductVariant> ProductVariants { get; set; }
+        public DbSet<ProductImage> ProductImages {get;set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +32,8 @@ namespace Entities
             modelBuilder.Entity<ProductCategory>().ToTable("ProductCategories");
             modelBuilder.Entity<ProductSaleOption>().ToTable("ProductSaleOptions");
             modelBuilder.Entity<ProductSaleOptionColor>().ToTable("SaleOptionColors");
+            modelBuilder.Entity<ProductImage>().ToTable("ProductImage");
+
 
 
             // ProductCategory composite key

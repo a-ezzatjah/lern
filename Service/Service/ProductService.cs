@@ -60,12 +60,7 @@ namespace Service.Service
                 return ServiceResponseDto<ProductListItemDto>.Fail(error);
             }
 
-            var normalizedName = model.Name.Trim();
-            var productExists = await _shopDbContext.Products.AnyAsync(x => x.Name.ToLower() == normalizedName.ToLower());
-            if (productExists)
-            {
-                return ServiceResponseDto<ProductListItemDto>.Fail("محصول تکراری می‌باشد");
-            }
+           
 
             var product = _mapper.Map<Product>(model);
 
@@ -86,8 +81,6 @@ namespace Service.Service
             return result != null
       ? ServiceResponseDto<ProductListItemDto>.Success(result)
       : ServiceResponseDto<ProductListItemDto>.Fail("خطا در بازخوانی اطلاعات...");
-
-
 
         }
 
@@ -156,24 +149,39 @@ namespace Service.Service
 
         public async Task<ServiceResponseDto<bool>> DeleteAsync(int productId)
         {
-            var product = await GetEntityByIdAsync(productId);
+            var product = await _shopDbContext.Products
+            .FirstOrDefaultAsync(x=>x.Id == productId);
+            
+
             if (product == null)
             {
                 return ServiceResponseDto<bool>.Fail("محصول مورد نظر یافت نشد");
             }
 
+
+          var hasRelatedSaleoption = await _shopDbContext.ProductSaleOptions.AnyAsync(x=>x.ProductId == productId);
+           
+           if(hasRelatedSaleoption)
+            {
+                 return ServiceResponseDto<bool>.Fail("محصول دارای زیر مجموعه میباشد");
+            }
+ 
+          
+
+          var hasRelatedProductImage = await _shopDbContext.ProductImages.AnyAsync(x=>x.ProductId == productId);
+           
+           if(hasRelatedProductImage)
+            {
+                 return ServiceResponseDto<bool>.Fail("محصول دارای زیر مجموعه میباشد");
+            }
+
+
             _shopDbContext.Products.Remove(product);
             await _shopDbContext.SaveChangesAsync();
 
             return ServiceResponseDto<bool>.Success();
+
         }
-
-
-
-
-
-
-
 
 
 
@@ -188,15 +196,14 @@ namespace Service.Service
         {
             return await _shopDbContext.Products
                 .AsNoTracking()
-                .Include(x => x.ProductCategories)
-                    .ThenInclude(x => x.Category)
-                .Include(x => x.SaleOptions)
-                    .ThenInclude(x => x.ProductSaleOptionColors)
                 .Where(x => x.Id == productId)
                 .ProjectTo<ProductListItemDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
         }
 
+
+
+        // متد جهت نمایش اطلاعات کامل محصول برای اپدیت ادمین 
         public async Task<ProductUpdateDto?> GetForUpdateAsync(int productId)
         {
             return await _shopDbContext.Products
@@ -213,52 +220,14 @@ namespace Service.Service
 
 
 
-
-
-
-
-
-
-
-
-
         public async Task<ProductDetailDto?> GetByIdAsync(int productId)
         {
             return await _shopDbContext.Products
                 .AsNoTracking()
-                .Include(x => x.ProductCategories)
-                    .ThenInclude(x => x.Category)
-                .Include(x => x.SaleOptions)
-                    .ThenInclude(x => x.ProductSaleOptionColors)
                 .Where(x => x.Id == productId)
                 .ProjectTo<ProductDetailDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
         }
-
-
-
-
-
-        public Task<Product?> GetEntityByIdAsync(int productId)
-        {
-            return _shopDbContext.Products.FirstOrDefaultAsync(x => x.Id == productId);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -302,13 +271,19 @@ namespace Service.Service
                 }
                 else if (query.SearchType == EnumProductSearchType.Color)
                 {
-                    productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.ProductSaleOptionColors.Any(y => y.Color.Contains(query.SearchText))));
+                    productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.SaleOptionColors
+                        .Any(y => y.Color.Contains(query.SearchText))));
                 }
                 else if (query.SearchType == EnumProductSearchType.price)
                 {
                     if (decimal.TryParse(query.SearchText, out var price))
                     {
-                        productQuery = productQuery.Where(x => x.SaleOptions.Any(s => s.ProductSaleOptionColors.Any(y => y.Price == price)));
+                  
+                 productQuery = productQuery.Where(p =>
+                                 p.SaleOptions.Any(so =>
+                                 so.ProductVariants.Any(v => v.Price == price) ||
+                                 so.SaleOptionColors.Any(c => c.ProductVariants.Any(v => v.Price == price))));
+
                     }
 
                 }
@@ -340,8 +315,8 @@ namespace Service.Service
                 (EnumProductSortType.slug, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Slug).ThenByDescending(x => x.Id),
                 (EnumProductSortType.Name, OrderEnum.ASC) => productQuery.OrderBy(x => x.Name).ThenBy(x => x.Id),
                 (EnumProductSortType.Name, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Name).ThenByDescending(x => x.Id),
-                (EnumProductSortType.Price, OrderEnum.ASC) => productQuery.OrderBy(x => x.SaleOptions.Min(s => s.BasePrice)).ThenBy(x => x.Id),
-                (EnumProductSortType.Price, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.SaleOptions.Min(s => s.BasePrice)).ThenByDescending(x => x.Id),
+                // (EnumProductSortType.Price, OrderEnum.ASC) => productQuery.OrderBy(x => x.SaleOptions.Min(s => s.BasePrice)).ThenBy(x => x.Id),
+                // (EnumProductSortType.Price, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.SaleOptions.Min(s => s.BasePrice)).ThenByDescending(x => x.Id),
                 (EnumProductSortType.HasDiscount, OrderEnum.ASC) => productQuery.OrderBy(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0).ThenBy(x => x.Id),
                 (EnumProductSortType.HasDiscount, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0).ThenByDescending(x => x.Id),
                 (EnumProductSortType.DiscountValue, OrderEnum.ASC) => productQuery.OrderBy(x => x.DiscountValue).ThenBy(x => x.Id),
@@ -387,6 +362,11 @@ namespace Service.Service
 
 
 
-
     }
 }
+
+
+
+
+
+

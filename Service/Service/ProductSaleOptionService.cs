@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using ServiceContract.DTO.DtoCommit;
@@ -93,6 +94,22 @@ namespace Service.Service
 
             var result = _mapper.Map<ProductSaleOptionListItemDto>(productSaleOption);
             return ServiceResponseDto<ProductSaleOptionListItemDto>.Success(result);
+        }
+
+
+
+
+
+
+
+        public async Task<ProductSaleOptionUpdateDto?> GetProductSaleOptionForUpdateAsync(
+            int productSaleOptionId)
+        {
+            return await _shopDbContext.ProductSaleOptions
+                .AsNoTracking()
+                .Where(x => x.Id == productSaleOptionId)
+                .ProjectTo<ProductSaleOptionUpdateDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
         }
 
 

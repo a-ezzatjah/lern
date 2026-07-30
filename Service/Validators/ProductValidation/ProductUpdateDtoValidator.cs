@@ -22,14 +22,18 @@ namespace Service.Validators.ProductValodation
 
             RuleFor(x => x.Name)
                 .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("نام محصول معتبر نمیباشد")
+                .MaximumLength(100).WithMessage("تعداد کاراکتر نام بیشتر از حد مجاز می‌باشد")
                 .MustAsync(async (model, name, CancellationToken) =>
-                { return !await _shopDbContext.Products.AnyAsync(x => x.Name == name && x.Id != model.Id); });
+                { return !await _shopDbContext.Products.AnyAsync(x => x.Name.Trim().ToLower()== name.Trim().ToLower() && x.Id != model.Id); })
+                .WithMessage("نام محصول تکراری می‌باشد");
 
 
             RuleFor(x => x.Slug)
                .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("اسلاگ محصول معتبر نمیباشد")
+               .MaximumLength(100).WithMessage("تعداد کاراکتر اسلاگ بیشتر از حد مجاز می‌باشد")
                .MustAsync(async (model, slug, CancellationToken) =>
-               { return !await _shopDbContext.Products.AnyAsync(x => x.Slug == slug && x.Id != model.Id); });
+               { return !await _shopDbContext.Products.AnyAsync(x => x.Slug.Trim().ToLower() == slug.Trim().ToLower() && x.Id != model.Id); })
+               .WithMessage("نام اسلاگ تکراری می‌باشد");
 
 
 

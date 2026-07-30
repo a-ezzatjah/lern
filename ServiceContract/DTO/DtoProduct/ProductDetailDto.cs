@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DTO;
+using ServiceContract.DTO.DtoProductImage;
 using ServiceContract.DTO.DtoProductSaleOption;
+using ServiceContract.DTO.DtoProductSaleOptionColor;
+using ServiceContract.DTO.DtoProductVariant;
 
 namespace ServiceContract.DTO.DtoProduct
 {
@@ -12,8 +15,8 @@ namespace ServiceContract.DTO.DtoProduct
     {
 
 
-        public string? Name { get; set; }
-        public string? Slug { get; set; }
+        public string Name { get; set; }
+        public string Slug { get; set; }
         public string? Description { get; set; }
 
         public bool IsActive { get; set; }
@@ -21,17 +24,17 @@ namespace ServiceContract.DTO.DtoProduct
         public decimal? DiscountValue { get; set; }
         public DisconTypeEnum? DiscountType { get; set; }
 
-        public bool HasDiscount { get; set; }
+        public bool HasDiscount { get; set; } 
 
         public List<int> CategoryIds { get; set; } = new();
         public List<string> CategoryNames { get; set; } = new();
         public List<ProductSaleOptionDetailDto> SaleOptions { get; set; } = new();
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public List<ProductSaleOptionColorDetailDto> ProductSaleOptionColors { get; set; } = new();
 
+        public List<ProductVariantDetailDto> ProductVariants { get; set; } = new();
 
-
+        public List<ProductImageDetailDto> productImageDetailDtos { get; set; } = new();
 
 
 
