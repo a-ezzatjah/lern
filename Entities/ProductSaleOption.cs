@@ -27,7 +27,7 @@ namespace Entities
         public int Step { get; set; } = 1;
 
 
-        public ICollection<ProductSaleOptionColor>? SaleOptionColors { get; set; }
+        public ICollection<ProductSaleOptionColor> SaleOptionColors { get; set; } = new List<ProductSaleOptionColor>();
         public ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
 
 

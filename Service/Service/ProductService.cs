@@ -315,8 +315,8 @@ namespace Service.Service
                 (EnumProductSortType.slug, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Slug).ThenByDescending(x => x.Id),
                 (EnumProductSortType.Name, OrderEnum.ASC) => productQuery.OrderBy(x => x.Name).ThenBy(x => x.Id),
                 (EnumProductSortType.Name, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.Name).ThenByDescending(x => x.Id),
-                // (EnumProductSortType.Price, OrderEnum.ASC) => productQuery.OrderBy(x => x.SaleOptions.Min(s => s.BasePrice)).ThenBy(x => x.Id),
-                // (EnumProductSortType.Price, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.SaleOptions.Min(s => s.BasePrice)).ThenByDescending(x => x.Id),
+                (EnumProductSortType.Price, OrderEnum.ASC) =>  productQuery.OrderBy(x=>x.SaleOptions.SelectMany(s=>s.ProductVariants.Select(p=>(decimal?)p.Price).Concat(s.SaleOptionColors.SelectMany(v=>v.ProductVariants.Select(x=>(decimal?)x.Price)))).Min() ?? 0).ThenBy(x=>x.Id),
+
                 (EnumProductSortType.HasDiscount, OrderEnum.ASC) => productQuery.OrderBy(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0).ThenBy(x => x.Id),
                 (EnumProductSortType.HasDiscount, OrderEnum.DESC) => productQuery.OrderByDescending(x => x.DiscountValue.HasValue && x.DiscountValue.Value > 0).ThenByDescending(x => x.Id),
                 (EnumProductSortType.DiscountValue, OrderEnum.ASC) => productQuery.OrderBy(x => x.DiscountValue).ThenBy(x => x.Id),
