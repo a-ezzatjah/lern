@@ -19,6 +19,8 @@ namespace ServiceContract.Interfaces
 
         public Task<PageResult<ProductListItemDto>> GetFilterAsync(ProductQuery query);
 
+        public Task<List<ProductCardDto>> GetProductCardsAsync();
+
         public Task<ProductListItemDto?> GetListItemByIdAsync(int productId);
 
         public Task<ProductUpdateDto?> GetForUpdateAsync(int productId);
@@ -26,5 +28,10 @@ namespace ServiceContract.Interfaces
         public Task<ServiceResponseDto<ProductListItemDto>> UpdateAsync(ProductUpdateDto model);
 
         public Task<ServiceResponseDto<bool>> DeleteAsync(int productid);
+
+        public  Task<List<ProductCardDto>> GetNewestProductCardsAsync(int take = 8);
+
+        public Task<List<ProductCardDto>> GetDiscountedProductCardsAsync(int take = 8);
+
     }
 }

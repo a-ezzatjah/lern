@@ -20,7 +20,7 @@ builder.Services.AddScoped<IProductSaleOptionService, ProductSaleOptionService>(
 builder.Services.AddScoped<IProductSaleOptionColorService, ProductSaleOptionColorService>();
 builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(cfg =>
@@ -38,7 +38,11 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseStaticFiles();
 app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
 

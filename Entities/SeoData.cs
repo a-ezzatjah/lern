@@ -16,9 +16,6 @@ namespace Entities
         public string? MetaKeywords { get; set; }
 
         public string? CanonicalUrl { get; set; }
-        public string? OgTitle { get; set; }
-        public string? OgDescription { get; set; }
-        public string? OgImageUrl { get; set; }
 
         public bool IndexPage { get; set; } = true;
         public bool FollowPage { get; set; } = true;

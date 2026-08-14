@@ -93,7 +93,7 @@ namespace Entities
             // ProductImage
             modelBuilder.Entity<ProductImage>()
                 .HasOne(x => x.Product)
-                .WithMany(x => x.productImages)
+                .WithMany(x => x.ProductImages)
                 .HasForeignKey(x => x.ProductId);
             modelBuilder.Entity<ProductImage>()
                 .HasOne(x => x.Variant)
@@ -115,9 +115,6 @@ namespace Entities
                     seo.Property(s => s.MetaDescription).HasMaxLength(500).HasColumnName("MetaDescription");
                     seo.Property(s => s.MetaKeywords).HasMaxLength(300).HasColumnName("MetaKeywords");
                     seo.Property(s => s.CanonicalUrl).HasMaxLength(500).HasColumnName("CanonicalUrl");
-                    seo.Property(s => s.OgTitle).HasMaxLength(200).HasColumnName("OgTitle");
-                    seo.Property(s => s.OgDescription).HasMaxLength(500).HasColumnName("OgDescription");
-                    seo.Property(s => s.OgImageUrl).HasMaxLength(500).HasColumnName("OgImageUrl");
                     seo.Property(s => s.IndexPage).HasColumnName("IndexPage");
                     seo.Property(s => s.FollowPage).HasColumnName("FollowPage");
                 });
@@ -132,9 +129,6 @@ namespace Entities
                    seo.Property(s => s.MetaDescription).HasMaxLength(500).HasColumnName("MetaDescription");
                    seo.Property(s => s.MetaKeywords).HasMaxLength(300).HasColumnName("MetaKeywords");
                    seo.Property(s => s.CanonicalUrl).HasMaxLength(500).HasColumnName("CanonicalUrl");
-                   seo.Property(s => s.OgTitle).HasMaxLength(200).HasColumnName("OgTitle");
-                   seo.Property(s => s.OgDescription).HasMaxLength(500).HasColumnName("OgDescription");
-                   seo.Property(s => s.OgImageUrl).HasMaxLength(500).HasColumnName("OgImageUrl");
                    seo.Property(s => s.IndexPage).HasColumnName("IndexPage");
                    seo.Property(s => s.FollowPage).HasColumnName("FollowPage");
                });
@@ -156,15 +150,11 @@ namespace Entities
                 .Property(pso => pso.Step).HasPrecision(18, 3);
              
             // ProductSaleOption → ProductSaleOptionColor
-            modelBuilder.Entity<ProductSaleOptionColor>()
-                .Property(soc => soc.ImageUrl)
-                .HasMaxLength(500);
+     
 
             modelBuilder.Entity<ProductSaleOptionColor>()
                 .Property(soc => soc.HexCode)
                 .HasMaxLength(20);
-            modelBuilder.Entity<ProductSaleOptionColor>()
-                .Property(soc => soc.Price).HasPrecision(18, 2);
 
          
 

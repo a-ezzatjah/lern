@@ -20,8 +20,7 @@ namespace Service.Mapping
                 .ForMember(x => x.ProductVariants, otp => otp.Ignore());
 
             CreateMap<ProductSaleOptionColor, ProductSaleOptionColorDetailDto>();
-            CreateMap<ProductSaleOptionColor, ProductSaleOptionColorListItemDto>()
-                .ForMember(x => x.FinalPrice, otp => otp.Ignore());
+            CreateMap<ProductSaleOptionColor, ProductSaleOptionColorListItemDto>();
             CreateMap<ProductSaleOptionColor, ProductSaleOptionColorUpdateDto>();
         }
     }

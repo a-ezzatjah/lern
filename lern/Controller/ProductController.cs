@@ -15,6 +15,12 @@ namespace lern.Controller
             _productService = productService;
         }
 
+        [HttpGet("cards")]
+        public async Task<IActionResult> GetProductCardsAsync()
+        {
+            return Ok(await _productService.GetProductCardsAsync());
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {

@@ -23,6 +23,8 @@ namespace Service.Mapping
                 .ForMember(x => x.ParentName, otp => otp.MapFrom(s => s.Parent != null ? s.Parent.Name : null))
                 .ForMember(x => x.ChildrenCount, otp => otp.MapFrom(s => s.Children.Count));
 
+            CreateMap<Category, global::CategoryBriefDto>();
+
             CreateMap<Category, CategoryTreeItemDto>()
                 .ForMember(x => x.SortOrder, otp => otp.MapFrom(s => s.SortOrder ?? 0))
                 .ForMember(x => x.Children, otp => otp.Ignore());

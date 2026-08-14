@@ -19,6 +19,8 @@ namespace Entities
         public string Name { get; set; } = null!;
         public string Slug { get; set; } = null!;
         public string? Description { get; set; }
+
+        public string? ShortDescription { get; set; }
         public bool IsActive { get; set; } = true;
 
         [Column("Discount")]
@@ -28,16 +30,14 @@ namespace Entities
         public DisconTypeEnum? DiscountType { get; set; }
 
         public DateTime? DiscountStartAt { get; set; }
+
         public DateTime? DiscountEndAt { get; set; }
 
-
-        [NotMapped]
-        public bool HasDiscount => DiscountValue.HasValue && DiscountValue.Value > 0;
 
         public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
         public ICollection<ProductSaleOption> SaleOptions { get; set; } = new List<ProductSaleOption>();
 
-        public ICollection<ProductImage>? productImages { get; set; } = new List<ProductImage>();
+        public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

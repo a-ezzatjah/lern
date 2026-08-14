@@ -1,0 +1,85 @@
+@model lern.Models.HomeIndexViewModel
+
+@{
+    ViewData["Title"] = "صفحه اصلی";
+}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <main class="container">
+        <section class="products-section">
+            <div class="section-heading">
+                <div>
+                    <span class="section-eyebrow">پیشنهادهای ویژه</span>
+                    <h1>محصولات تخفیف‌دار</h1>
+                </div>
+                <span class="product-count">
+                    @Model.DiscountedProducts.Count محصول
+                </span>
+            </div>
+
+            @if (Model.DiscountedProducts.Count == 0)
+            {
+                <div class="empty-state">
+                    در حال حاضر محصول تخفیف‌داری موجود نیست.
+                </div>
+            }
+            else
+            {
+                <div class="product-grid">
+                    @foreach (var product in Model.DiscountedProducts)
+                    {
+                        var displayedPrice =
+                            product.HasMultipleOptions
+                                ? product.MinPrice
+                                : product.FinalPrice;
+
+                        <article class="product-card">
+                            <div class="product-image-wrapper">
+                                <img class="product-image"
+                                     src="@product.PrimaryImageUrl"
+                                     alt="@product.Name"
+                                     loading="lazy" />
+
+                                @if (product.DiscountPercent.HasValue)
+                                {
+                                    <span class="discount-badge">
+                                        ٪@product.DiscountPercent.Value.ToString("0.##")
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="product-content">
+                                <h2>@product.Name</h2>
+
+                                @if (displayedPrice.HasValue)
+                                {
+                                    <div class="product-price">
+                                        @if (product.HasMultipleOptions)
+                                        {
+                                            <span class="price-prefix">از</span>
+                                        }
+                                        <strong>@displayedPrice.Value.ToString("N0")</strong>
+                                    </div>
+                                }
+
+                                <div class="product-status">
+                                    <span class="available-dot"></span>
+                                    موجود
+                                </div>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    </main>
+</body>
+</html>

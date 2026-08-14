@@ -67,8 +67,6 @@ namespace Service.Service
             ProductColor.ProductSaleOptionId = model.ProductSaleOptionId;
             ProductColor.Color = model.Color;
             ProductColor.HexCode = model.HexCode;
-            ProductColor.Price = model.Price;
-            ProductColor.ImageUrl = model.ImageUrl;
 
 
             _shopDbContext.ProductSaleOptionColors.Add(ProductColor);
@@ -79,10 +77,10 @@ namespace Service.Service
             var result = new ProductSaleOptionColorDetailDto();
 
             
+            result.Id = ProductColor.Id;
+            result.ProductSaleOptionId = ProductColor.ProductSaleOptionId;
             result.Color = ProductColor.Color;
             result.HexCode = ProductColor.HexCode;
-            result.Price = ProductColor.Price;
-            result.ImageUrl = ProductColor.ImageUrl;
 
 
             return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Success(result);
@@ -155,8 +153,6 @@ namespace Service.Service
             }
 
             ProductColor.Color = model.Color;
-            ProductColor.Price = model.Price;
-            ProductColor.ImageUrl = model.ImageUrl;
             ProductColor.HexCode = model.HexCode;
 
 
@@ -170,8 +166,6 @@ namespace Service.Service
             result.ProductSaleOptionId = ProductColor.ProductSaleOptionId;
             result.Color = ProductColor.Color;
             result.HexCode = ProductColor.HexCode;
-            result.Price = ProductColor.Price;
-            result.ImageUrl = ProductColor.ImageUrl;
 
             return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Success(result);
 

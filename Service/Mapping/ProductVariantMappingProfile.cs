@@ -21,7 +21,9 @@ namespace Service.Mapping
                 .ForMember(x => x.ProductImages, otp => otp.Ignore());
 
             CreateMap<ProductVariant, ProductVariantDetailDto>()
-                .ForMember(x => x.ProductId, otp => otp.Ignore());
+                .ForMember(
+                    x => x.ProductId,
+                    otp => otp.MapFrom(s => s.ProductSaleOption.ProductId));
 
             CreateMap<ProductVariant, ProductVariantListItemDto>();
 
