@@ -127,6 +127,11 @@ body {
     font-size: 0.82rem;
 }
 
+.price-unit {
+    color: #4f5257;
+    font-size: 0.85rem;
+}
+
 .product-status {
     display: flex;
     align-items: center;

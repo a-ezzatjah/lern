@@ -41,11 +41,13 @@ namespace Entities
             modelBuilder.Entity<ProductCategory>()
                 .HasOne(x => x.Product)
                 .WithMany(x => x.ProductCategories)
-                .HasForeignKey(x => x.ProductId);
+                .HasForeignKey(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<ProductCategory>()
                 .HasOne(x => x.Category)
                 .WithMany(x => x.ProductCategories)
-                .HasForeignKey(x => x.CategoryId);
+                .HasForeignKey(x => x.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             // Category self-referencing
@@ -84,8 +86,7 @@ namespace Entities
             modelBuilder.Entity<ProductVariant>()
                 .HasOne(x => x.saleoptioncolor)
                 .WithMany(x => x.ProductVariants)
-                .HasForeignKey(x => x.ProductSaleOptionColorId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(x => x.ProductSaleOptionColorId);
 
 
 
@@ -94,14 +95,16 @@ namespace Entities
             modelBuilder.Entity<ProductImage>()
                 .HasOne(x => x.Product)
                 .WithMany(x => x.ProductImages)
-                .HasForeignKey(x => x.ProductId);
+                .HasForeignKey(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<ProductImage>()
                 .HasOne(x => x.Variant)
                 .WithMany(x => x.ProductImages)
-                .HasForeignKey(x => x.VariantId);
-               
-                
-                
+                .HasForeignKey(x => x.VariantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
 
 
 

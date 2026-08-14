@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entities.Migrations
 {
     [DbContext(typeof(ShopDbContext))]
-    [Migration("20260726161816_RenameSaleOptionColorToProductSaleOptionColor")]
-    partial class RenameSaleOptionColorToProductSaleOptionColor
+    [Migration("20260814191250_UpdateProductSchemaAndDeleteBehavior")]
+    partial class UpdateProductSchemaAndDeleteBehavior
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -98,6 +98,9 @@ namespace Entities.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("ShortDescription")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -141,11 +144,9 @@ namespace Entities.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AltText")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsPrimary")
@@ -166,7 +167,7 @@ namespace Entities.Migrations
 
                     b.HasIndex("VariantId");
 
-                    b.ToTable("ProductImages", (string)null);
+                    b.ToTable("ProductImage", (string)null);
                 });
 
             modelBuilder.Entity("Entities.ProductSaleOption", b =>
@@ -177,56 +178,16 @@ namespace Entities.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal?>("BasePrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("FixedHeight")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal?>("FixedLength")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal?>("FixedWeight")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal?>("FixedWidth")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("InputLabel")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("MaxQuantity")
+                    b.Property<int?>("MaxQuantity")
                         .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("int");
 
-                    b.Property<decimal?>("MinQuantity")
+                    b.Property<int?>("MinQuantity")
                         .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal?>("PerUnitHeight")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal?>("PerUnitLength")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal?>("PerUnitWeight")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal?>("PerUnitWidth")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -234,9 +195,9 @@ namespace Entities.Migrations
                     b.Property<int>("SaleType")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Step")
+                    b.Property<int>("Step")
                         .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -269,14 +230,6 @@ namespace Entities.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal?>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("ProductSaleOptionId")
                         .HasColumnType("int");
 
@@ -284,7 +237,7 @@ namespace Entities.Migrations
 
                     b.HasIndex("ProductSaleOptionId");
 
-                    b.ToTable("ProductSaleOptionColors", (string)null);
+                    b.ToTable("SaleOptionColors", (string)null);
                 });
 
             modelBuilder.Entity("Entities.ProductVariant", b =>
@@ -308,22 +261,11 @@ namespace Entities.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal?>("MaxQuantity")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal?>("MinQuantity")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductSaleOptionColorId")
+                    b.Property<int?>("ProductSaleOptionColorId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductSaleOptionId")
@@ -336,22 +278,16 @@ namespace Entities.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Step")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
                     b.Property<int>("StockQuantity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
-
                     b.HasIndex("ProductSaleOptionColorId");
 
                     b.HasIndex("ProductSaleOptionId");
 
-                    b.ToTable("ProductVariants", (string)null);
+                    b.ToTable("ProductVariants");
                 });
 
             modelBuilder.Entity("Entities.Category", b =>
@@ -396,21 +332,6 @@ namespace Entities.Migrations
                                 .HasMaxLength(200)
                                 .HasColumnType("nvarchar(200)")
                                 .HasColumnName("MetaTitle");
-
-                            b1.Property<string>("OgDescription")
-                                .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
-                                .HasColumnName("OgDescription");
-
-                            b1.Property<string>("OgImageUrl")
-                                .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
-                                .HasColumnName("OgImageUrl");
-
-                            b1.Property<string>("OgTitle")
-                                .HasMaxLength(200)
-                                .HasColumnType("nvarchar(200)")
-                                .HasColumnName("OgTitle");
 
                             b1.Property<DateTime?>("UpdatedAt")
                                 .HasColumnType("datetime2");
@@ -466,21 +387,6 @@ namespace Entities.Migrations
                                 .HasColumnType("nvarchar(200)")
                                 .HasColumnName("MetaTitle");
 
-                            b1.Property<string>("OgDescription")
-                                .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
-                                .HasColumnName("OgDescription");
-
-                            b1.Property<string>("OgImageUrl")
-                                .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
-                                .HasColumnName("OgImageUrl");
-
-                            b1.Property<string>("OgTitle")
-                                .HasMaxLength(200)
-                                .HasColumnType("nvarchar(200)")
-                                .HasColumnName("OgTitle");
-
                             b1.Property<DateTime?>("UpdatedAt")
                                 .HasColumnType("datetime2");
 
@@ -500,13 +406,13 @@ namespace Entities.Migrations
                     b.HasOne("Entities.Category", "Category")
                         .WithMany("ProductCategories")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Entities.Product", "Product")
                         .WithMany("ProductCategories")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -517,12 +423,14 @@ namespace Entities.Migrations
             modelBuilder.Entity("Entities.ProductImage", b =>
                 {
                     b.HasOne("Entities.Product", "Product")
-                        .WithMany("productImages")
-                        .HasForeignKey("ProductId");
+                        .WithMany("ProductImages")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Entities.ProductVariant", "Variant")
                         .WithMany("ProductImages")
-                        .HasForeignKey("VariantId");
+                        .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Product");
 
@@ -543,7 +451,7 @@ namespace Entities.Migrations
             modelBuilder.Entity("Entities.ProductSaleOptionColor", b =>
                 {
                     b.HasOne("Entities.ProductSaleOption", "ProductSaleOption")
-                        .WithMany("ProductSaleOptionColors")
+                        .WithMany("SaleOptionColors")
                         .HasForeignKey("ProductSaleOptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -553,17 +461,10 @@ namespace Entities.Migrations
 
             modelBuilder.Entity("Entities.ProductVariant", b =>
                 {
-                    b.HasOne("Entities.Product", "product")
-                        .WithMany("productVariants")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Entities.ProductSaleOptionColor", "ProductSaleOptionColor")
+                    b.HasOne("Entities.ProductSaleOptionColor", "saleoptioncolor")
                         .WithMany("ProductVariants")
                         .HasForeignKey("ProductSaleOptionColorId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Entities.ProductSaleOption", "ProductSaleOption")
                         .WithMany("ProductVariants")
@@ -573,9 +474,7 @@ namespace Entities.Migrations
 
                     b.Navigation("ProductSaleOption");
 
-                    b.Navigation("ProductSaleOptionColor");
-
-                    b.Navigation("product");
+                    b.Navigation("saleoptioncolor");
                 });
 
             modelBuilder.Entity("Entities.Category", b =>
@@ -589,18 +488,16 @@ namespace Entities.Migrations
                 {
                     b.Navigation("ProductCategories");
 
+                    b.Navigation("ProductImages");
+
                     b.Navigation("SaleOptions");
-
-                    b.Navigation("productImages");
-
-                    b.Navigation("productVariants");
                 });
 
             modelBuilder.Entity("Entities.ProductSaleOption", b =>
                 {
-                    b.Navigation("ProductSaleOptionColors");
-
                     b.Navigation("ProductVariants");
+
+                    b.Navigation("SaleOptionColors");
                 });
 
             modelBuilder.Entity("Entities.ProductSaleOptionColor", b =>

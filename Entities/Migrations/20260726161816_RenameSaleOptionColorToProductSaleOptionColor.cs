@@ -86,8 +86,7 @@ namespace Entities.Migrations
                         name: "FK_ProductVariants_ProductSaleOptionColors_ProductSaleOptionColorId",
                         column: x => x.ProductSaleOptionColorId,
                         principalTable: "ProductSaleOptionColors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductVariants_ProductSaleOptions_ProductSaleOptionId",
                         column: x => x.ProductSaleOptionId,
@@ -98,8 +97,7 @@ namespace Entities.Migrations
                         name: "FK_ProductVariants_products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(

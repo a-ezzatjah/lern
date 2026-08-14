@@ -116,6 +116,14 @@ namespace Service.Service
                 return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Fail("محصول موجود نمیباشد");
             }
 
+            var hasRelatedVariants = _shopDbContext.ProductVariants.Any(
+                x => x.ProductSaleOptionColorId == productSaleOptionColorId);
+
+            if (hasRelatedVariants)
+            {
+                return ServiceResponseDto<ProductSaleOptionColorDetailDto>.Fail(
+                    "این رنگ دارای واریانت مرتبط است و تا قبل از حذف واریانت‌ها قابل حذف نیست");
+            }
 
             _shopDbContext.ProductSaleOptionColors.Remove(productcolor);
 
