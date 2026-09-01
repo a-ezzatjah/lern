@@ -1,7 +1,7 @@
 @model ServiceContract.DTO.DtoProduct.ProductCardDto
 @{
     var price = Model.HasMultipleOptions ? Model.MinPrice : Model.FinalPrice;
-    var productUrl = $"/product/{Model.Id}";
+    var productUrl = Url.Action("Details", "StoreProduct", new { id = Model.Id }) ?? $"/product/{Model.Id}";
 }
 <article class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-lg product-box-item h-full flex flex-col" itemscope itemtype="http://schema.org/Product">
     <div class="flex justify-between items-start min-h-7">
