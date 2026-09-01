@@ -1,0 +1,16 @@
+@model (lern.Models.AdminVariantInputViewModel Item, int Index)
+@{ var i = Model.Index; var prefix = $"Variants[{i}]"; }
+<div class="admin-variant-row" data-variant-row>
+    <div class="admin-variant-heading"><strong>حالت فروش @(i + 1)</strong><button type="button" class="remove-variant admin-link-button" hidden>حذف</button></div>
+    <div class="admin-field-grid">
+        <label>عنوان فروش<input name="@($"{prefix}.SaleTitle")" value="@Model.Item.SaleTitle" placeholder="مثلاً توپی مشکی" /></label>
+        <label>نوع فروش<select name="@($"{prefix}.SaleType")"><option value="1" selected="@(Model.Item.SaleType == 1 ? "selected" : null)">بسته/توپی</option><option value="2" selected="@(Model.Item.SaleType == 2 ? "selected" : null)">متری</option><option value="4" selected="@(Model.Item.SaleType == 4 ? "selected" : null)">عددی</option></select></label>
+        <label>رنگ<input name="@($"{prefix}.Color")" value="@Model.Item.Color" placeholder="مشکی" /></label>
+        <label>کد رنگ<input name="@($"{prefix}.HexCode")" value="@Model.Item.HexCode" placeholder="#000000" /></label>
+        <label>قیمت (تومان)<input name="@($"{prefix}.Price")" value="@Model.Item.Price" type="number" step="0.01" min="0" /></label>
+        <label>موجودی<input name="@($"{prefix}.StockQuantity")" value="@Model.Item.StockQuantity" type="number" min="0" /></label>
+        <label>تخفیف Variant<input name="@($"{prefix}.DiscountValue")" value="@Model.Item.DiscountValue" type="number" step="0.01" min="0" /></label>
+        <label>نوع تخفیف<select name="@($"{prefix}.DiscountType")"><option value="">بدون تخفیف</option><option value="1">درصدی</option><option value="2">مبلغی</option></select></label>
+        <label class="full">تصویر این حالت فروش<input name="@($"{prefix}.Image")" type="file" accept=".jpg,.jpeg,.png,.webp" /><small>حداکثر ۵ مگابایت</small></label>
+    </div>
+</div>

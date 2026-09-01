@@ -31,6 +31,7 @@ namespace Service.Mapping
 
         //ProductDetailDtoMapping
         CreateMap<ProductSaleOptionColor, ProductSaleOptionColorDetailDto>();
+        CreateMap<ProductSaleOption, ProductSaleOptionDetailDto>();
         CreateMap<ProductVariant, ProductVariantDetailDto>();
         CreateMap<ProductImage, ProductImageDetailDto>();      
         CreateMap<Category , CategoryBriefDto>();

@@ -1,4 +1,5 @@
 using Entities.Enums;
+using ServiceContract.DTO.DtoProductVariant;
 using ServiceContract.DTO.DtoProductSaleOptionColor;
 
 namespace ServiceContract.DTO.DtoProductSaleOption
@@ -10,6 +11,10 @@ namespace ServiceContract.DTO.DtoProductSaleOption
         public EnumSaleType SaleType { get; set; }
         public string? UnitName { get; set; }
         public string? InputLabel { get; set; }
+        public int? MinQuantity { get; set; }
+        public int? MaxQuantity { get; set; }
+        public int Step { get; set; } = 1;
+        public List<ProductVariantDetailDto> ProductVariants { get; set; } = new();
         public List<ProductSaleOptionColorDetailDto> ProductSaleOptionColors { get; set; } = new();
     }
 }

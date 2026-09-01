@@ -4,72 +4,146 @@
     ViewData["Title"] = "صفحه اصلی";
 }
 
-<main class="container">
-    <section class="products-section">
-        <div class="section-heading">
-            <div>
-                <span class="section-eyebrow">پیشنهادهای ویژه</span>
-                <h1>محصولات تخفیف‌دار</h1>
+<!-- ================= start slider section ================= -->
+<section class="py-5">
+    <h2 class="sr-only">اسلایدر فروشگاه</h2>
+    <div class="w-full overflow-hidden">
+        <div class="swiper max-w-[1920px] mx-auto !relative default-carousel swiper-container" aria-label="اسلایدر فروشگاه">
+            <div class="swiper-wrapper" style="padding-bottom:0!important">
+                @foreach (var slide in new[] { "slider-2-1.jpg", "slider-2-2.jpg", "slider-2-3.jpg" })
+                {
+                    <div class="swiper-slide">
+                        <div class="h-90 flex justify-center items-center">
+                            <img src="~/assets/images/slider/@slide" class="h-full w-full object-cover rounded-lg" loading="lazy" alt="تصویر تبلیغاتی فروشگاه">
+                        </div>
+                    </div>
+                }
             </div>
-            <span class="product-count">
-                @Model.DiscountedProducts.Count محصول
-            </span>
+            <div class="swiper-button-next bg-white rounded-full border border-gray-200 !size-12 after:!text-xl after:text-primary"></div>
+            <div class="swiper-button-prev bg-white rounded-full border border-gray-200 !size-12 after:!text-xl after:text-primary"></div>
+            <div class="swiper-pagination !z-30 !bottom-0"></div>
+            <div class="slider-pagination-bg absolute w-40 h-10 -translate-x-1/2 -mb-3 pt-1 end-1/2 bottom-0 z-10"></div>
         </div>
+    </div>
+</section>
 
-        @if (Model.DiscountedProducts.Count == 0)
-        {
-            <div class="empty-state">
-                در حال حاضر محصول تخفیف‌داری موجود نیست.
+@if (Model.DiscountedProducts.Count > 0)
+{
+    <section class="py-5" itemscope itemtype="http://schema.org/ItemList">
+        <div class="container">
+            <div class="bg-primary dark:bg-zinc-800 bg-contain bg-[url(../images/slider/patterns.png)] p-5 rounded-lg">
+                <header class="flex items-center justify-between mb-4">
+                    <h2 class="font-black text-2xl text-white">پیشنهادهای شگفت‌انگیز</h2>
+                    <a href="/api/Product/cards" class="text-white">مشاهده همه ←</a>
+                </header>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    @foreach (var product in Model.DiscountedProducts.Take(8))
+                    {
+                        <partial name="_ProductCard" model="product" />
+                    }
+                </div>
             </div>
+        </div>
+    </section>
+}
+
+<section class="py-5">
+    <div class="container">
+        <header class="grid place-items-center grid-cols-6 gap-y-4 mb-5">
+            <div class="ps-15 section-heading sm:col-span-4 w-full col-span-6">
+                <h2 class="font-black text-2xl dark:text-white">جدیدترین <span class="text-primary">محصولات</span></h2>
+                <p class="text-neutral-600 dark:text-white">محصولات تازه‌وارد فروشگاه</p>
+            </div>
+            <div class="sm:col-span-2 col-span-6 w-full sm:text-end">
+                <a href="/api/Product/cards" class="btn bg-transparent border-secondary border-2 hover:bg-secondary hover:text-white dark:text-white dark:border-white">مشاهده همه</a>
+            </div>
+        </header>
+        @if (Model.NewestProducts.Count == 0)
+        {
+            <div class="storefront-empty-state">هنوز محصولی ثبت نشده است.</div>
         }
         else
         {
-            <div class="product-grid">
-                @foreach (var product in Model.DiscountedProducts)
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                @foreach (var product in Model.NewestProducts.Take(8))
                 {
-                    var displayedPrice =
-                    product.HasMultipleOptions
-                    ? product.MinPrice
-                    : product.FinalPrice;
-
-                    <article class="product-card">
-                        <div class="product-image-wrapper">
-                            <img class="product-image"
-                                 src="@product.PrimaryImageUrl"
-                                 alt="@product.Name"
-                                 loading="lazy" />
-
-                            @if (product.DiscountPercent.HasValue)
-                            {
-                                <span class="discount-badge">
-                                    ٪@product.DiscountPercent.Value.ToString("0.##")
-                                </span>
-                            }
-                        </div>
-
-                        <div class="product-content">
-                            <h2>@product.Name</h2>
-
-                            @if (displayedPrice.HasValue)
-                            {
-                                <div class="product-price">
-                                    @if (product.HasMultipleOptions)
-                                    {
-                                        <span class="price-prefix">از</span>
-                                    }
-                                    <strong>@displayedPrice.Value.ToString("N0")</strong>
-                                    <span class="price-unit">تومان</span>
-                                </div>
-                            }
-
-                            <div class="product-status">
-                                <span class="available-dot"></span>
-                                موجود
-                            </div>
-                        </div>
-                    </article>
+                    <partial name="_ProductCard" model="product" />
                 }
             </div>
         }
-    </section>
-</main>
+    </div>
+</section>
+
+<!-- ================= start category section ================= -->
+<section class="py-5">
+    <div class="container">
+        <header class="mb-5">
+            <h2 class="font-black text-2xl dark:text-white">دسته‌بندی <span class="text-primary">فروشگاه</span></h2>
+            <p class="text-neutral-600 dark:text-white">محبوب‌ترین دسته‌بندی‌ها</p>
+        </header>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            @foreach (var item in new[] { ("محصولات دیجیتال", "mobile-5.png"), ("لپ‌تاپ و کامپیوتر", "laptop-1.png"), ("تلویزیون", "television-1.png"), ("ساعت و اکسسوری", "wach-1.png") })
+            {
+                <a href="/api/Product/cards" class="group border border-gray-200 rounded-xl p-4 bg-white dark:bg-gray-800 text-center shadow-sm">
+                    <img src="~/assets/images/product/@item.Item2" class="h-28 w-full object-contain group-hover:scale-105 transition" loading="lazy" alt="@item.Item1">
+                    <h3 class="mt-3 font-bold dark:text-white">@item.Item1</h3>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container grid md:grid-cols-2 gap-4">
+        <img src="~/assets/images/slider/slider-2-4.jpg" class="w-full rounded-xl object-cover" loading="lazy" alt="پیشنهاد ویژه">
+        <img src="~/assets/images/slider/slider-2-3.jpg" class="w-full rounded-xl object-cover" loading="lazy" alt="تخفیف‌های فروشگاه">
+    </div>
+</section>
+
+<!-- ================= start blog section ================= -->
+<section class="py-5">
+    <div class="container">
+        <header class="grid place-items-center grid-cols-6 gap-y-4 mb-5">
+            <div class="ps-15 section-heading sm:col-span-4 w-full col-span-6">
+                <h2 class="font-black text-2xl dark:text-white">مجله <span class="text-primary">فروشگاه</span></h2>
+                <p class="text-neutral-600 dark:text-white">آخرین مقالات و مطالب آموزشی</p>
+            </div>
+            <div class="sm:col-span-2 col-span-6 w-full sm:text-end">
+                <a href="/articles" class="btn bg-transparent border-secondary border-2 hover:bg-secondary hover:text-white dark:text-white dark:border-white">مشاهده همه</a>
+            </div>
+        </header>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            @foreach (var article in new[] {
+                ("راهنمای انتخاب محصول مناسب برای خرید", "نکات مهمی که قبل از خرید باید بدانید.", "slider-2-1.jpg"),
+                ("چطور از محصولات خود بهتر نگهداری کنیم؟", "روش‌های کاربردی برای افزایش عمر محصولات.", "slider-2-2.jpg"),
+                ("جدیدترین ترندهای بازار در سال جاری", "نگاهی به محصولات محبوب و پرفروش بازار.", "slider-2-3.jpg")
+            })
+            {
+                <article class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-md hover:-translate-y-1 transition">
+                    <img src="~/assets/images/slider/@article.Item3" class="w-full h-48 object-cover" loading="lazy" alt="@article.Item1">
+                    <div class="p-4">
+                        <span class="text-xs text-primary">مقالات فروشگاه</span>
+                        <h3 class="font-bold text-lg leading-8 mt-2 dark:text-white">@article.Item1</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-300 leading-7 mt-2">@article.Item2</p>
+                        <a href="/articles" class="inline-flex items-center text-primary mt-3">ادامه مطلب ←</a>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.Swiper) {
+                new Swiper('.default-carousel', {
+                    loop: true,
+                    autoplay: { delay: 4500 },
+                    pagination: { el: '.swiper-pagination', clickable: true },
+                    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
+                });
+            }
+        });
+    </script>
+}

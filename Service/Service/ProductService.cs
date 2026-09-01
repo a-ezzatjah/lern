@@ -14,7 +14,11 @@ using Service.Validators;
 using ServiceContract.Common;
 using ServiceContract.DTO.DtoCommit;
 using ServiceContract.DTO.DtoProduct;
+using ServiceContract.DTO.DtoProductImage;
 using ServiceContract.DTO.DtoProductSaleOption;
+using ServiceContract.DTO.DtoProductSaleOptionColor;
+using ServiceContract.DTO.DtoProductVariant;
+using ServiceContract.DTO.DtoSeo;
 using ServiceContract.Enums;
 using ServiceContract.Interfaces;
 using ServiceContract.Quaries;
@@ -222,11 +226,121 @@ namespace Service.Service
 
         public async Task<ProductDetailDto?> GetByIdAsync(int productId)
         {
-            return await _shopDbContext.Products
+            var product = await _shopDbContext.Products.AsNoTracking()
+                .Include(x => x.ProductCategories).ThenInclude(x => x.Category)
+                .Include(x => x.ProductImages)
+                .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants).ThenInclude(x => x.ProductImages)
+                .Include(x => x.SaleOptions).ThenInclude(x => x.SaleOptionColors).ThenInclude(x => x.ProductVariants)
+                .FirstOrDefaultAsync(x => x.Id == productId);
+            if (product is null) return null;
+
+            var variants = product.SaleOptions.SelectMany(x => x.ProductVariants)
+                .Concat(product.SaleOptions.SelectMany(x => x.SaleOptionColors).SelectMany(x => x.ProductVariants))
+                .DistinctBy(x => x.Id).ToList();
+            var result = _mapper.Map<ProductDetailDto>(product);
+            result.SaleOptions = product.SaleOptions.Select(x => _mapper.Map<ProductSaleOptionDetailDto>(x)).ToList();
+            result.ProductVariants = variants.Select(x => _mapper.Map<ProductVariantDetailDto>(x)).ToList();
+            result.productImage = product.ProductImages
+                .Concat(variants.SelectMany(x => x.ProductImages))
+                .DistinctBy(x => x.Id)
+                .Select(x => _mapper.Map<ProductImageDetailDto>(x)).ToList();
+            return result;
+        }
+
+        public async Task<ProductPageViewModel?> GetPageAsync(int productId)
+        {
+            var product = await _shopDbContext.Products
                 .AsNoTracking()
-                .Where(x => x.Id == productId)
-                .ProjectTo<ProductDetailDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync();
+                .AsSplitQuery()
+                .Include(x => x.ProductCategories).ThenInclude(x => x.Category)
+                .Include(x => x.ProductImages)
+                .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants).ThenInclude(x => x.ProductImages)
+                .Include(x => x.SaleOptions).ThenInclude(x => x.SaleOptionColors)
+                    .ThenInclude(x => x.ProductVariants).ThenInclude(x => x.ProductImages)
+                .FirstOrDefaultAsync(x => x.Id == productId && x.IsActive);
+
+            if (product is null)
+                return null;
+
+            var now = DateTime.UtcNow;
+            var variants = product.SaleOptions
+                .SelectMany(x => x.ProductVariants)
+                .Concat(product.SaleOptions.SelectMany(x => x.SaleOptionColors).SelectMany(x => x.ProductVariants))
+                .DistinctBy(x => x.Id)
+                .ToList();
+
+            var variantDtos = variants.Select(variant =>
+            {
+                var dto = _mapper.Map<ProductVariantDetailDto>(variant);
+                dto.ProductId = product.Id;
+                dto.AvailableQuantity = Math.Max(0, variant.StockQuantity - variant.ReservedQuantity);
+                dto.IsAvailable = dto.AvailableQuantity > 0;
+                dto.FinalPrice = CalculateVariantPrice(variant, product, now);
+                dto.SaleOptionTitle = variant.ProductSaleOption?.Title;
+                dto.Color = variant.saleoptioncolor?.Color;
+                dto.ColorHexCode = variant.saleoptioncolor?.HexCode;
+                dto.ProductImages = variant.ProductImages
+                    .OrderByDescending(x => x.IsPrimary).ThenBy(x => x.SortOrder)
+                    .Select(_mapper.Map<ProductImageDetailDto>)
+                    .ToList();
+                return dto;
+            }).ToList();
+
+            var result = new ProductPageViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Slug = product.Slug,
+                Description = product.Description,
+                ShortDescription = product.ShortDescription,
+                DiscountEndAt = product.DiscountEndAt,
+                Categories = product.ProductCategories.Select(x => _mapper.Map<CategoryBriefDto>(x.Category)).ToList(),
+                ProductVariants = variantDtos,
+                Images = product.ProductImages
+                    .Concat(variants.SelectMany(x => x.ProductImages))
+                    .DistinctBy(x => x.Id)
+                    .OrderByDescending(x => x.IsPrimary).ThenBy(x => x.SortOrder)
+                    .Select(_mapper.Map<ProductImageDetailDto>)
+                    .ToList(),
+                SeoData = _mapper.Map<SeoDataDto?>(product.Seo)
+            };
+
+            result.SaleOptions = product.SaleOptions.Select(option =>
+            {
+                var optionDto = _mapper.Map<ProductSaleOptionDetailDto>(option);
+                optionDto.MinQuantity = option.MinQuantity;
+                optionDto.MaxQuantity = option.MaxQuantity;
+                optionDto.Step = option.Step;
+                optionDto.ProductVariants = variantDtos
+                    .Where(x => x.ProductSaleOptionId == option.Id && x.ProductSaleOptionColorId == null)
+                    .ToList();
+                optionDto.ProductSaleOptionColors = option.SaleOptionColors.Select(color =>
+                {
+                    var colorDto = _mapper.Map<ProductSaleOptionColorDetailDto>(color);
+                    colorDto.ProductVariants = variantDtos
+                        .Where(x => x.ProductSaleOptionColorId == color.Id)
+                        .ToList();
+                    return colorDto;
+                }).ToList();
+                return optionDto;
+            }).ToList();
+
+            var pricedVariants = variantDtos.Where(x => x.Price > 0).ToList();
+            var availableVariants = pricedVariants.Where(x => x.IsAvailable).ToList();
+            result.IsAvailable = availableVariants.Count > 0;
+            result.DefaultVariantId = availableVariants.FirstOrDefault()?.Id;
+            result.MinPrice = pricedVariants.Count == 0 ? null : pricedVariants.Min(x => x.FinalPrice);
+            result.MaxPrice = pricedVariants.Count == 0 ? null : pricedVariants.Max(x => x.FinalPrice);
+            result.HasDiscount = pricedVariants.Any(x => x.FinalPrice < x.Price);
+            result.DiscountPercent = pricedVariants
+                .Where(x => x.Price > 0 && x.FinalPrice < x.Price)
+                .Select(x => Math.Round((x.Price - x.FinalPrice) * 100m / x.Price, 2))
+                .DefaultIfEmpty()
+                .Max();
+            if (!result.HasDiscount)
+                result.DiscountPercent = null;
+
+            return result;
         }
 
 

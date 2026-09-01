@@ -1,12 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Kohestani</title>
+    <title>&#x6A9;&#x634; &#x633;&#x647; &#x633;&#x627;&#x646;&#x62A; &#x62A;&#x648;&#x67E;&#x6CC; &#x645;&#x634;&#x6A9;&#x6CC; - Kohestani</title>
 
-    @* ۱. بخش CSS ها را از index.html کپی کن و اینجا بگذار *@
-    @* دقت کن مسیرها باید با /assets/ شروع شوند *@
 
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -24,13 +22,12 @@
     <link rel="canonical" href="https://example.com/your-page-url">
     <link rel="stylesheet" href="assets/js/plugin/story-player/styles.css">
     <link rel="stylesheet" href="assets/js/plugin/swiper/swiper-bundle.min.css">
-    <link rel="stylesheet" href="~/assets/css/app.css" asp-append-version="true">
+    <link rel="stylesheet" href="/assets/css/app.css?v=ILkSsISYhWbyO1P1SSnHyWJfhiTmTIKjjv0hcPsN1o0">
     <link rel="preload" href="assets/fonts/payda/PeydaWebFaNum-Medium.woff2" as="font" type="font/woff2" crossorigin>
 
 </head>
 <body class="bg-light dark:bg-zinc-900 text-text-primary-light dark:text-text-primary-dark transition-colors duration-200">
 
-    @* ۲. بخش Header و Navbar را از index.html کپی کن و اینجا بگذار *@
 
         <!-- ================= start header ================= -->
         <header id="topHeader" class="py-3 dark:shadow-primary-600 dark:shadow dark:bg-gray-800 sticky top-0 start-0 end-0 z-20 shadow-md bg-white">
@@ -1905,10 +1902,33 @@
             </div>
         </header>
     <main>
-        @RenderBody()
+        <main class="py-8">
+    <div class="container">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-lg">
+            <div>
+                <div class="h-96 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-700">
+                    <img id="product-image" src="/uploads/products/kesh-3cm-black.jpg" class="max-h-full max-w-full object-contain" alt="&#x6A9;&#x634; &#x633;&#x647; &#x633;&#x627;&#x646;&#x62A; &#x62A;&#x648;&#x67E;&#x6CC; &#x645;&#x634;&#x6A9;&#x6CC;">
+                </div>
+            </div>
+            <div class="space-y-5">
+                <div><span class="text-sm text-primary">محصول فروشگاه</span><h1 class="text-2xl font-black dark:text-white mt-2">&#x6A9;&#x634; &#x633;&#x647; &#x633;&#x627;&#x646;&#x62A; &#x62A;&#x648;&#x67E;&#x6CC; &#x645;&#x634;&#x6A9;&#x6CC;</h1><p class="text-gray-500 mt-3 leading-8">&#x6A9;&#x634; &#x633;&#x647; &#x633;&#x627;&#x646;&#x62A; &#x62A;&#x648;&#x67E;&#x6CC; &#x645;&#x634;&#x6A9;&#x6CC; &#x641;&#x631;&#x648;&#x634; &#x628;&#x647; &#x635;&#x648;&#x631;&#x62A; &#x62A;&#x648;&#x67E;&#x6CC;</p></div>
+                    <div class="space-y-4">
+                        <h2 class="font-bold dark:text-white">انتخاب حالت فروش</h2>
+                            <div><label class="block text-sm text-gray-500 mb-2">???? (???)</label><div class="grid grid-cols-2 gap-2">
+                                    <label class="cursor-pointer"><input class="variant-radio peer sr-only" type="radio" name="variant" value="1" data-price="300000.00" checked><span class="block border rounded-lg p-3 peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-gray-700">KESH-3CM-BLACK-BALL<br><strong>300,000 تومان</strong></span></label>
+                            </div></div>
+                        <div class="flex items-center justify-between border-t pt-4"><span class="text-gray-500">قیمت</span><strong id="selected-price" class="text-2xl text-primary">300,000 تومان</strong></div>
+                        <div class="flex gap-3"><input id="quantity" type="number" min="1" value="1" class="w-24 border rounded-lg px-3"><button id="add-to-cart" class="admin-primary-button flex-1">افزودن به سبد خرید</button></div>
+                        <p id="cart-message" class="text-sm"></p>
+                    </div>
+                <div class="border-t pt-4 text-gray-600 dark:text-gray-300 leading-8"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
     </main>
 
-    @* ۳. بخش Footer را از index.html کپی کن و اینجا بگذار *@
     <section class="py-5 dark:text-white dark:bg-gray-800 bg-white drop-shadow-md border-t border-gray-200" itemscope itemtype="http://schema.org/WPFooter">
         <div class="container">
             <!-- Logo and Back to Top -->
@@ -2072,7 +2092,6 @@
             </div>
         </div>
     </section>
-    @* پایان فوتر  *@
     <!-- ================= start cart offcanvas ================= -->
     <!-- Offcanvas Cart -->
     <div id="offcanvas-left"
@@ -2303,7 +2322,6 @@
     </nav>
     <!-- ================= end nav mobile menu ================= -->
 
-    @* شروع اسکریپت *@
     <script src="assets/js/plugin/story-player/story-player.js"></script>
     <script src="assets/js/plugin/swiper/swiper-bundle.min.js"></script>
     <script src="assets/js/dependencies/swiper-script.js"></script>
@@ -2421,7 +2439,12 @@
         new StoryPlayer('stories-container', stories);
     </script>
 
-    @* ۴. بخش JS ها را از انتهای index.html کپی کن و اینجا بگذار *@
-    @await RenderSectionAsync("Scripts", required: false)
+    
+<script>
+const radios=[...document.querySelectorAll('.variant-radio')], price=document.getElementById('selected-price');
+radios.forEach(r=>r.addEventListener('change',()=>price.textContent=Number(r.dataset.price).toLocaleString('fa-IR')+' تومان'));
+document.getElementById('add-to-cart')?.addEventListener('click',async()=>{const selected=radios.find(r=>r.checked), msg=document.getElementById('cart-message'); const res=await fetch('/api/cart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productVariantId:Number(selected.value),quantity:Number(document.getElementById('quantity').value)})}); msg.textContent=res.ok?'محصول به سبد خرید اضافه شد.':'افزودن به سبد خرید انجام نشد.'; msg.className='text-sm '+(res.ok?'text-green-600':'text-red-600');});
+</script>
+
 </body>
 </html>

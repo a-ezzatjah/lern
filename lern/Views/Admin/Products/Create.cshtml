@@ -1,0 +1,96 @@
+@model lern.Models.AdminProductCreateViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "افزودن محصول";
+}
+
+<div class="admin-page-heading">
+    <div>
+        <span class="admin-eyebrow">فروشگاه</span>
+        <h1>افزودن محصول جدید</h1>
+        <p>اطلاعات محصول، حالت‌های فروش، رنگ‌ها و تصاویر را وارد کنید.</p>
+    </div>
+    <a class="admin-secondary-button" href="@Url.Action("Index", "Admin")">بازگشت به پیشخوان</a>
+</div>
+
+<div id="ajax-message" class="admin-alert" hidden></div>
+<div class="admin-validation" asp-validation-summary="ModelOnly"></div>
+
+<form id="product-form" asp-action="CreateProduct" asp-controller="Admin" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <div class="admin-form-grid">
+        <div class="admin-form-main">
+            <section class="admin-card">
+                <div class="admin-card-heading"><span class="admin-card-icon"><svg aria-hidden="true"><use href="#admin-i-box"/></svg></span><div><h2>اطلاعات پایه محصول</h2><p>نام و شناسه‌ی محصول را وارد کنید.</p></div></div>
+                <div class="admin-field-grid">
+                    <label>نام محصول<input asp-for="Name" placeholder="مثلاً کش سه سانت توپی" /></label>
+                    <label>Slug انگلیسی<input asp-for="Slug" placeholder="three-cm-elastic" /></label>
+                    <label class="full">توضیح کوتاه<input asp-for="ShortDescription" placeholder="توضیح مختصر محصول" /></label>
+                </div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-card-heading"><span class="admin-card-icon green"><svg aria-hidden="true"><use href="#admin-i-percent"/></svg></span><div><h2>تخفیف کلی محصول</h2><p>اختیاری؛ تخفیف هر Variant می‌تواند جداگانه باشد.</p></div></div>
+                <div class="admin-field-grid">
+                    <label>مقدار تخفیف<input asp-for="ProductDiscountValue" type="number" step="0.01" min="0" /></label>
+                    <label>نوع تخفیف<select asp-for="ProductDiscountType"><option value="">بدون تخفیف</option><option value="1">درصدی</option><option value="2">مبلغی</option></select></label>
+                </div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-card-heading"><span class="admin-card-icon purple"><svg aria-hidden="true"><use href="#admin-i-grid"/></svg></span><div><h2>حالت‌های فروش و Variantها</h2><p>هر ردیف یک حالت فروش، رنگ، قیمت، موجودی و تصویر دارد.</p></div></div>
+                <div id="variants-list">
+                    @for (var i = 0; i < Model.Variants.Count; i++)
+                    {
+                        <partial name="~/Views/Admin/Products/_VariantRow.cshtml" model="(Model.Variants[i], i)" />
+                    }
+                </div>
+                <button type="button" id="add-variant" class="admin-secondary-button">＋ افزودن حالت فروش</button>
+            </section>
+        </div>
+        <aside class="admin-form-side">
+            <section class="admin-card admin-submit-card">
+                <h2>انتشار محصول</h2>
+                <p>پس از ثبت، محصول در دیتابیس ذخیره و تصویر آن در کارت محصول نمایش داده می‌شود.</p>
+                <label class="admin-switch"><input asp-for="IsActive" /><span></span> محصول فعال باشد</label>
+                <button type="submit" class="admin-primary-button admin-submit-button">ثبت محصول</button>
+            </section>
+            <section class="admin-card admin-help-card">
+                <span class="admin-help-icon"><svg aria-hidden="true"><use href="#admin-i-info"/></svg></span>
+                <h3>راهنما</h3>
+                <p>قیمت را به تومان وارد کنید. برای هر رنگ یا نوع فروش، یک ردیف جدا بسازید.</p>
+            </section>
+        </aside>
+    </div>
+</form>
+
+<template id="variant-template">
+    <partial name="~/Views/Admin/Products/_VariantRow.cshtml" model="(new lern.Models.AdminVariantInputViewModel(), -1)" />
+</template>
+
+@section Scripts {
+<script>
+(() => {
+    const form = document.getElementById("product-form"), list = document.getElementById("variants-list");
+    const template = document.getElementById("variant-template"), add = document.getElementById("add-variant");
+    const message = document.getElementById("ajax-message"), submit = form.querySelector("button[type=submit]");
+    const reindex = () => [...list.querySelectorAll("[data-variant-row]")].forEach((row, i) => {
+        row.querySelectorAll("input,select").forEach(x => x.name = x.name.replace(/Variants\[-?\d+\]/, `Variants[${i}]`));
+        row.querySelector(".remove-variant").hidden = list.children.length === 1;
+    });
+    add.addEventListener("click", () => { list.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("Variants[-1]", `Variants[${list.children.length}]`)); reindex(); });
+    list.addEventListener("click", e => { if (e.target.closest(".remove-variant")) { e.target.closest("[data-variant-row]").remove(); reindex(); } });
+    form.addEventListener("submit", async e => {
+        e.preventDefault(); message.hidden = true; submit.disabled = true;
+        try {
+            const r = await fetch(form.action, { method: "POST", body: new FormData(form), headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" } });
+            const text = await r.text(); const result = text ? JSON.parse(text) : null;
+            if (!r.ok || !result?.success) throw new Error(result?.message || "ثبت محصول انجام نشد.");
+            message.className = "admin-alert success"; message.textContent = result.message; message.hidden = false; form.reset();
+        } catch (error) { message.className = "admin-alert error"; message.textContent = error.message; message.hidden = false; }
+        finally { submit.disabled = false; }
+    });
+    reindex();
+})();
+</script>
+}

@@ -17,8 +17,8 @@ public class HomeController : Microsoft.AspNetCore.Mvc.Controller
     {
         var viewModel = new HomeIndexViewModel
         {
-            DiscountedProducts =
-                await _productService.GetDiscountedProductCardsAsync()
+            DiscountedProducts = await _productService.GetDiscountedProductCardsAsync(),
+            NewestProducts = await _productService.GetNewestProductCardsAsync()
         };
 
         return View(viewModel);

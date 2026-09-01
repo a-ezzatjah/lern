@@ -1,0 +1,202 @@
+@model lern.Models.StoreProductDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+    var selectedVariant = Model.SelectedVariant;
+    var hasAvailableVariant = Model.Options.SelectMany(x => x.Choices).Any(x => x.IsAvailable);
+}
+
+<main class="product-detail-page" itemscope itemtype="https://schema.org/Product">
+    <div class="container">
+        <nav class="product-breadcrumb" aria-label="مسیر صفحه">
+            <a href="/">خانه</a>
+            <span aria-hidden="true">/</span>
+            <span>@Model.Name</span>
+        </nav>
+
+        <div class="product-detail-shell">
+            <section aria-label="تصاویر محصول">
+                <div class="product-gallery-main">
+                    <span class="product-gallery-badge">محصول فروشگاه</span>
+                    <img id="productMainImage" src="@Model.PrimaryImageUrl" alt="@Model.Name" itemprop="image" />
+                </div>
+
+                @if (Model.Gallery.Count > 1)
+                {
+                    <div class="product-thumbnails" aria-label="تصاویر کوچک محصول">
+                        @foreach (var image in Model.Gallery)
+                        {
+                            <button type="button" class="product-thumbnail @(image == Model.Gallery.First() ? "is-active" : string.Empty)"
+                                    data-product-image="@image.ImageUrl" aria-label="نمایش @image.AltText">
+                                <img src="@image.ImageUrl" alt="@image.AltText" loading="lazy" />
+                            </button>
+                        }
+                    </div>
+                }
+
+                <div class="product-benefits" aria-label="مزایای خرید">
+                    <div><span>✓</span><small>ضمانت سلامت کالا</small></div>
+                    <div><span>↗</span><small>ارسال سریع</small></div>
+                    <div><span>♧</span><small>پشتیبانی خرید</small></div>
+                </div>
+            </section>
+
+            <section class="product-info-panel">
+                <div class="product-heading">
+                    <span class="product-eyebrow">جزئیات محصول</span>
+                    <h1 itemprop="name">@Model.Name</h1>
+                    @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+                    {
+                        <p itemprop="description">@Model.ShortDescription</p>
+                    }
+                </div>
+
+                @if (Model.Options.Count > 0)
+                {
+                    <div class="variant-picker">
+                        <div class="variant-picker-heading">
+                            <div>
+                                <span class="section-kicker">انتخاب کنید</span>
+                                <h2>گزینه‌های محصول</h2>
+                            </div>
+                            <span class="variant-key-hint">قیمت بر اساس انتخاب شماست</span>
+                        </div>
+
+                        @foreach (var option in Model.Options)
+                        {
+                            <fieldset class="variant-group">
+                                <legend>@option.Title</legend>
+                                <div class="variant-grid">
+                                    @foreach (var choice in option.Choices)
+                                    {
+                                        var inputId = $"variant-{choice.Id ?? 0}-{option.Title.GetHashCode()}";
+                                        <label class="variant-choice @(choice.IsAvailable ? string.Empty : "is-disabled")" for="@inputId">
+                                            <input id="@inputId" class="variant-radio" type="radio" name="productVariant"
+                                                   value="@choice.Id" data-price="@choice.PriceDataValue"
+                                                   data-image="@choice.ImageUrl" data-quantity="@choice.AvailableQuantity"
+                                                   @(choice.IsSelected ? "checked" : string.Empty)
+                                                   disabled="@(!choice.IsAvailable)" />
+                                            <span class="variant-choice-main">
+                                                @if (!string.IsNullOrWhiteSpace(choice.ColorHexCode))
+                                                {
+                                                    <span class="variant-swatch" style="background-color:@choice.ColorHexCode" aria-hidden="true"></span>
+                                                }
+                                                <span>
+                                                    <strong>@choice.Label</strong>
+                                                    @if (!string.IsNullOrWhiteSpace(choice.Sku))
+                                                    {
+                                                        <small>کد: @choice.Sku</small>
+                                                    }
+                                                </span>
+                                            </span>
+                                            <span class="variant-choice-price">@choice.FinalPrice.ToString("N0") <small>تومان</small></span>
+                                            @if (!choice.IsAvailable)
+                                            {
+                                                <span class="variant-status">ناموجود</span>
+                                            }
+                                        </label>
+                                    }
+                                </div>
+                            </fieldset>
+                        }
+                    </div>
+                }
+
+                <div class="product-price-row" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                    <div>
+                        <span>قیمت نهایی</span>
+                        <small id="priceHint">@(selectedVariant is null ? "گزینه‌ای انتخاب نشده است" : "قیمت انتخاب فعلی")</small>
+                    </div>
+                    <strong id="productPrice">@(selectedVariant?.FinalPrice.ToString("N0") ?? "-") <small>تومان</small></strong>
+                    <meta itemprop="priceCurrency" content="IRR" />
+                    @if (selectedVariant is not null)
+                    {
+                        <meta id="offerPrice" itemprop="price" content="@selectedVariant.FinalPrice" />
+                    }
+                </div>
+
+                <div class="product-cart-row">
+                    <label class="quantity-control" for="productQuantity">
+                        تعداد
+                        <input id="productQuantity" type="number" min="1" max="@(selectedVariant?.AvailableQuantity ?? 1)" value="1" />
+                    </label>
+                    <button id="addToCartButton" type="button" class="btn bg-primary-grad text-white product-add-button"
+                            disabled="@(!hasAvailableVariant)" data-selected-variant="@(selectedVariant?.Id?.ToString() ?? string.Empty)">
+                        <span aria-hidden="true">+</span> افزودن به سبد خرید
+                    </button>
+                </div>
+                <p id="cartMessage" class="cart-message" role="status" aria-live="polite"></p>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <details class="product-description" open>
+                        <summary>توضیحات محصول</summary>
+                        <div itemprop="description">@Model.Description</div>
+                    </details>
+                }
+            </section>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        (() => {
+            const mainImage = document.getElementById('productMainImage');
+            const price = document.getElementById('productPrice');
+            const priceHint = document.getElementById('priceHint');
+            const offerPrice = document.getElementById('offerPrice');
+            const quantity = document.getElementById('productQuantity');
+            const addButton = document.getElementById('addToCartButton');
+            const message = document.getElementById('cartMessage');
+
+            document.querySelectorAll('[data-product-image]').forEach((thumbnail) => {
+                thumbnail.addEventListener('click', () => {
+                    mainImage.src = thumbnail.dataset.productImage;
+                    document.querySelectorAll('.product-thumbnail').forEach((item) => item.classList.remove('is-active'));
+                    thumbnail.classList.add('is-active');
+                });
+            });
+
+            const formatPrice = (value) => Number(value).toLocaleString('fa-IR');
+            const updateVariant = (input) => {
+                addButton.dataset.selectedVariant = input.value;
+                addButton.disabled = input.disabled;
+                quantity.max = input.dataset.quantity;
+                price.innerHTML = `${formatPrice(input.dataset.price)} <small>تومان</small>`;
+                priceHint.textContent = 'قیمت انتخاب فعلی';
+                if (offerPrice) offerPrice.content = input.dataset.price;
+                if (input.dataset.image) mainImage.src = input.dataset.image;
+            };
+
+            document.querySelectorAll('.variant-radio').forEach((input) => {
+                input.addEventListener('change', () => updateVariant(input));
+            });
+
+            addButton.addEventListener('click', async () => {
+                const variantId = Number(addButton.dataset.selectedVariant);
+                const amount = Math.max(1, Number(quantity.value) || 1);
+                if (!variantId) return;
+
+                message.className = 'cart-message is-loading';
+                message.textContent = 'در حال افزودن به سبد خرید...';
+                addButton.disabled = true;
+                try {
+                    const response = await fetch('/api/cart', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productVariantId: variantId, quantity: amount })
+                    });
+                    if (!response.ok) throw new Error(await response.text());
+                    message.className = 'cart-message is-success';
+                    message.textContent = 'محصول با موفقیت به سبد خرید اضافه شد.';
+                } catch (error) {
+                    message.className = 'cart-message is-error';
+                    message.textContent = error.message || 'افزودن محصول انجام نشد.';
+                } finally {
+                    addButton.disabled = false;
+                }
+            });
+        })();
+    </script>
+}

@@ -17,6 +17,8 @@ namespace ServiceContract.Interfaces
 
         public Task<ProductDetailDto?> GetByIdAsync(int productId);
 
+        public Task<ProductPageViewModel?> GetPageAsync(int productId);
+
         public Task<PageResult<ProductListItemDto>> GetFilterAsync(ProductQuery query);
 
         public Task<List<ProductCardDto>> GetProductCardsAsync();
