@@ -46,6 +46,12 @@
         box-shadow: 0 10px 18px rgba(79, 70, 229, .16);
     }
 
+    #sale-options-panel .sale-option-button.is-selected {
+        border-color: #4f46e5;
+        background: linear-gradient(135deg, #eef2ff, #f0fdfa);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, .18), 0 12px 20px rgba(79, 70, 229, .16);
+    }
+
     #sale-options-panel .variant-choice {
         min-height: 1.75rem;
         padding: .2rem .5rem;
@@ -62,6 +68,13 @@
         transform: translateY(-1px);
         border-color: #818cf8;
         box-shadow: 0 5px 10px rgba(79, 70, 229, .14);
+    }
+
+    #sale-options-panel .variant-choice.is-selected {
+        border-color: #4f46e5;
+        background: #eef2ff;
+        color: #3730a3;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, .15), 0 6px 12px rgba(79, 70, 229, .14);
     }
 
     #sale-options-panel .variant-choice:disabled {
@@ -86,6 +99,19 @@
         border-color: #475569;
         background: #1f2937;
         color: #f8fafc;
+    }
+
+    .dark #sale-options-panel .sale-option-button.is-selected {
+        border-color: #818cf8;
+        background: linear-gradient(135deg, #312e81, #134e4a);
+        box-shadow: 0 0 0 3px rgba(129, 140, 248, .24), 0 12px 20px rgba(15, 23, 42, .35);
+    }
+
+    .dark #sale-options-panel .variant-choice.is-selected {
+        border-color: #818cf8;
+        background: #3730a3;
+        color: #fff;
+        box-shadow: 0 0 0 3px rgba(129, 140, 248, .22), 0 6px 12px rgba(15, 23, 42, .35);
     }
 </style>
 
@@ -407,7 +433,7 @@
                                     var firstChoice = choices.FirstOrDefault(x => x.IsAvailable) ?? choices.First();
                                     <div data-sale-option>
                                         <button type="button"
-                                                class="sale-option-button w-full text-start text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-200"
+                                                class="sale-option-button w-full text-start text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-200 @(choices.Any(x => x.IsSelected) ? "is-selected" : "")"
                                                 data-variant-id="@firstChoice.Id"
                                                 data-max-quantity="@firstChoice.AvailableQuantity"
                                                 data-price="@firstChoice.PriceDataValue"
@@ -419,7 +445,7 @@
                                             @foreach (var choice in choices)
                                             {
                                                 <button type="button"
-                                                        class="variant-choice text-xs text-gray-600 dark:text-gray-200 @(choice.IsSelected ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-gray-700 dark:text-white" : "")"
+                                                        class="variant-choice text-xs text-gray-600 dark:text-gray-200 @(choice.IsSelected ? "is-selected border-primary-500 bg-primary-50 text-primary-700 dark:bg-gray-700 dark:text-white" : "")"
                                                         data-variant-id="@choice.Id"
                                                         data-max-quantity="@choice.AvailableQuantity"
                                                         data-price="@choice.PriceDataValue"
@@ -2428,11 +2454,16 @@
                     discountPercentElement.textContent = `${discountPercent.toLocaleString('fa-IR')}٪`;
                 }
                 document.querySelectorAll('.variant-choice').forEach(x => {
+                    x.classList.toggle('is-selected', x === button);
                     x.classList.toggle('border-primary-500', x === button);
                     x.classList.toggle('bg-primary-50', x === button);
                     x.classList.toggle('dark:bg-gray-700', x === button);
                     x.classList.toggle('text-primary-700', x === button);
                     x.classList.toggle('dark:text-white', x === button);
+                });
+                const selectedSaleOption = button.closest('[data-sale-option]');
+                document.querySelectorAll('.sale-option-button').forEach(x => {
+                    x.classList.toggle('is-selected', x.closest('[data-sale-option]') === selectedSaleOption);
                 });
                 const imageUrl = button.dataset.imageUrl;
                 if (imageUrl) {
