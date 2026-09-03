@@ -11,6 +11,7 @@ public class StoreProductDetailsViewModel
     public string? ShortDescription { get; init; }
     public string? Description { get; init; }
     public List<ProductGalleryImageViewModel> Gallery { get; init; } = new();
+    public List<ProductCategoryViewModel> Categories { get; init; } = new();
     public List<ProductOptionViewModel> Options { get; init; } = new();
     public ProductVariantOptionViewModel? SelectedVariant { get; init; }
 
@@ -86,6 +87,11 @@ public class StoreProductDetailsViewModel
                     AltText = string.IsNullOrWhiteSpace(x.AltText) ? product.Name : x.AltText
                 })
                 .ToList(),
+            Categories = product.Categories.Select(x => new ProductCategoryViewModel
+            {
+                Name = x.Name,
+                Slug = x.Slug
+            }).ToList(),
             Options = options.Where(x => x.Choices.Count > 0).ToList(),
             SelectedVariant = selectedVariant
         };
@@ -129,6 +135,12 @@ public class ProductGalleryImageViewModel
 {
     public string ImageUrl { get; init; } = string.Empty;
     public string AltText { get; init; } = string.Empty;
+}
+
+public class ProductCategoryViewModel
+{
+    public string Name { get; init; } = string.Empty;
+    public string Slug { get; init; } = string.Empty;
 }
 
 public class ProductOptionViewModel

@@ -113,12 +113,26 @@
         color: #fff;
         box-shadow: 0 0 0 3px rgba(129, 140, 248, .22), 0 6px 12px rgba(15, 23, 42, .35);
     }
+
+    @@media (min-width: 1024px) {
+        #product-gallery-column {
+            align-self: start;
+            min-height: 42rem;
+            padding-top: 0;
+        }
+
+        #purchase-panel {
+            align-self: start;
+            margin-top: -4.5rem;
+        }
+    }
 </style>
 
 @{
     ViewData["Title"] = Model.Name;
     var selectedVariant = Model.SelectedVariant;
     var hasAvailableVariant = Model.Options.SelectMany(x => x.Choices).Any(x => x.IsAvailable);
+    var categoryNames = Model.Categories.Select(x => x.Name).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 }
 
 <!-- ================= start content section ================= -->
@@ -174,7 +188,7 @@
         <div class="dark:bg-gray-800 dark:text-white bg-white rounded-lg drop-shadow-lg border-gray-300 border-1 px-4 pt-4">
             <div class="grid grid-cols-6 gap-4 place-items-start">
                 <!-- gallery -->
-                <section class="lg:col-span-2 mt-7 col-span-6 pb-10 w-full lg:sticky top-0" itemprop="image" itemscope
+                <section id="product-gallery-column" class="lg:col-span-2 mt-7 col-span-6 pb-10 w-full lg:sticky top-24" itemprop="image" itemscope
                          itemtype="https://schema.org/ImageGallery">
                     <header class="flex items-center relative z-10 ms-3 mt-2 justify-between">
                         <div class="flex flex-col bg-white absolute top-1 start-0 p-1 rounded space-y-3  dark:bg-transparent">
@@ -320,20 +334,6 @@
                             <h2 class="text-zinc-500 text-base" itemprop="model">@(Model.ShortDescription ?? Model.Name)</h2>
                         </div>
                     </div>
-                    <!-- rating -->
-                    <div class="flex mt-4 items-center" itemprop="aggregateRating" itemscope=""
-                         itemtype="https://schema.org/AggregateRating">
-                        <meta itemprop="ratingValue" content="4">
-                        <meta itemprop="reviewCount" content="128">
-                        <span class="me-2">4.9</span>
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 text-orange-300 ms-1" aria-hidden="true"
-                                 xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"></path>
-                            </svg>
-                        </div>
-                    </div>
-
                     <!-- feature and meta -->
                     <div class="grid grid-cols-4 gap-4">
                         <!-- feature -->
@@ -466,12 +466,12 @@
                             </div>
                         </section>
                         <!-- meta -->
-                        <section class="lg:col-span-2 col-span-4 w-full">
+                        <section id="purchase-panel" class="lg:col-span-2 col-span-4 w-full">
                             <div class="p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm mx-auto">
 
                                 <!-- Specifications -->
                                 <ul class="space-y-2 divide-y divide-gray-200 dark:divide-zinc-700 text-sm text-zinc-700 dark:text-zinc-300 leading-6">
-                                    <li class="flex justify-between pb-2 items-start gap-2">
+                                    <li class="flex pb-2 items-start gap-2">
                                         <div class="flex flex-col space-y-3">
                                             <div class="flex items-center space-x-3">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -481,13 +481,10 @@
                                                           stroke-width="2"
                                                           d="M15.75 3v2.25M8.25 3v2.25m-3 2.25h13.5M3.75 9h16.5v11.25a.75.75 0 01-.75.75H4.5a.75.75 0 01-.75-.75V9z"/>
                                                 </svg>
-                                                <span><strong>مدل:</strong> شیائومی</span>
+                                                <span><strong>نوع محصول:</strong> لوازم خرازی</span>
                                             </div>
-                                            <a href="" class="block text-gray-500 dark:text-zinc-400 text-xs">مشاهده 43 محصول دیگر </a>
+                                            <span class="block text-gray-500 dark:text-zinc-400 text-xs">مناسب خیاطی، دوخت و کارهای هنری</span>
                                         </div>
-                                        <a href="">
-                                            <img src="~/assets/images/brand/brand1-2.png" class="w-15" alt="">
-                                        </a>
                                     </li>
                                     <li class="flex justify-between pb-2 items-start gap-2">
                                         <div class="flex flex-col space-y-3">
@@ -500,9 +497,9 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                           stroke-width="2" d="M20.25 12l-8.25 5.25L3.75 12"/>
                                                 </svg>
-                                                <span><strong>دسته‌بندی:</strong> کالای دیجیتال</span>
+                                                <span><strong>دسته‌بندی:</strong> @(categoryNames.Count > 0 ? string.Join("، ", categoryNames) : "لوازم خرازی")</span>
                                             </div>
-                                            <a href="" class="block text-gray-500 dark:text-zinc-400 text-xs">مشاهده 43 محصول دیگر دسته بندی</a>
+                                            <a href="/shop/categories" class="block text-gray-500 dark:text-zinc-400 text-xs">مشاهده محصولات بیشتر در این دسته‌بندی</a>
                                         </div>
                                     </li>
                                     <li class="flex pb-2 items-start gap-2">
@@ -511,7 +508,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
-                                        <span><strong>گارانتی:</strong> گارانتی ۱۸ ماهه گرین</span>
+                                        <span><strong>تضمین:</strong> کیفیت و سلامت کالا</span>
                                     </li>
                                 </ul>
 
@@ -1310,8 +1307,14 @@
                     <div class="lg:col-span-1 col-span-4">
                         <div class="sticky top-0">
                             <div class="space-y-8 border border-gray-200 p-2 rounded text-center">
-                                <h4 class="text-3xl">متوسط امتیاز ها</h4>
-                                <h5 class="text-3xl">3.00</h5>
+                                <h4 class="text-3xl">متوسط امتیازها</h4>
+                                <div class="flex items-center justify-center gap-2" itemprop="aggregateRating" itemscope=""
+                                     itemtype="https://schema.org/AggregateRating">
+                                    <meta itemprop="ratingValue" content="4.9">
+                                    <meta itemprop="reviewCount" content="128">
+                                    <h5 class="text-3xl">۴.۹</h5>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">از ۵</span>
+                                </div>
                                 <div class="flex rounded items-center p-2 bg-gray-100 dark:bg-transparent justify-center">
                                     <svg class="w-4 h-4 text-orange-400 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                                         <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"></path>
@@ -1325,7 +1328,7 @@
                                     <svg class="w-4 h-4 text-orange-400 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                                         <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"></path>
                                     </svg>
-                                    <svg class="w-4 h-4 ms-1 text-gray-300 dark:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                                    <svg class="w-4 h-4 text-orange-400 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                                         <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"></path>
                                     </svg>
                                 </div>
