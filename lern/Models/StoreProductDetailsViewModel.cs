@@ -104,6 +104,7 @@ public class StoreProductDetailsViewModel
             Id = variant.Id,
             Label = label,
             Sku = variant.Sku,
+            OriginalPrice = variant.Price,
             FinalPrice = variant.FinalPrice,
             AvailableQuantity = availableQuantity,
             IsAvailable = availableQuantity > 0,
@@ -142,11 +143,19 @@ public class ProductVariantOptionViewModel
     public string Label { get; init; } = string.Empty;
     public string? Sku { get; init; }
     public string? ColorHexCode { get; init; }
+    public decimal OriginalPrice { get; init; }
     public decimal FinalPrice { get; init; }
     public int AvailableQuantity { get; init; }
     public bool IsAvailable { get; init; }
     public bool IsSelected { get; init; }
     public string? ImageUrl { get; init; }
 
+    public bool HasDiscount => FinalPrice < OriginalPrice;
+    public decimal DiscountPercent => !HasDiscount || OriginalPrice <= 0
+        ? 0
+        : Math.Round((OriginalPrice - FinalPrice) * 100m / OriginalPrice, 2);
+
+    public string OriginalPriceDataValue => OriginalPrice.ToString(CultureInfo.InvariantCulture);
     public string PriceDataValue => FinalPrice.ToString(CultureInfo.InvariantCulture);
+    public string DiscountPercentDataValue => DiscountPercent.ToString(CultureInfo.InvariantCulture);
 }

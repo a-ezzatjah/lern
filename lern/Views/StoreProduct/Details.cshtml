@@ -1,14 +1,99 @@
+@using System.Text.Json
 @model lern.Models.StoreProductDetailsViewModel
+
+<style>
+    #sale-options-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    #sale-options-panel [data-sale-option] {
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        background: linear-gradient(145deg, #ffffff, #f8fafc);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, .07), 0 2px 5px rgba(15, 23, 42, .04);
+    }
+
+    #sale-options-panel .sale-option-button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 3.25rem;
+        padding: .8rem 1rem;
+        border: 1px solid #dbe3ef;
+        border-radius: .8rem;
+        background: #fff;
+        color: #1e293b;
+        box-shadow: 0 3px 8px rgba(15, 23, 42, .08);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+    #sale-options-panel .sale-option-button::before {
+        content: "";
+        width: .3rem;
+        height: 1.5rem;
+        margin-left: .65rem;
+        border-radius: 999px;
+        background: linear-gradient(#6366f1, #06b6d4);
+    }
+
+    #sale-options-panel .sale-option-button:hover {
+        transform: translateY(-2px);
+        border-color: #818cf8;
+        box-shadow: 0 10px 18px rgba(79, 70, 229, .16);
+    }
+
+    #sale-options-panel .variant-choice {
+        min-height: 1.75rem;
+        padding: .2rem .5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 2px 5px rgba(15, 23, 42, .06);
+        font-size: .68rem;
+        line-height: 1.1;
+        transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+
+    #sale-options-panel .variant-choice:hover:not(:disabled) {
+        transform: translateY(-1px);
+        border-color: #818cf8;
+        box-shadow: 0 5px 10px rgba(79, 70, 229, .14);
+    }
+
+    #sale-options-panel .variant-choice:disabled {
+        cursor: not-allowed;
+        opacity: .45;
+        box-shadow: none;
+    }
+
+    #sale-options-panel .variant-choice .size-3 {
+        width: .55rem;
+        height: .55rem;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.12);
+    }
+
+    .dark #sale-options-panel [data-sale-option] {
+        border-color: #374151;
+        background: linear-gradient(145deg, #1f2937, #111827);
+    }
+
+    .dark #sale-options-panel .sale-option-button,
+    .dark #sale-options-panel .variant-choice {
+        border-color: #475569;
+        background: #1f2937;
+        color: #f8fafc;
+    }
+</style>
 
 @{
     ViewData["Title"] = Model.Name;
     var selectedVariant = Model.SelectedVariant;
     var hasAvailableVariant = Model.Options.SelectMany(x => x.Choices).Any(x => x.IsAvailable);
 }
-
-<body class="bg-light dark:bg-zinc-900 text-text-primary-light dark:text-text-primary-dark transition-colors duration-200">
-
-
 
 <!-- ================= start content section ================= -->
 <section class="py-5" itemscope itemtype="https://schema.org/Product">
@@ -107,42 +192,42 @@
                         <div class="swiper-wrapper" style="padding-bottom: 20px !important;">
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-1.png"
+                                <img src="~/assets/images/product/mobile-1.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-2.png"
+                                <img src="~/assets/images/product/mobile-2.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-3.png"
+                                <img src="~/assets/images/product/mobile-3.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-4.png"
+                                <img src="~/assets/images/product/mobile-4.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-5.png"
+                                <img src="~/assets/images/product/mobile-5.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-6.png"
+                                <img src="~/assets/images/product/mobile-6.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
@@ -157,42 +242,42 @@
                         <div class="swiper-wrapper" style="padding-bottom: 0px !important;">
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-1.png"
+                                <img src="~/assets/images/product/mobile-1.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg cursor-pointer border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-2.png"
+                                <img src="~/assets/images/product/mobile-2.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg cursor-pointer border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-3.png"
+                                <img src="~/assets/images/product/mobile-3.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg cursor-pointer border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-4.png"
+                                <img src="~/assets/images/product/mobile-4.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg cursor-pointer border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-5.png"
+                                <img src="~/assets/images/product/mobile-5.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg cursor-pointer border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                             <div class="swiper-slide !pe-1" itemprop="image" itemscope
                                  itemtype="https://schema.org/ImageObject">
-                                <img src="assets/images/product/mobile-6.png"
+                                <img src="~/assets/images/product/mobile-6.png"
                                      alt="گوشی موبایل اپل مدل iPhone 13 Pro Max"
                                      class="rounded-lg cursor-pointer border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
@@ -204,12 +289,9 @@
                 <section class="lg:col-span-4 col-span-6 w-full my-7">
                     <!-- title -->
                     <div class="space-y-5 ">
-                        <h1 class="font-bold text-xl border-b border-b-gray-300 pb-3" itemprop="name">گوشی موبایل اپل
-                            مدل iPhone 13 Pro Max دو سیم
-                            کارت
-                        </h1>
+                        <h1 class="font-bold text-xl border-b border-b-gray-300 pb-3" itemprop="name">@Model.Name</h1>
                         <div class="flex items-start space-y-3 flex-col w-full">
-                            <h2 class="text-zinc-500 text-base" itemprop="model">Apple iPhone 13 Pro Max Dual SIM</h2>
+                            <h2 class="text-zinc-500 text-base" itemprop="model">@(Model.ShortDescription ?? Model.Name)</h2>
                         </div>
                     </div>
                     <!-- rating -->
@@ -229,7 +311,7 @@
                     <!-- feature and meta -->
                     <div class="grid grid-cols-4 gap-4">
                         <!-- feature -->
-                        <section class="lg:col-span-2 col-span-4 w-full">
+                        <section id="legacy-feature" class="hidden lg:col-span-2 col-span-4 w-full">
                             <!-- color -->
                             <div class="my-4">
                                 <h4 class="font-bold text-lg">رنگ بندی : سبز</h4>
@@ -315,6 +397,48 @@
                                 </a>
                             </div>
                         </section>
+                        <!-- dynamic sale options and colors -->
+                        <section id="sale-options-panel" class="lg:col-span-2 col-span-4 w-full">
+                            <div class="my-4">
+                                @foreach (var option in Model.Options)
+                                {
+                                    var choices = option.Choices.Where(x => x.Id.HasValue).ToList();
+                                    if (choices.Count == 0) { continue; }
+                                    var firstChoice = choices.FirstOrDefault(x => x.IsAvailable) ?? choices.First();
+                                    <div data-sale-option>
+                                        <button type="button"
+                                                class="sale-option-button w-full text-start text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-200"
+                                                data-variant-id="@firstChoice.Id"
+                                                data-max-quantity="@firstChoice.AvailableQuantity"
+                                                data-price="@firstChoice.PriceDataValue"
+                                                data-original-price="@firstChoice.OriginalPriceDataValue"
+                                                data-discount-percent="@firstChoice.DiscountPercentDataValue">
+                                            به صورت @option.Title خرید کنید
+                                        </button>
+                                        <div class="mt-4 flex flex-wrap items-center gap-2">
+                                            @foreach (var choice in choices)
+                                            {
+                                                <button type="button"
+                                                        class="variant-choice text-xs text-gray-600 dark:text-gray-200 @(choice.IsSelected ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-gray-700 dark:text-white" : "")"
+                                                        data-variant-id="@choice.Id"
+                                                        data-max-quantity="@choice.AvailableQuantity"
+                                                        data-price="@choice.PriceDataValue"
+                                                        data-original-price="@choice.OriginalPriceDataValue"
+                                                        data-discount-percent="@choice.DiscountPercentDataValue"
+                                                        data-image-url="@choice.ImageUrl"
+                                                        disabled="@(!choice.IsAvailable ? "disabled" : null)">
+                                                    @if (!string.IsNullOrWhiteSpace(choice.ColorHexCode))
+                                                    {
+                                                        <span class="inline-block size-3 align-middle rounded-full me-1 ring-1 ring-black/10" style="background-color:@choice.ColorHexCode"></span>
+                                                    }
+                                                    @choice.Label
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </section>
                         <!-- meta -->
                         <section class="lg:col-span-2 col-span-4 w-full">
                             <div class="p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm mx-auto">
@@ -336,7 +460,7 @@
                                             <a href="" class="block text-gray-500 dark:text-zinc-400 text-xs">مشاهده 43 محصول دیگر </a>
                                         </div>
                                         <a href="">
-                                            <img src="assets/images/brand/brand1-2.png" class="w-15" alt="">
+                                            <img src="~/assets/images/brand/brand1-2.png" class="w-15" alt="">
                                         </a>
                                     </li>
                                     <li class="flex justify-between pb-2 items-start gap-2">
@@ -377,17 +501,21 @@
                                     </a>
                                     <div class="flex items-center">
                                         <div class="text-gray-700 dark:text-zinc-300 flex flex-col items-center">
-                                            <div class="flex justify-between items-center">
+                                            <div id="selected-variant-discount" class="flex justify-between items-center @(selectedVariant?.HasDiscount == true ? "" : "hidden")">
                                                 <del class="text-zinc-400" itemprop="priceSpecification" itemscope=""
                                                      itemtype="http://schema.org/UnitPriceSpecification">
                                                     <meta itemprop="priceCurrency" content="IRR">
-                                                    <span itemprop="price">100000000</span>
+                                                    <span id="selected-variant-original-price" itemprop="price">
+                                                        @(selectedVariant?.OriginalPrice.ToString("N0") ?? "0")
+                                                    </span>
                                                 </del>
-                                                <span class="bg-danger px-2 text-sm rounded-xl text-white ms-3"
-                                                      itemprop="discount">10%</span>
+                                                <span id="selected-variant-discount-percent" class="bg-danger px-2 text-sm rounded-xl text-white ms-3"
+                                                      itemprop="discount">@(selectedVariant?.DiscountPercent.ToString("0.##") ?? "0")٪</span>
                                             </div>
-                                            <span class="text-xl font-bold dark:text-white" itemprop="price"
-                                                  content="90000000">90,000,000</span>
+                                            <span id="selected-variant-price" class="text-xl font-bold dark:text-white" itemprop="price"
+                                                  content="@selectedVariant?.FinalPrice.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                                                @(selectedVariant?.FinalPrice.ToString("N0") ?? "0")
+                                            </span>
                                         </div>
                                         <span class="text-xs font-bold -rotate-90 dark:text-zinc-300">تومان</span>
                                     </div>
@@ -429,9 +557,15 @@
 
                                 <!--Add to cart-->
                                 <div class="flex items-center justify-center">
-                                    <button class="bg-green-600 w-full mt-3 hover:bg-green-700 text-white font-semibold rounded-md px-6 py-3 text-sm">
+                                    <button id="add-to-cart-button"
+                                            type="button"
+                                            data-variant-id="@selectedVariant?.Id"
+                                            data-max-quantity="@selectedVariant?.AvailableQuantity"
+                                            class="bg-green-600 w-full mt-3 hover:bg-green-700 text-white font-semibold rounded-md px-6 py-3 text-sm disabled:cursor-not-allowed disabled:bg-gray-400"
+                                            disabled="@(hasAvailableVariant ? null : "disabled")">
                                         افزودن به سبد خرید
                                     </button>
+                                    <p id="add-to-cart-status" class="mt-2 text-center text-sm" role="status"></p>
                                 </div>
                             </div>
 
@@ -586,7 +720,7 @@
                     <div class="sm:col-span-2 col-span-4 w-full" itemprop="seller" itemscope itemtype="https://schema.org/Organization">
                         <div class="flex flex-wrap items-center space-x-10 justify-start">
                             <div class="flex items-center space-x-2">
-                                <img src="assets/images/logo/digipay.svg" class="size-8 p-1 border border-gray-300 rounded" alt="دیجی پی" itemprop="logo">
+                                <img src="~/assets/images/logo/digipay.svg" class="size-8 p-1 border border-gray-300 rounded" alt="دیجی پی" itemprop="logo">
                                 <span class="font-bold text-nowrap text-base" itemprop="name">دیجی پی</span>
                             </div>
                             <div class="flex items-center space-x-2" itemprop="warranty" itemscope itemtype="https://schema.org/WarrantyPromise">
@@ -649,7 +783,7 @@
                     <div class="sm:col-span-2 col-span-4 w-full" itemprop="seller" itemscope itemtype="https://schema.org/Organization">
                         <div class="flex flex-wrap items-center space-x-10 justify-start">
                             <div class="flex items-center space-x-2">
-                                <img src="assets/images/logo/digikala.webp" class="size-8 p-1 border border-gray-300 rounded" alt="دیجی پی" itemprop="logo">
+                                <img src="~/assets/images/logo/digikala.webp" class="size-8 p-1 border border-gray-300 rounded" alt="دیجی پی" itemprop="logo">
                                 <span class="font-bold text-nowrap text-base" itemprop="name">دیجی کالا</span>
                             </div>
                             <div class="flex items-center space-x-2" itemprop="warranty" itemscope itemtype="https://schema.org/WarrantyPromise">
@@ -1623,7 +1757,8 @@
 </section>
 <!-- ================= end section product review ================= -->
 
-s
+@*
+<!-- This duplicate Layout markup is retained only as source reference. -->
 <!-- ================= start cart offcanvas ================= -->
 <!-- Offcanvas Cart -->
 <div id="offcanvas-left"
@@ -2232,3 +2367,127 @@ s
 <script src="assets/js/dependencies/app.js"></script>
 </body>
 </html>
+*@
+
+@section Scripts {
+    <script>
+        (() => {
+            const gallery = @Html.Raw(JsonSerializer.Serialize(Model.Gallery));
+            const cartButton = document.getElementById('add-to-cart-button');
+            const cartStatus = document.getElementById('add-to-cart-status');
+            const priceElement = document.getElementById('selected-variant-price');
+            const discountElement = document.getElementById('selected-variant-discount');
+            const originalPriceElement = document.getElementById('selected-variant-original-price');
+            const discountPercentElement = document.getElementById('selected-variant-discount-percent');
+
+            if (gallery.length && window.Swiper) {
+                const slides = gallery.map(image => `
+                    <div class="swiper-slide !pe-1">
+                        <img src="${image.ImageUrl}" alt="${image.AltText}" class="rounded-lg cursor-pointer border border-gray-300 p-2">
+                    </div>`).join('');
+
+                const mainWrapper = document.querySelector('#productGalleryTwo .swiper-wrapper');
+                const thumbsWrapper = document.querySelector('#productGalleryOne .swiper-wrapper');
+                if (mainWrapper) mainWrapper.innerHTML = slides;
+                if (thumbsWrapper) thumbsWrapper.innerHTML = slides;
+
+                window.swiperProductGalleryOne?.destroy(true, true);
+                window.swiperProductGalleryTwo?.destroy(true, true);
+                window.swiperProductGalleryOne = new Swiper('#productGalleryOne', {
+                    spaceBetween: 10,
+                    slidesPerView: 3,
+                    freeMode: true,
+                    watchSlidesProgress: true
+                });
+                window.swiperProductGalleryTwo = new Swiper('#productGalleryTwo', {
+                    spaceBetween: 10,
+                    thumbs: { swiper: window.swiperProductGalleryOne }
+                });
+            }
+
+            const selectVariant = (button) => {
+                if (!button || button.disabled) return;
+                cartButton.dataset.variantId = button.dataset.variantId || '';
+                cartButton.dataset.maxQuantity = button.dataset.maxQuantity || '0';
+                if (priceElement && button.dataset.price) {
+                    const price = Number(button.dataset.price);
+                    priceElement.textContent = Number.isFinite(price)
+                        ? price.toLocaleString('fa-IR')
+                        : button.dataset.price;
+                    priceElement.setAttribute('content', button.dataset.price);
+                }
+                const originalPrice = Number(button.dataset.originalPrice);
+                const discountPercent = Number(button.dataset.discountPercent);
+                const hasDiscount = Number.isFinite(originalPrice) &&
+                    Number.isFinite(discountPercent) &&
+                    discountPercent > 0 &&
+                    originalPrice > Number(button.dataset.price);
+                discountElement?.classList.toggle('hidden', !hasDiscount);
+                if (hasDiscount) {
+                    originalPriceElement.textContent = originalPrice.toLocaleString('fa-IR');
+                    discountPercentElement.textContent = `${discountPercent.toLocaleString('fa-IR')}٪`;
+                }
+                document.querySelectorAll('.variant-choice').forEach(x => {
+                    x.classList.toggle('border-primary-500', x === button);
+                    x.classList.toggle('bg-primary-50', x === button);
+                    x.classList.toggle('dark:bg-gray-700', x === button);
+                    x.classList.toggle('text-primary-700', x === button);
+                    x.classList.toggle('dark:text-white', x === button);
+                });
+                const imageUrl = button.dataset.imageUrl;
+                if (imageUrl) {
+                    const image = document.querySelector('#productGalleryTwo img');
+                    if (image) image.src = imageUrl;
+                }
+                cartButton.disabled = !button.dataset.maxQuantity || Number(button.dataset.maxQuantity) <= 0;
+            };
+
+            document.querySelectorAll('.sale-option-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const choice = button.closest('[data-sale-option]')?.querySelector('.variant-choice:not(:disabled)');
+                    selectVariant(choice || button);
+                });
+            });
+            document.querySelectorAll('.variant-choice').forEach(button => {
+                button.addEventListener('click', () => selectVariant(button));
+            });
+
+            if (!cartButton) return;
+
+            cartButton.addEventListener('click', async () => {
+                const variantId = Number(cartButton.dataset.variantId);
+                const maxQuantity = Number(cartButton.dataset.maxQuantity);
+                const quantityElement = document.getElementById('count1');
+                const quantity = Math.min(Math.max(1, Number(quantityElement?.textContent) || 1), maxQuantity);
+
+                if (!variantId || !maxQuantity) {
+                    cartStatus.textContent = 'این محصول در حال حاضر قابل سفارش نیست.';
+                    cartStatus.className = 'mt-2 text-center text-sm text-red-600';
+                    return;
+                }
+
+                cartButton.disabled = true;
+                cartStatus.textContent = 'در حال افزودن به سبد خرید...';
+                cartStatus.className = 'mt-2 text-center text-sm text-gray-600';
+
+                try {
+                    const response = await fetch('/api/cart', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productVariantId: variantId, quantity })
+                    });
+
+                    if (!response.ok) throw new Error(await response.text());
+
+                    cartStatus.textContent = 'محصول به سبد خرید اضافه شد.';
+                    cartStatus.className = 'mt-2 text-center text-sm text-green-600';
+                } catch {
+                    cartStatus.textContent = 'افزودن محصول به سبد خرید انجام نشد. دوباره تلاش کنید.';
+                    cartStatus.className = 'mt-2 text-center text-sm text-red-600';
+                } finally {
+                    cartButton.disabled = false;
+                }
+            });
+        })();
+    </script>
+}
