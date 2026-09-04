@@ -119,15 +119,23 @@
             align-self: start;
             min-height: 42rem;
             padding-top: 0;
+            margin-top: 0;
         }
 
         #purchase-panel {
             align-self: start;
-            margin-top: -4.5rem;
+            margin-top: -56px;
         }
 
         #shop-features {
             margin-top: 7rem;
+        }
+
+
+
+        #product-title {
+            width: 46%;
+            margin-bottom: 1.5rem;
         }
     }
 </style>
@@ -192,7 +200,7 @@
         <div class="dark:bg-gray-800 dark:text-white bg-white rounded-lg drop-shadow-lg border-gray-300 border-1 px-4 pt-4">
             <div class="grid grid-cols-6 gap-4 place-items-start">
                 <!-- gallery -->
-                <section id="product-gallery-column" class="lg:col-span-2 mt-7 col-span-6 pb-10 w-full lg:sticky top-24" itemprop="image" itemscope
+                <section id="product-gallery-column" class="lg:col-span-2 col-span-6 pb-10 w-full lg:sticky top-24" itemprop="image" itemscope
                          itemtype="https://schema.org/ImageGallery">
                     <header class="flex items-center relative z-10 ms-3 mt-2 justify-between">
                         <div class="flex flex-col bg-white absolute top-1 start-0 p-1 rounded space-y-3  dark:bg-transparent">
@@ -330,13 +338,10 @@
                     </div>
                 </section>
                 <!-- meta -->
-                <section class="lg:col-span-4 col-span-6 w-full my-7">
+                <section class="lg:col-span-4 col-span-6 w-full">
                     <!-- title -->
                     <div class="space-y-5 ">
-                        <h1 class="font-bold text-xl border-b border-b-gray-300 pb-3" itemprop="name">@Model.Name</h1>
-                        <div class="flex items-start space-y-3 flex-col w-full">
-                            <h2 class="text-zinc-500 text-base" itemprop="model">@(Model.ShortDescription ?? Model.Name)</h2>
-                        </div>
+                        <h1 id="product-title" class="font-bold text-xl border-b border-b-gray-300 pb-3" itemprop="name">@Model.Name</h1>
                     </div>
                     <!-- feature and meta -->
                     <div class="grid grid-cols-4 gap-4">
@@ -594,17 +599,24 @@
                                     </button>
                                     <p id="add-to-cart-status" class="mt-2 text-center text-sm" role="status"></p>
                                 </div>
+                                @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+                                {
+                                    <p class="mt-6 border-t border-gray-200 pt-3 text-sm leading-7 text-gray-600 dark:border-zinc-600 dark:text-gray-300" itemprop="description">
+                                        @Model.ShortDescription
+                                    </p>
+                                }
                             </div>
 
                         </section>
                         <!-- shop feature -->
                         <section id="shop-features" class="col-span-4 w-full">
                             <section class="col-span-4 w-full border-t border-t-gray-300">
-                                <div class="grid gap-x-4 gap-y-4 lg:grid-cols-5 sm:grid-cols-2">
+                               <div class="grid gap-x-4 gap-y-4 lg:grid-cols-5 sm:grid-cols-2" style="padding: 10px;">
+
                                     <article itemscope="" itemtype="https://schema.org/Service" class="">
                                         <meta itemprop="name" content="پرداخت در محل">
                                         <meta itemprop="description" content="پرداخت وجه پس از تحویل کالا">
-                                        <div class="px-3 pt-3 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
+                                        <div class="px-3 pt-1 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
                                             <div class="size-10 flex items-center justify-center rounded-lg bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-white">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                      stroke-width="1.5" stroke="currentColor" class="size-6"
@@ -625,7 +637,7 @@
                                     <article itemscope="" itemtype="https://schema.org/Service" class="">
                                         <meta itemprop="name" content="تضمین کیفیت و اصالت">
                                         <meta itemprop="description" content="ضمانت مرجوعی کالا در صورت نارضایتی">
-                                        <div class="px-3 pt-3 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
+                                        <div class="px-3 pt-1 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
                                             <div class="size-10 flex items-center justify-center rounded-lg bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-white">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                      stroke-width="1.5" stroke="currentColor" class="size-6"
@@ -645,7 +657,7 @@
                                         <meta itemprop="name" content="پشتیبانی ۲۴ ساعته">
                                         <meta itemprop="description"
                                               content="پشتیبانی آنلاین و تلفنی در هر ساعت از شبانه‌روز">
-                                        <div class="px-3 pt-3 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
+                                        <div class="px-3 pt-1 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
                                             <div class="size-10 flex items-center justify-center rounded-lg bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-white">
                                                 <svg aria-label="پشتیبانی ۲۴ ساعته" xmlns="http://www.w3.org/2000/svg"
                                                      fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -664,7 +676,7 @@
                                     <article itemscope="" itemtype="https://schema.org/Service" class="">
                                         <meta itemprop="name" content="خرید آسان و سریع">
                                         <meta itemprop="description" content="فرآیند خرید راحت و بی‌دردسر با چند کلیک">
-                                        <div class="px-3 pt-3 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
+                                        <div class="px-3 pt-1 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
                                             <div class="size-10 flex items-center justify-center rounded-lg bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-white">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                      stroke-width="1.5" stroke="currentColor" class="size-6"
@@ -687,7 +699,7 @@
                                               content="ارسال محصولات به تمام نقاط کشور با استفاده از پست پیشتاز">
                                         <meta itemprop="shippingMethod" content="پست پیشتاز">
                                         <meta itemprop="shippingDestination" content="تمام نقاط کشور">
-                                        <div class="px-3 pt-3 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
+                                        <div class="px-3 pt-1 dark:bg-transparent cursor-pointer transition duration-300 flex bg-white rounded-lg lg:flex-col items-center lg:justify-center max-lg:space-x-3">
                                             <div class="size-10 flex items-center justify-center rounded-lg bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-white">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                      stroke-width="1.5" stroke="currentColor" class="size-6"
