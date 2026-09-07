@@ -2531,6 +2531,7 @@
 
                     cartStatus.textContent = 'محصول به سبد خرید اضافه شد.';
                     cartStatus.className = 'mt-2 text-center text-sm text-green-600';
+                    await window.storeCart?.refresh({ open: true });
                 } catch {
                     cartStatus.textContent = 'افزودن محصول به سبد خرید انجام نشد. دوباره تلاش کنید.';
                     cartStatus.className = 'mt-2 text-center text-sm text-red-600';

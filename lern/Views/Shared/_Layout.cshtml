@@ -93,14 +93,14 @@
                                     </svg>
                                 </a>
                                 <!-- basket -->
-                                <div onclick="toggleOffcanvas('offcanvas-left')" class="relative md:ms-5 ms-2 flex">
+                                <button id="cart-drawer-button" type="button" class="relative md:ms-5 ms-2 flex" aria-label="باز کردن سبد خرید">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                          stroke="currentColor" class="size-7 dark:text-white">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                     </svg>
-                                    <span class="size-5 text-sm -top-3 -end-2 absolute bg-primary-grad dark:bg-white text-white rounded-lg text-center">2</span>
-                                </div>
+                                    <span id="cart-count" class="size-5 text-sm -top-3 -end-2 absolute bg-primary-grad dark:bg-white text-white rounded-lg text-center">۰</span>
+                                </button>
                                 <!-- dark mode -->
                                 <div class="md:ms-5 ms-2">
                                     <button id="dark-mode-toggle">
@@ -2092,59 +2092,16 @@
                 </svg>
             </button>
         </header>
-        <!-- Cart Items -->
-        <main class="relative space-y-4 divide-y divide-gray-200 p-3 overflow-y-scroll h-full">
-            <!-- Product 1 -->
-            <div class="py-3 last:mb-35" itemscope itemtype="http://schema.org/Product">
-                <div class="flex flex-wrap items-center">
-                    <div class="text-start w-1/3">
-                        <img class="max-w-full"
-                             src="assets/images/product/wach-1.png"
-                             alt="ساعت مچی عقربه‌ای مردانه اینویکتا مدل Automatico Ghost Reserve"
-                             itemprop="image"
-                             loading="lazy">
-                    </div>
-                    <div class="w-2/3 space-y-4">
-                        <h3 class="font-bold leading-7" itemprop="name">
-                            ساعت مچی عقربه‌ای مردانه اینویکتا مدل Automatico Ghost Reserve
-                        </h3>
-                        <div class="flex items-center justify-between">
-                            <del class="text-rose-600 dark:text-white line-through" itemprop="priceCurrency" content="IRR">
-                                <span itemprop="highPrice">5,000,000</span>
-                            </del>
-                            <ins class="no-underline text-xl text-green-600 font-bold"
-                                 itemprop="price"
-                                 content="2500000">
-                                2,500,000 <span class="text-sm font-normal text-gray-700 dark:text-white">تومان</span>
-                            </ins>
-                        </div>
-                        <div class="flex items-end justify-between">
-                            <span itemprop="quantity">تعداد: 3</span>
-                            <a href="#"
-                               class="bg-red-100 dark:border dark:bg-transparent dark:text-white text-red-950 p-2 rounded-lg"
-                               role="button"
-                               aria-label="حذف محصول از سبد خرید">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                     stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+        <main id="cart-drawer-items" class="relative space-y-4 divide-y divide-gray-200 p-3 overflow-y-scroll h-full pb-36"></main>
         <!-- Footer -->
         <footer class="p-2 absolute bottom-0 start-0 end-0 bg-white dark:border-0  dark:bg-zinc-900 border border-gray-400">
             <div class="flex items-center justify-between">
                 <div class="space-y-2">
                     <span class="inline-block text-lg">جمع کل</span>
-                    <h3 class="font-bold text-xl" itemprop="totalPrice" content="11000000">
-                        11,000,000 تومان
-                    </h3>
+                    <h3 id="cart-drawer-total" class="font-bold text-xl" itemprop="totalPrice" content="0">۰ تومان</h3>
                 </div>
                 <div class="text-end">
-                    <a href="/checkout"
+                    <a href="/cart"
                        class="bg-primary-grad hover:bg-primary-600 text-white py-2 px-4 rounded-lg"
                        role="button"
                        aria-label="تکمیل فرایند خرید">
@@ -2308,6 +2265,7 @@
     <script src="~/assets/js/plugin/swiper/swiper-bundle.min.js" asp-append-version="true"></script>
     <script src="~/assets/js/dependencies/swiper-script.js" asp-append-version="true"></script>
     <script src="~/assets/js/dependencies/app.js" asp-append-version="true"></script>
+    <script src="~/assets/js/cart-store.js" asp-append-version="true"></script>
 
     <!-- initial story api -->
     <script>
