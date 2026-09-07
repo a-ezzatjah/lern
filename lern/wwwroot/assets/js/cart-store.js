@@ -3,6 +3,7 @@
     const fallbackImage = '/assets/images/logo.png';
     const formatPrice = value => `${Number(value || 0).toLocaleString('fa-IR')} تومان`;
     const errorText = async response => (await response.text()) || 'عملیات سبد خرید انجام نشد.';
+    let pageItemTemplate;
 
     const getCart = async () => {
         const response = await fetch(apiUrl, { credentials: 'same-origin' });
@@ -86,68 +87,60 @@
     };
 
     const createPageItem = item => {
-        const row = document.createElement('li');
-        row.className = 'grid grid-cols-4 gap-4 dark:bg-gray-800 dark:text-white bg-white rounded-lg drop-shadow-lg border-gray-300 border p-4';
+        const row = pageItemTemplate.cloneNode(true);
+        const image = row.querySelector('img');
+        const name = row.querySelector('h3');
+        const priceValues = row.querySelectorAll('[itemprop="price"]');
+        const quantity = row.querySelector('[id^="count"]');
+        const quantityButtons = quantity?.parentElement.querySelectorAll('button') || [];
+        const increase = quantityButtons[0];
+        const decrease = quantityButtons[1];
+        const remove = row.querySelector('a.bg-primary-grad');
+        const lineTotal = Number(item.price) * item.quantity;
 
-        const main = document.createElement('div');
-        main.className = 'lg:col-span-3 col-span-4 w-full';
-        const content = document.createElement('div');
-        content.className = 'flex flex-wrap gap-4';
-        const image = document.createElement('img');
-        image.src = item.imageUrl || fallbackImage;
-        image.alt = item.productName;
-        image.className = 'size-32 object-contain';
-        image.onerror = () => { image.src = fallbackImage; };
+        if (image) {
+            image.src = item.imageUrl || fallbackImage;
+            image.alt = item.productName;
+            image.onerror = () => { image.src = fallbackImage; };
+        }
+        if (name) name.textContent = item.productName;
+        if (priceValues[0]) priceValues[0].textContent = formatPrice(lineTotal);
+        if (priceValues[1]) {
+            priceValues[1].textContent = formatPrice(lineTotal);
+            priceValues[1].setAttribute('content', lineTotal);
+        }
+        if (quantity) {
+            quantity.removeAttribute('id');
+            quantity.textContent = item.quantity.toLocaleString('fa-IR');
+        }
 
-        const details = document.createElement('div');
-        details.className = 'flex-1 space-y-5';
-        const name = document.createElement('h3');
-        name.className = 'font-bold leading-7';
-        name.textContent = item.productName;
-        const quantityBox = document.createElement('div');
-        quantityBox.className = 'inline-flex items-center space-x-2 border rounded-full px-4 py-2 dark:bg-zinc-800 bg-white shadow';
-        const increase = document.createElement('button');
-        increase.type = 'button';
-        increase.className = 'bg-gray-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg';
-        increase.textContent = '+';
-        const quantity = document.createElement('span');
-        quantity.className = 'text-lg px-5 inline-block';
-        quantity.textContent = item.quantity.toLocaleString('fa-IR');
-        const decrease = document.createElement('button');
-        decrease.type = 'button';
-        decrease.className = 'bg-gray-200 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center text-lg';
-        decrease.textContent = '−';
-        decrease.disabled = item.quantity <= 1;
-        const remove = document.createElement('button');
-        remove.type = 'button';
-        remove.className = 'ms-2 rounded-full bg-primary-grad p-2 text-white';
-        remove.textContent = 'حذف';
+        [increase, decrease].forEach(button => button?.removeAttribute('onclick'));
+        if (decrease) decrease.disabled = item.quantity <= 1;
+        if (remove) {
+            remove.href = '#';
+            remove.setAttribute('aria-label', `حذف ${item.productName} از سبد خرید`);
+        }
 
         const run = async action => {
-            [increase, decrease, remove].forEach(button => button.disabled = true);
+            [increase, decrease].forEach(button => { if (button) button.disabled = true; });
+            remove?.classList.add('pointer-events-none', 'opacity-60');
             try {
                 await action();
                 await refresh();
             } catch (error) {
                 showPageMessage(error.message, true);
-                [increase, decrease, remove].forEach(button => button.disabled = false);
+                if (increase) increase.disabled = false;
+                if (decrease) decrease.disabled = item.quantity <= 1;
+                remove?.classList.remove('pointer-events-none', 'opacity-60');
             }
         };
-        increase.addEventListener('click', () => run(() => changeQuantity(item.id, item.quantity + 1)));
-        decrease.addEventListener('click', () => run(() => changeQuantity(item.id, item.quantity - 1)));
-        remove.addEventListener('click', () => run(() => removeItem(item.id)));
-        quantityBox.append(increase, quantity, decrease);
-        details.append(name, quantityBox, remove);
-        content.append(image, details);
-        main.append(content);
 
-        const priceColumn = document.createElement('div');
-        priceColumn.className = 'lg:col-span-1 col-span-4 w-full flex xl:items-end xl:justify-end';
-        const price = document.createElement('strong');
-        price.className = 'text-xl block font-bold dark:text-white';
-        price.textContent = formatPrice(Number(item.price) * item.quantity);
-        priceColumn.append(price);
-        row.append(main, priceColumn);
+        increase?.addEventListener('click', () => run(() => changeQuantity(item.id, item.quantity + 1)));
+        decrease?.addEventListener('click', () => run(() => changeQuantity(item.id, item.quantity - 1)));
+        remove?.addEventListener('click', event => {
+            event.preventDefault();
+            run(() => removeItem(item.id));
+        });
         return row;
     };
 
@@ -174,14 +167,14 @@
         const pageTotal = document.getElementById('cart-page-total');
         const pageSubtotal = document.getElementById('cart-page-subtotal');
         const summaryValues = document.querySelectorAll('#cart-page-summary p');
-        if (pageItems) {
+        if (pageItems && pageItemTemplate) {
             pageItems.replaceChildren();
             if (!items.length) {
-                const empty = document.createElement('p');
-                empty.className = 'py-10 text-center text-gray-500';
+                const empty = document.createElement('li');
+                empty.className = 'rounded-lg border border-gray-300 bg-white p-8 text-center text-gray-500 drop-shadow-lg dark:bg-gray-800 dark:text-gray-300';
                 empty.textContent = 'سبد خرید شما خالی است.';
                 pageItems.append(empty);
-            } else items.forEach(item => pageItems.append(createItem(item, false)));
+            } else items.forEach(item => pageItems.append(createPageItem(item)));
         }
         if (pageTotal) pageTotal.textContent = formatPrice(total);
         if (pageSubtotal) pageSubtotal.textContent = formatPrice(total);
@@ -190,6 +183,9 @@
             if (summaryValues.length > 1) summaryValues[1].textContent = formatPrice(0);
             if (summaryValues.length > 2) summaryValues[2].textContent = formatPrice(total);
         }
+        const pageContent = document.getElementById('cart-page-content');
+        pageContent?.classList.remove('hidden');
+        pageContent?.style.removeProperty('display');
     };
 
     const showPageMessage = (message, isError = false) => {
@@ -211,12 +207,18 @@
             return items;
         } catch (error) {
             showPageMessage(error.message, true);
+            const pageContent = document.getElementById('cart-page-content');
+            pageContent?.classList.remove('hidden');
+            pageContent?.style.removeProperty('display');
             return [];
         }
     };
 
     window.storeCart = { refresh };
     document.addEventListener('DOMContentLoaded', () => {
+        const pageItems = document.getElementById('cart-page-items');
+        pageItemTemplate = pageItems?.firstElementChild?.cloneNode(true);
+        pageItems?.replaceChildren();
         document.getElementById('cart-drawer-button')?.addEventListener('click', async () => {
             await refresh();
             openDrawer();

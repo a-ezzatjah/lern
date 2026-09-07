@@ -17,7 +17,7 @@ public class OrderController : ControllerBase
         .Select(x => new { x.Id, x.Status, x.Total, x.CreatedAt, Items = x.Items.Select(i => new { i.ProductName, i.Quantity, i.UnitPrice }) }).ToListAsync());
 
     [HttpPost("checkout")]
-    public async Task<IActionResult> Checkout()
+    public async Task<IActionResult> Checkout(CheckoutRequest request)
     {
         if (Request.Cookies["customer-key"] is null) return BadRequest("شناسه مشتری وجود ندارد؛ ابتدا سبد خرید را دریافت کنید.");
         await using var tx = await _db.Database.BeginTransactionAsync();
@@ -34,7 +34,8 @@ public class OrderController : ControllerBase
             order.Subtotal += total;
             c.ProductVariant.ReservedQuantity += c.Quantity;
         }
-        order.Total = order.Subtotal; _db.Orders.Add(order); _db.CartItems.RemoveRange(cart);
+        order.Total = order.Subtotal + Math.Max(0, request.ShippingCost);
+        _db.Orders.Add(order); _db.CartItems.RemoveRange(cart);
         await _db.SaveChangesAsync(); await tx.CommitAsync();
         return Ok(new { order.Id, order.Total, order.Status });
     }
@@ -56,3 +57,5 @@ public class OrderController : ControllerBase
         await _db.SaveChangesAsync(); return Ok(new { order.Id, order.Status });
     }
 }
+
+public record CheckoutRequest(decimal ShippingCost);
