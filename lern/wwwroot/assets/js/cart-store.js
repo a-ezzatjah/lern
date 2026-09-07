@@ -47,6 +47,13 @@
         price.className = 'mt-1 font-bold text-green-600';
         price.textContent = formatPrice(item.price);
 
+        if (Number(item.discountPercent) > 0) {
+            const discount = document.createElement('span');
+            discount.className = 'mt-1 inline-block text-xs font-bold text-primary';
+            discount.textContent = `${Number(item.discountPercent).toLocaleString('fa-IR')}٪ تخفیف`;
+            details.append(discount);
+        }
+
         const controls = document.createElement('div');
         controls.className = 'mt-3 flex items-center gap-2';
         const decrease = document.createElement('button');
@@ -91,6 +98,10 @@
         const image = row.querySelector('img');
         const name = row.querySelector('h3');
         const priceValues = row.querySelectorAll('[itemprop="price"]');
+        const originalPrice = row.querySelector('.cart-original-price');
+        const discount = row.querySelector('.cart-discount');
+        const variant = row.querySelector('.cart-variant');
+        const color = row.querySelector('.cart-color');
         const quantity = row.querySelector('[id^="count"]');
         const quantityButtons = quantity?.parentElement.querySelectorAll('button') || [];
         const increase = quantityButtons[0];
@@ -108,6 +119,20 @@
         if (priceValues[1]) {
             priceValues[1].textContent = formatPrice(lineTotal);
             priceValues[1].setAttribute('content', lineTotal);
+        }
+        if (originalPrice) {
+            const originalLineTotal = Number(item.originalPrice) * item.quantity;
+            originalPrice.textContent = formatPrice(originalLineTotal);
+            originalPrice.classList.toggle('hidden', Number(item.discountAmount) <= 0);
+        }
+        if (discount) {
+            discount.textContent = Number(item.discountPercent) > 0 ? `${Number(item.discountPercent).toLocaleString('fa-IR')}٪` : '';
+            discount.classList.toggle('hidden', Number(item.discountPercent) <= 0);
+        }
+        if (variant) variant.textContent = item.saleOptionTitle || '—';
+        if (color) {
+            color.textContent = item.color || '—';
+            color.closest('.cart-product-color')?.classList.toggle('hidden', !item.color);
         }
         if (quantity) {
             quantity.removeAttribute('id');
@@ -146,6 +171,8 @@
 
     const render = items => {
         const total = items.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+        const subtotal = items.reduce((sum, item) => sum + (Number(item.originalPrice) * item.quantity), 0);
+        const discountTotal = subtotal - total;
         const count = items.reduce((sum, item) => sum + item.quantity, 0);
         const countElement = document.getElementById('cart-count');
         if (countElement) countElement.textContent = count.toLocaleString('fa-IR');
@@ -179,8 +206,8 @@
         if (pageTotal) pageTotal.textContent = formatPrice(total);
         if (pageSubtotal) pageSubtotal.textContent = formatPrice(total);
         if (summaryValues.length) {
-            summaryValues[0].textContent = formatPrice(total);
-            if (summaryValues.length > 1) summaryValues[1].textContent = formatPrice(0);
+            summaryValues[0].textContent = formatPrice(subtotal);
+            if (summaryValues.length > 1) summaryValues[1].textContent = formatPrice(discountTotal);
             if (summaryValues.length > 2) summaryValues[2].textContent = formatPrice(total);
         }
         const pageContent = document.getElementById('cart-page-content');

@@ -1,4 +1,5 @@
 using Entities;
+using lern.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,8 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> Checkout(CheckoutRequest request)
     {
         if (Request.Cookies["customer-key"] is null) return BadRequest("شناسه مشتری وجود ندارد؛ ابتدا سبد خرید را دریافت کنید.");
+        if (request.ShippingCost != 300000)
+            return BadRequest("هزینه ارسال انتخاب‌شده معتبر نیست.");
         await using var tx = await _db.Database.BeginTransactionAsync();
         var cart = await _db.CartItems.Include(x => x.Product).Include(x => x.ProductVariant)
             .Where(x => x.CustomerKey == Key).ToListAsync();
@@ -29,12 +32,13 @@ public class OrderController : ControllerBase
         {
             var available = c.ProductVariant.StockQuantity - c.ProductVariant.ReservedQuantity;
             if (available < c.Quantity) return BadRequest($"موجودی «{c.Product.Name}» کافی نیست.");
-            var total = c.ProductVariant.Price * c.Quantity;
-            order.Items.Add(new OrderItem { ProductId = c.ProductId, ProductVariantId = c.ProductVariantId, ProductName = c.Product.Name, UnitPrice = c.ProductVariant.Price, Quantity = c.Quantity, LineTotal = total });
+            var unitPrice = CartPricing.GetFinalPrice(c.Product, c.ProductVariant, DateTime.UtcNow);
+            var total = unitPrice * c.Quantity;
+            order.Items.Add(new OrderItem { ProductId = c.ProductId, ProductVariantId = c.ProductVariantId, ProductName = c.Product.Name, UnitPrice = unitPrice, Quantity = c.Quantity, LineTotal = total });
             order.Subtotal += total;
             c.ProductVariant.ReservedQuantity += c.Quantity;
         }
-        order.Total = order.Subtotal + Math.Max(0, request.ShippingCost);
+        order.Total = order.Subtotal + request.ShippingCost;
         _db.Orders.Add(order); _db.CartItems.RemoveRange(cart);
         await _db.SaveChangesAsync(); await tx.CommitAsync();
         return Ok(new { order.Id, order.Total, order.Status });

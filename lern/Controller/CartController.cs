@@ -1,4 +1,5 @@
 using Entities;
+using lern.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,16 +14,35 @@ public class CartController : ControllerBase
     public async Task<IActionResult> Get()
     {
         var customerKey = EnsureCustomerKey();
-        return Ok(await _db.CartItems.AsNoTracking()
-        .Include(x => x.Product).Include(x => x.ProductVariant)
-        .Where(x => x.CustomerKey == customerKey).Select(x => new
+        var now = DateTime.UtcNow;
+        var cartItems = await _db.CartItems.AsNoTracking()
+            .Include(x => x.Product).ThenInclude(x => x.ProductImages)
+            .Include(x => x.ProductVariant).ThenInclude(x => x.ProductImages)
+            .Include(x => x.ProductVariant).ThenInclude(x => x.ProductSaleOption)
+            .Include(x => x.ProductVariant).ThenInclude(x => x.saleoptioncolor)
+            .Where(x => x.CustomerKey == customerKey)
+            .ToListAsync();
+
+        return Ok(cartItems.Select(x =>
         {
+            var originalPrice = x.ProductVariant.Price;
+            var price = CartPricing.GetFinalPrice(x.Product, x.ProductVariant, now);
+            var discountAmount = originalPrice - price;
+            var discountPercent = originalPrice == 0 ? 0 : Math.Round(discountAmount / originalPrice * 100m, 0);
+
+            return new
+            {
             x.Id,
             x.ProductId,
             x.ProductVariantId,
             ProductName = x.Product.Name,
             x.Quantity,
-            x.ProductVariant.Price,
+            OriginalPrice = originalPrice,
+            Price = price,
+            DiscountAmount = discountAmount,
+            DiscountPercent = discountPercent,
+            SaleOptionTitle = x.ProductVariant.ProductSaleOption.Title,
+            Color = x.ProductVariant.saleoptioncolor == null ? null : x.ProductVariant.saleoptioncolor.Color,
             ImageUrl = x.ProductVariant.ProductImages
                 .OrderByDescending(image => image.IsPrimary)
                 .ThenBy(image => image.SortOrder)
@@ -33,7 +53,8 @@ public class CartController : ControllerBase
                     .ThenBy(image => image.SortOrder)
                     .Select(image => image.ImageUrl)
                     .FirstOrDefault()
-        }).ToListAsync());
+            };
+        }));
     }
 
     [HttpPost]

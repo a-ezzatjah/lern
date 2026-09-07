@@ -1,0 +1,44 @@
+@{ ViewData["Title"] = "ثبت آدرس"; }
+
+<!-- فرم مستقیماً از user-panel-edit-address.html قالب فارسی آرینو گرفته شده است. -->
+<section class="py-5">
+    <div class="container">
+        <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-dark dark:text-light">ویرایش آدرس</h2>
+                <p class="text-gray-600 dark:text-gray-400">اطلاعات آدرس خود را به روزرسانی کنید</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="/checkout" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 me-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+                    بازگشت
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-card-dark rounded-xl shadow-soft dark:shadow-soft-dark p-6">
+            <form class="space-y-6" onsubmit="event.preventDefault();">
+                <div>
+                    <label for="editAddressTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">عنوان آدرس <span class="text-danger dark:text-danger-dark">*</span></label>
+                    <div class="relative"><input type="text" id="editAddressTitle" class="w-full pe-10 border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="مثال: منزل، محل کار" required><div class="absolute end-3 top-3 text-gray-400 dark:text-gray-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg></div></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="relative"><label for="editProvince" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">استان <span class="text-danger dark:text-danger-dark">*</span></label><select id="editProvince" class="w-full appearance-none border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" required><option value="">انتخاب استان</option><option value="tehran">تهران</option><option value="alborz">البرز</option><option value="isfahan">اصفهان</option><option value="fars">فارس</option><option value="khorasan">خراسان رضوی</option><option value="mazandaran">مازندران</option></select></div>
+                    <div class="relative"><label for="editCity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">شهر <span class="text-danger dark:text-danger-dark">*</span></label><select id="editCity" class="w-full appearance-none border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" required><option value="">انتخاب شهر</option><option value="tehran">تهران</option><option value="karaj">کرج</option><option value="isfahan">اصفهان</option><option value="shiraz">شیراز</option><option value="mashhad">مشهد</option><option value="sari">ساری</option></select></div>
+                </div>
+
+                <div><label for="editAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">آدرس دقیق <span class="text-danger dark:text-danger-dark">*</span></label><textarea id="editAddress" rows="3" class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="خیابان، کوچه، پلاک، واحد" required></textarea></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label for="editPostalCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">کد پستی <span class="text-danger dark:text-danger-dark">*</span></label><input type="text" id="editPostalCode" inputmode="numeric" maxlength="10" class="w-full pe-10 border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="10 رقمی" required></div>
+                    <div><label for="editPhone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تلفن همراه <span class="text-danger dark:text-danger-dark">*</span></label><input type="tel" id="editPhone" class="w-full pe-10 border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="09xxxxxxxxx" required></div>
+                </div>
+
+                <div><label for="editReceiverName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نام تحویل گیرنده <span class="text-danger dark:text-danger-dark">*</span></label><input type="text" id="editReceiverName" class="w-full pe-10 border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="نام و نام خانوادگی" required></div>
+                <div class="flex items-center"><input id="editDefaultAddress" type="checkbox" class="form-checkbox h-5 w-5 text-primary dark:text-primary-dark rounded border-gray-300 dark:border-gray-600 focus:ring-primary dark:focus:ring-primary-dark"><label for="editDefaultAddress" class="ms-2 block text-sm text-gray-700 dark:text-gray-300">تنظیم به عنوان آدرس پیش‌فرض</label></div>
+                <div class="flex flex-col-reverse md:flex-row md:justify-end md:space-x-4 mt-8"><button type="submit" class="px-6 mb-2 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 dark:bg-primary-dark dark:hover:bg-primary/80 transition-colors">ذخیره تغییرات</button></div>
+            </form>
+        </div>
+    </div>
+</section>
