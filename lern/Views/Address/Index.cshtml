@@ -8,7 +8,7 @@
                 <h2 class="text-2xl font-bold text-dark dark:text-light">ویرایش آدرس</h2>
                 <p class="text-gray-600 dark:text-gray-400">اطلاعات آدرس خود را به روزرسانی کنید</p>
             </div>
-            <div class="mt-4 md:mt-0">
+            <div class="mt-4 md:mt-0 flex gap-2">
                 <a href="/checkout" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 me-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
                     بازگشت
@@ -17,7 +17,7 @@
         </div>
 
         <div class="bg-white dark:bg-card-dark rounded-xl shadow-soft dark:shadow-soft-dark p-6">
-            <form class="space-y-6" onsubmit="event.preventDefault();">
+            <form id="address-form" class="space-y-6" novalidate>
                 <div>
                     <label for="editAddressTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">عنوان آدرس <span class="text-danger dark:text-danger-dark">*</span></label>
                     <div class="relative"><input type="text" id="editAddressTitle" class="w-full pe-10 border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="مثال: منزل، محل کار" required><div class="absolute end-3 top-3 text-gray-400 dark:text-gray-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg></div></div>
@@ -38,7 +38,75 @@
                 <div><label for="editReceiverName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نام تحویل گیرنده <span class="text-danger dark:text-danger-dark">*</span></label><input type="text" id="editReceiverName" class="w-full pe-10 border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="نام و نام خانوادگی" required></div>
                 <div class="flex items-center"><input id="editDefaultAddress" type="checkbox" class="form-checkbox h-5 w-5 text-primary dark:text-primary-dark rounded border-gray-300 dark:border-gray-600 focus:ring-primary dark:focus:ring-primary-dark"><label for="editDefaultAddress" class="ms-2 block text-sm text-gray-700 dark:text-gray-300">تنظیم به عنوان آدرس پیش‌فرض</label></div>
                 <div class="flex flex-col-reverse md:flex-row md:justify-end md:space-x-4 mt-8"><button type="submit" class="px-6 mb-2 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 dark:bg-primary-dark dark:hover:bg-primary/80 transition-colors">ذخیره تغییرات</button></div>
+                <p id="address-message" class="text-sm" role="status" aria-live="polite"></p>
             </form>
         </div>
     </div>
 </section>
+
+<script>
+(() => {
+    const form = document.getElementById('address-form');
+    const message = document.getElementById('address-message');
+    const showLimitMessage = () => { message.textContent = 'شما نمی‌توانید بیشتر از سه آدرس ذخیره کنید.'; message.className = 'address-limit-message mt-5 w-full rounded-xl px-5 py-4 text-center text-base font-bold shadow-lg'; message.style.cssText=''; };
+    const field = id => document.getElementById(id);
+    const provinceCities = { 'آذربایجان شرقی':['تبریز','مراغه','مرند','میانه','اهر'], 'آذربایجان غربی':['ارومیه','خوی','مهاباد','بوکان','میاندوآب'], 'اردبیل':['اردبیل','مشگین‌شهر','خلخال','پارس‌آباد'], 'اصفهان':['اصفهان','کاشان','خمینی‌شهر','نجف‌آباد','شهرضا'], 'البرز':['کرج','فردیس','نظرآباد','هشتگرد'], 'ایلام':['ایلام','دهلران','مهران','آبدانان'], 'بوشهر':['بوشهر','کنگان','برازجان','جم'], 'تهران':['تهران','ری','کرج','شمیرانات','دماوند'], 'چهارمحال و بختیاری':['شهرکرد','بروجن','فارسان','لردگان'], 'خراسان جنوبی':['بیرجند','قائن','طبس','نهبندان'], 'خراسان رضوی':['مشهد','نیشابور','سبزوار','تربت حیدریه','قوچان'], 'خراسان شمالی':['بجنورد','شیروان','اسفراین','جاجرم'], 'خوزستان':['اهواز','آبادان','خرمشهر','دزفول','اندیمشک'], 'زنجان':['زنجان','ابهر','خرمدره','قیدار'], 'سمنان':['سمنان','شاهرود','دامغان','گرمسار'], 'سیستان و بلوچستان':['زاهدان','چابهار','زابل','ایرانشهر'], 'فارس':['شیراز','مرودشت','جهرم','فسا','لار'], 'قزوین':['قزوین','تاکستان','آبیک','الوند'], 'قم':['قم','جعفریه','کهک'], 'کردستان':['سنندج','سقز','مریوان','بانه','قروه'], 'کرمان':['کرمان','رفسنجان','سیرجان','جیرفت','بم'], 'کرمانشاه':['کرمانشاه','اسلام‌آباد غرب','سنقر','کنگاور'], 'کهگیلویه و بویراحمد':['یاسوج','دهدشت','گچساران'], 'گلستان':['گرگان','گنبد کاووس','علی‌آباد کتول','آق‌قلا'], 'گیلان':['رشت','انزلی','لاهیجان','رودسر','آستارا'], 'لرستان':['خرم‌آباد','بروجرد','دورود','الیگودرز'], 'مازندران':['ساری','بابل','آمل','قائم‌شهر','نوشهر'], 'مرکزی':['اراک','ساوه','خمین','محلات'], 'هرمزگان':['بندرعباس','قشم','کیش','بندر لنگه'], 'همدان':['همدان','ملایر','نهاوند','رزن'], 'یزد':['یزد','میبد','اردکان','بافق'] };
+    const province = field('editProvince'), city = field('editCity'), provinceOptions = Object.keys(provinceCities);
+    province.style.appearance = 'auto'; city.style.appearance = 'auto'; province.style.webkitAppearance = 'auto'; city.style.webkitAppearance = 'auto';
+    province.innerHTML = '<option value="">انتخاب استان</option>' + provinceOptions.map(p => `<option value="${p}">${p}</option>`).join('');
+    const updateCities = selected => { const cities = provinceCities[province.value] || []; city.innerHTML = '<option value="">انتخاب شهر</option>' + cities.map(c => `<option value="${c}">${c}</option>`).join(''); if (selected) city.value = selected; };
+    province.addEventListener('change', () => updateCities());
+    const setValues = address => {
+        if (!address) return;
+        field('editAddressTitle').value = address.title ?? '';
+        field('editProvince').value = address.province ?? '';
+        updateCities(address.city ?? '');
+        field('editAddress').value = address.details ?? '';
+        field('editPostalCode').value = address.postalCode ?? '';
+        field('editPhone').value = address.phone ?? '';
+        field('editReceiverName').value = address.receiverName ?? '';
+        field('editDefaultAddress').checked = !!address.isDefault;
+    };
+    const isNew = new URLSearchParams(location.search).get('new') === '1';
+    const validationMessages = { editAddressTitle:'عنوان آدرس را وارد کنید.', editProvince:'استان را انتخاب کنید.', editCity:'شهر را انتخاب کنید.', editAddress:'آدرس دقیق را وارد کنید.', editPostalCode:'کد پستی باید ۱۰ رقم باشد.', editPhone:'شماره تلفن همراه را وارد کنید.', editReceiverName:'نام تحویل‌گیرنده را وارد کنید.' };
+    Object.keys(validationMessages).forEach(id => { const input=field(id); input.addEventListener('invalid', e => { e.preventDefault(); input.setCustomValidity(validationMessages[id]); input.reportValidity(); }); input.addEventListener('input', () => input.setCustomValidity('')); input.addEventListener('change', () => input.setCustomValidity('')); });
+    if (!isNew) { const editId = new URLSearchParams(location.search).get('id'); fetch('/api/address' + (editId ? '?id=' + encodeURIComponent(editId) : '')).then(response => response.status === 204 ? null : response.ok ? response.json() : null).then(setValues).catch(() => {}); }
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        for (const [id, msg] of Object.entries(validationMessages)) { const input=field(id); if (!input.value.trim()) { input.setCustomValidity(msg); input.reportValidity(); return; } }
+        const postal=field('editPostalCode'); if (!/^\d{10}$/.test(postal.value.trim())) { postal.setCustomValidity('کد پستی باید دقیقاً ۱۰ رقم باشد.'); postal.reportValidity(); return; }
+        message.textContent = 'در حال ذخیره‌سازی...';
+        message.className = 'text-sm text-gray-600';
+        const payload = {
+            title: field('editAddressTitle').value, province: field('editProvince').value,
+            city: field('editCity').value, details: field('editAddress').value,
+            postalCode: field('editPostalCode').value, phone: field('editPhone').value,
+            receiverName: field('editReceiverName').value, isDefault: field('editDefaultAddress').checked
+        };
+        if (isNew) {
+            try { const existing = await fetch('/api/address/list').then(r => r.ok ? r.json() : []); if (existing.length >= 3) { showLimitMessage(); return; } } catch (_) { }
+        }
+        try {
+            const response = await fetch('/api/address', { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const result = await response.json().catch(() => null);
+            if (!response.ok) {
+                const detail = typeof result === 'string'
+                    ? result
+                    : (result?.detail || result?.title || result?.message ||
+                       (result?.errors && Object.values(result.errors).flat().join(' ')) ||
+                       'خطا در ذخیره آدرس');
+                throw new Error(detail);
+            }
+            setValues(result);
+            message.textContent = 'آدرس با موفقیت ذخیره شد؛ در حال انتقال...';
+            message.className = 'text-sm text-green-600';
+            // بعد از ذخیره موفق، کاربر باید به مرحله تکمیل سفارش برگردد.
+            window.setTimeout(() => window.location.assign('/checkout'), 250);
+        } catch (error) {
+            if ((error.message || '').includes('سه آدرس') || (error.message || '').includes('نمی‌توانید')) { showLimitMessage(); return; }
+            message.textContent = error.message || 'ذخیره آدرس انجام نشد.';
+            message.className = 'text-sm text-red-600';
+        }
+    });
+})();
+</script>

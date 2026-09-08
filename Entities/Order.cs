@@ -4,6 +4,9 @@ public class Order
 {
     public int Id { get; set; }
     public string CustomerKey { get; set; } = null!;
+    public string CustomerFirstName { get; set; } = null!;
+    public string CustomerLastName { get; set; } = null!;
+    public string CustomerPhone { get; set; } = null!;
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public decimal Subtotal { get; set; }
     public decimal Total { get; set; }

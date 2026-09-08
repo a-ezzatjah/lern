@@ -198,6 +198,43 @@
     --color-text-primary-dark: #F8FAFC;
   }
 }
+
+/* Storefront light-mode surfaces: white page with warm cream cards. */
+html:not(.dark) body:not(.admin-shell) { background-color: #ffffff !important; }
+html:not(.dark) body:not(.admin-shell) #topHeader,
+html:not(.dark) body:not(.admin-shell) > section[itemtype*="WPFooter"],
+html:not(.dark) body:not(.admin-shell) nav.fixed { background-color: #fffaf0 !important; box-shadow: 0 4px 18px rgba(120,90,40,.10); }
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-lg,
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-xl,
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-2xl { background-color: #fffdf7 !important; border-color: #eee5d5; box-shadow: 0 3px 14px rgba(120,90,40,.09); }
+
+/* Final storefront palette and address validation contrast. */
+html:not(.dark) body:not(.admin-shell) { background-color: #edf1f4 !important; }
+html:not(.dark) body:not(.admin-shell) .bg-white,
+html:not(.dark) body:not(.admin-shell) [class~="bg-white"] { background-color: #f8f5ee !important; }
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-lg,
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-xl,
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-2xl { background-color: #fff8e9 !important; border-color: #e8dcc7 !important; box-shadow: 0 4px 16px rgba(100,80,40,.12) !important; }
+html:not(.dark) body:not(.admin-shell) #topHeader,
+html:not(.dark) body:not(.admin-shell) > section[itemtype*="WPFooter"] { background-color: #f5efe3 !important; }
+html:not(.dark) .address-limit-message { border: 2px solid #fca5a5; background: #fef2f2; color: #b91c1c; }
+html.dark .address-limit-message { border: 2px solid #f87171; background: #450a0a; color: #fecaca; }
+
+/* جداسازی ظریف کارت‌ها، هدر و فوتر از پس‌زمینه‌ی سفید در حالت روز */
+html:not(.dark) body { background-color: #ffffff; }
+html:not(.dark) #topHeader,
+html:not(.dark) body > section[itemtype*="WPFooter"],
+html:not(.dark) nav.fixed {
+  background-color: #fffaf0 !important;
+  box-shadow: 0 4px 18px rgba(120, 90, 40, .10);
+}
+html:not(.dark) .bg-white.rounded-lg,
+html:not(.dark) .bg-white.rounded-xl,
+html:not(.dark) .bg-white.rounded-2xl {
+  background-color: #fffdf7 !important;
+  border-color: #eee5d5;
+  box-shadow: 0 3px 14px rgba(120, 90, 40, .09);
+}
 @layer base {
   *, ::after, ::before, ::backdrop, ::file-selector-button {
     box-sizing: border-box;

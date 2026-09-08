@@ -23,11 +23,13 @@ public class OrderController : ControllerBase
         if (Request.Cookies["customer-key"] is null) return BadRequest("شناسه مشتری وجود ندارد؛ ابتدا سبد خرید را دریافت کنید.");
         if (request.ShippingCost != 300000)
             return BadRequest("هزینه ارسال انتخاب‌شده معتبر نیست.");
+        if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName) || string.IsNullOrWhiteSpace(request.Phone))
+            return BadRequest("لطفاً نام، نام خانوادگی و شماره تماس را وارد کنید.");
         await using var tx = await _db.Database.BeginTransactionAsync();
         var cart = await _db.CartItems.Include(x => x.Product).Include(x => x.ProductVariant)
             .Where(x => x.CustomerKey == Key).ToListAsync();
         if (cart.Count == 0) return BadRequest("سبد خرید خالی است.");
-        var order = new Order { CustomerKey = Key, Status = OrderStatus.Pending };
+        var order = new Order { CustomerKey = Key, Status = OrderStatus.Pending, CustomerFirstName = request.FirstName.Trim(), CustomerLastName = request.LastName.Trim(), CustomerPhone = request.Phone.Trim() };
         foreach (var c in cart)
         {
             var available = c.ProductVariant.StockQuantity - c.ProductVariant.ReservedQuantity;
@@ -62,4 +64,4 @@ public class OrderController : ControllerBase
     }
 }
 
-public record CheckoutRequest(decimal ShippingCost);
+public record CheckoutRequest(decimal ShippingCost, string FirstName = "", string LastName = "", string Phone = "");

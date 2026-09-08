@@ -36,6 +36,18 @@ builder.Services.AddValidatorsFromAssemblyContaining<ProductCreateDtoValidator>(
 
 var app = builder.Build();
 
+// اطمینان از ایجاد جدول آدرس هنگام اجرای برنامه (در محیط توسعه/استقرار اولیه).
+// در صورت در دسترس نبودن دیتابیس، اجرای برنامه متوقف نمی‌شود و خطا در لاگ ثبت می‌گردد.
+try
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    await scope.ServiceProvider.GetRequiredService<ShopDbContext>().Database.MigrateAsync();
+}
+catch (Exception ex)
+{
+    app.Logger.LogWarning(ex, "اجرای migration های دیتابیس انجام نشد.");
+}
+
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseStaticFiles();

@@ -27,6 +27,7 @@ namespace Entities
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+        public DbSet<Address> Addresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,6 +42,8 @@ namespace Entities
             modelBuilder.Entity<OrderItem>().ToTable("OrderItems");
             modelBuilder.Entity<CartItem>().ToTable("CartItems");
             modelBuilder.Entity<PaymentTransaction>().ToTable("PaymentTransactions");
+            modelBuilder.Entity<Address>().ToTable("Addresses");
+            modelBuilder.Entity<Address>().HasIndex(x => new { x.CustomerKey, x.Title });
             modelBuilder.Entity<CartItem>().HasIndex(x => new { x.CustomerKey, x.ProductVariantId }).IsUnique();
             modelBuilder.Entity<OrderItem>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<OrderItem>().HasOne(x => x.ProductVariant).WithMany().HasForeignKey(x => x.ProductVariantId).OnDelete(DeleteBehavior.Restrict);
