@@ -78,6 +78,19 @@ public class AddressApiController : ControllerBase
         address.IsDefault = true; address.UpdatedAt = DateTime.UtcNow; await _db.SaveChangesAsync(); return Ok(ToResponse(address));
     }
 
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await EnsureAddressTableAsync();
+        var key = EnsureCustomerKey();
+        var address = await _db.Addresses.FirstOrDefaultAsync(x => x.Id == id && x.CustomerKey == key);
+        if (address is null) return NotFound();
+
+        _db.Addresses.Remove(address);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
     private object ToResponse(Address x) => new { x.Id, x.Title, x.Province, x.City, Details = x.Details, x.PostalCode, x.Phone, x.ReceiverName, x.IsDefault };
     private Task<int> EnsureAddressTableAsync() => _db.Database.ExecuteSqlRawAsync(@"
 IF OBJECT_ID(N'[Addresses]', N'U') IS NULL
