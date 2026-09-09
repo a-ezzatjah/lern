@@ -78,6 +78,23 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         return View("Products/Create", model);
     }
 
+    [HttpGet("Products")]
+    public async Task<IActionResult> Products(string? search)
+    {
+        var query = _db.Products.AsNoTracking()
+            .Include(x => x.ProductImages)
+            .Include(x => x.ProductCategories).ThenInclude(x => x.Category)
+            .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants)
+            .Include(x => x.SaleOptions).ThenInclude(x => x.SaleOptionColors)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(x => x.Name.Contains(search) || x.Slug.Contains(search));
+
+        var products = await query.OrderByDescending(x => x.CreatedAt).ToListAsync();
+        return View("Products/Index", new AdminProductListViewModel { Search = search, Products = products });
+    }
+
     [HttpPost("Products")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateProduct(AdminProductCreateViewModel model)
