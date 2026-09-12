@@ -2279,6 +2279,19 @@
                 item.classList.add('bg-gray-100');
                 document.querySelector(`[data-mega-target="${id}"]`)?.classList.remove('hidden');
             }));
+
+            const trigger = document.getElementById('mega-menu-fire');
+            const menu = document.getElementById('mega-menu-fire-target');
+            const showMenu = () => { menu.classList.remove('hidden'); menu.classList.add('block'); };
+            const hideMenu = () => { menu.classList.add('hidden'); menu.classList.remove('block'); };
+            trigger?.addEventListener('mouseenter', showMenu);
+            trigger?.addEventListener('click', event => {
+                event.preventDefault();
+                menu.classList.contains('hidden') ? showMenu() : hideMenu();
+            });
+            document.addEventListener('mousemove', event => {
+                if (trigger && menu && !trigger.contains(event.target) && !menu.contains(event.target)) hideMenu();
+            });
         });
     </script>
     <script src="~/assets/js/cart-store.js" asp-append-version="true"></script>

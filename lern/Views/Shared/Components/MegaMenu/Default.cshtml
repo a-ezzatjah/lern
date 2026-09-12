@@ -20,25 +20,35 @@
             @foreach (var root in Model.Roots)
             {
                 var children = Model.ChildrenByParent.TryGetValue(root.Id, out var items) ? items : Array.Empty<Entities.Category>();
-                <div data-mega-target="@root.Id" class="grid @(root != Model.Roots.FirstOrDefault() ? "hidden" : "") h-[400px] overflow-y-auto grid-cols-4 gap-x-8 gap-y-5 m-5 content-start">
+                <div data-mega-target="@root.Id" class="@(root != Model.Roots.FirstOrDefault() ? "hidden" : "") h-[400px] overflow-y-auto p-5">
                     @if (children.Count == 0)
                     {
-                        <p class="col-span-4 text-sm text-gray-500">برای این دسته هنوز زیرمجموعه‌ای ثبت نشده است.</p>
+                        <p class="text-sm text-gray-500">برای این دسته هنوز زیرمجموعه‌ای ثبت نشده است.</p>
                     }
-                    @foreach (var child in children)
+                    else
                     {
-                        <section>
-                            <p class="mb-3 text-sm font-bold dark:text-white">@child.Name</p>
-                            @if (Model.ChildrenByParent.TryGetValue(child.Id, out var grandchildren) && grandchildren.Count > 0)
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 content-start">
+                            @foreach (var child in children)
                             {
-                                <div class="space-y-2">
-                                    @foreach (var grandchild in grandchildren)
+                                var hasGrandchildren = Model.ChildrenByParent.TryGetValue(child.Id, out var grandchildren) && grandchildren.Count > 0;
+                                <section class="rounded-xl border border-gray-100 bg-gray-50/70 p-4 dark:border-gray-700 dark:bg-zinc-800">
+                                    <a href="#" class="mb-3 block border-b border-gray-200 pb-2 text-sm font-bold text-gray-900 hover:text-primary dark:border-gray-700 dark:text-white">@child.Name</a>
+                                    @if (hasGrandchildren)
                                     {
-                                        <a href="#" class="text-xs text-gray-600 block hover:text-primary dark:text-gray-300">@grandchild.Name</a>
+                                        <ul class="grid grid-cols-1 gap-y-2">
+                                            @foreach (var grandchild in grandchildren!)
+                                            {
+                                                <li><a href="#" class="block text-xs leading-5 text-gray-600 hover:text-primary dark:text-gray-300">@grandchild.Name</a></li>
+                                            }
+                                        </ul>
                                     }
-                                </div>
+                                    else
+                                    {
+                                        <span class="text-xs text-gray-400">مشاهدهٔ محصولات این دسته</span>
+                                    }
+                                </section>
                             }
-                        </section>
+                        </div>
                     }
                 </div>
             }
