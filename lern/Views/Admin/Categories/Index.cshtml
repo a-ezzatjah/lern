@@ -1,0 +1,40 @@
+@model lern.Models.AdminCategoryListViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "دسته‌بندی‌ها";
+}
+
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <div><h1 class="text-2xl font-black dark:text-white">دسته‌بندی‌ها</h1><p class="mt-1 text-sm text-gray-500">مدیریت ساختار مگامنو و دسته‌بندی محصولات</p></div>
+    <button type="button" id="new-category" class="btn bg-primary text-white">افزودن دسته‌بندی</button>
+</div>
+<div class="hidden">@Html.AntiForgeryToken()</div>
+
+<section class="admin-card p-5">
+    <form method="get" class="flex gap-2 mb-5">
+        <input class="flex-1" name="search" value="@Model.Search" placeholder="جست‌وجو در نام، slug یا دستهٔ والد" />
+        <button class="btn bg-secondary text-white" type="submit">جست‌وجو</button>
+        @if (!string.IsNullOrWhiteSpace(Model.Search)) { <a class="btn border" href="@Url.Action("Categories")">پاک کردن</a> }
+    </form>
+    <div id="category-message" class="admin-alert mb-4" hidden></div>
+    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="border-b"><tr><th class="p-3">نام</th><th class="p-3">والد</th><th class="p-3">Slug</th><th class="p-3">ترتیب</th><th class="p-3">عملیات</th></tr></thead><tbody>
+    @foreach (var item in Model.Categories)
+    {
+        <tr class="border-b border-gray-100 dark:border-gray-700"><td class="p-3 font-medium dark:text-white">@item.Name</td><td class="p-3 text-sm text-gray-500">@(item.Parent?.Name ?? "دستهٔ اصلی")</td><td class="p-3 text-xs text-gray-500" dir="ltr">@item.Slug</td><td class="p-3">@(item.SortOrder ?? 0)</td><td class="p-3 whitespace-nowrap"><button type="button" class="text-primary edit-category" data-id="@item.Id" data-name="@item.Name" data-slug="@item.Slug" data-parent="@item.ParentId" data-sort="@(item.SortOrder ?? 0)">ویرایش</button><button type="button" class="mr-3 text-red-600 delete-category" data-id="@item.Id" data-name="@item.Name">حذف</button></td></tr>
+    }
+    </tbody></table></div>
+</section>
+
+<dialog id="category-dialog" class="rounded-xl p-0 w-full max-w-lg backdrop:bg-black/40"><form id="category-form" method="dialog" class="p-6 space-y-4"><div class="flex items-center justify-between"><h2 id="dialog-title" class="text-xl font-bold">افزودن دسته‌بندی</h2><button type="button" onclick="categoryDialog.close()">×</button></div><input id="category-id" type="hidden" /><label class="block">نام<input id="category-name" required maxlength="100" class="mt-1 w-full" /></label><label class="block">Slug<input id="category-slug" required maxlength="100" dir="ltr" class="mt-1 w-full" placeholder="sewing-thread" /></label><label class="block">دستهٔ والد<select id="category-parent" class="mt-1 w-full"><option value="">دستهٔ اصلی</option>@foreach(var parent in Model.ParentOptions){<option value="@parent.Id">@parent.Name</option>}</select></label><label class="block">ترتیب نمایش<input id="category-sort" type="number" value="0" class="mt-1 w-full" /></label><div class="flex justify-end gap-2"><button type="button" class="btn border" onclick="categoryDialog.close()">انصراف</button><button class="btn bg-primary text-white" type="submit">ذخیره</button></div></form></dialog>
+
+@section Scripts {
+<script>
+const categoryDialog = document.getElementById('category-dialog'), form = document.getElementById('category-form'), message = document.getElementById('category-message');
+const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+function notice(text, error=false){ message.textContent=text; message.hidden=false; message.classList.toggle('text-red-600',error); }
+function openForm(data){ document.getElementById('dialog-title').textContent=data?'ویرایش دسته‌بندی':'افزودن دسته‌بندی'; document.getElementById('category-id').value=data?.id||''; document.getElementById('category-name').value=data?.name||''; document.getElementById('category-slug').value=data?.slug||''; document.getElementById('category-parent').value=data?.parent||''; document.getElementById('category-sort').value=data?.sort||0; categoryDialog.showModal(); }
+document.getElementById('new-category').onclick=()=>openForm(); document.querySelectorAll('.edit-category').forEach(x=>x.onclick=()=>openForm(x.dataset));
+form.onsubmit=async e=>{ e.preventDefault(); const id=document.getElementById('category-id').value, body=new URLSearchParams({name:document.getElementById('category-name').value,slug:document.getElementById('category-slug').value,parentId:document.getElementById('category-parent').value,sortOrder:document.getElementById('category-sort').value,__RequestVerificationToken:token}); const r=await fetch(id?`/Admin/Categories/${id}/Edit`:'/Admin/Categories',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}); const result=await r.json(); if(!r.ok){notice(result.message,true);return;} location.reload(); };
+document.querySelectorAll('.delete-category').forEach(x=>x.onclick=async()=>{if(!confirm(`دسته «${x.dataset.name}» حذف شود؟`))return; const body=new URLSearchParams({__RequestVerificationToken:token}); const r=await fetch(`/Admin/Categories/${x.dataset.id}/Delete`,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}); const result=await r.json(); if(!r.ok){notice(result.message,true);return;} location.reload();});
+</script>
+}

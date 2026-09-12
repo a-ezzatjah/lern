@@ -1,0 +1,47 @@
+@model lern.ViewComponents.MegaMenuViewModel
+@{ Layout = null; }
+
+<div id="mega-menu-fire-target" class="bg-white dark:bg-zinc-900 container z-50 hidden top-[90%] drop-shadow-sm absolute mt-1 me-10 shadow-md rounded-b-md">
+    <div class="grid grid-cols-12">
+        <div class="col-span-2 h-[400px] overflow-y-auto border-e border-gray-200 dark:border-gray-700">
+            <ul class="my-2 space-y-1">
+                @foreach (var root in Model.Roots)
+                {
+                    <li data-mega-id="@root.Id" class="px-4 w-full border-opacity-0 hover:border-opacity-100 rounded-lg mega-menu-li">
+                        <a href="#" class="flex items-center justify-between py-3">
+                            <span class="text-xs">@root.Name</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="col-span-10 bg-white dark:bg-zinc-900">
+            @foreach (var root in Model.Roots)
+            {
+                var children = Model.ChildrenByParent.TryGetValue(root.Id, out var items) ? items : Array.Empty<Entities.Category>();
+                <div data-mega-target="@root.Id" class="grid @(root != Model.Roots.FirstOrDefault() ? "hidden" : "") h-[400px] overflow-y-auto grid-cols-4 gap-x-8 gap-y-5 m-5 content-start">
+                    @if (children.Count == 0)
+                    {
+                        <p class="col-span-4 text-sm text-gray-500">برای این دسته هنوز زیرمجموعه‌ای ثبت نشده است.</p>
+                    }
+                    @foreach (var child in children)
+                    {
+                        <section>
+                            <p class="mb-3 text-sm font-bold dark:text-white">@child.Name</p>
+                            @if (Model.ChildrenByParent.TryGetValue(child.Id, out var grandchildren) && grandchildren.Count > 0)
+                            {
+                                <div class="space-y-2">
+                                    @foreach (var grandchild in grandchildren)
+                                    {
+                                        <a href="#" class="text-xs text-gray-600 block hover:text-primary dark:text-gray-300">@grandchild.Name</a>
+                                    }
+                                </div>
+                            }
+                        </section>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

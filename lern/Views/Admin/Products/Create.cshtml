@@ -1,6 +1,7 @@
 @model lern.Models.AdminProductCreateViewModel
 @{
     Layout = "_AdminLayout";
+    ViewData["Title"] = Model.IsEdit ? "ویرایش محصول" : "افزودن محصول";
     ViewData["Title"] = "افزودن محصول";
 }
 
@@ -16,8 +17,9 @@
 <div id="ajax-message" class="admin-alert" hidden></div>
 <div class="admin-validation" asp-validation-summary="ModelOnly"></div>
 
-<form id="product-form" asp-action="CreateProduct" asp-controller="Admin" method="post" enctype="multipart/form-data">
+<form id="product-form" action="@(Model.IsEdit ? Url.Action("EditProduct", "Admin", new { id = Model.Id }) : Url.Action("CreateProduct", "Admin"))" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
     <div class="admin-form-grid">
         <div class="admin-form-main">
             <section class="admin-card">
@@ -26,6 +28,7 @@
                     <label>نام محصول<input asp-for="Name" placeholder="مثلاً کش سه سانت توپی" /></label>
                     <label>Slug انگلیسی<input asp-for="Slug" placeholder="three-cm-elastic" /></label>
                     <label class="full">توضیح کوتاه<input asp-for="ShortDescription" placeholder="توضیح مختصر محصول" /></label>
+                    <label class="full">تصویر اصلی محصول (نمایش در کارت محصول)<input asp-for="PrimaryImage" type="file" accept=".jpg,.jpeg,.png,.webp" /><small>مستقل از عکس Variantها؛ حداکثر ۵ مگابایت.</small>@if (!string.IsNullOrWhiteSpace(Model.ExistingPrimaryImageUrl)){<img src="@Model.ExistingPrimaryImageUrl" alt="تصویر اصلی فعلی" class="mt-2 h-20 w-20 rounded-lg border object-cover" />}</label>
                 </div>
             </section>
 
@@ -85,11 +88,13 @@
         try {
             const r = await fetch(form.action, { method: "POST", body: new FormData(form), headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" } });
             const text = await r.text(); const result = text ? JSON.parse(text) : null;
+            if (result?.redirectUrl) { window.location.href = result.redirectUrl; return; }
             if (!r.ok || !result?.success) throw new Error(result?.message || "ثبت محصول انجام نشد.");
             message.className = "admin-alert success"; message.textContent = result.message; message.hidden = false; form.reset();
         } catch (error) { message.className = "admin-alert error"; message.textContent = error.message; message.hidden = false; }
         finally { submit.disabled = false; }
     });
+    if (@Model.IsEdit.ToString().ToLowerInvariant()) submit.textContent = "ذخیره تغییرات";
     reindex();
 })();
 </script>

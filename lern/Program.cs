@@ -8,6 +8,7 @@ using FluentValidation;
 using DTO;
 using Service.Service;
 using Service.Validators.ProductValodation;
+using lern.Infrastructure;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,7 +42,9 @@ var app = builder.Build();
 try
 {
     await using var scope = app.Services.CreateAsyncScope();
-    await scope.ServiceProvider.GetRequiredService<ShopDbContext>().Database.MigrateAsync();
+    var db = scope.ServiceProvider.GetRequiredService<ShopDbContext>();
+    await db.Database.MigrateAsync();
+    await CategoryCatalogSeeder.SeedAsync(db);
 }
 catch (Exception ex)
 {

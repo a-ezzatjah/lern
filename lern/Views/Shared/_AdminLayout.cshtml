@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="~/assets/css/app.css" asp-append-version="true" />
 </head>
 <body class="admin-shell bg-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark">
+    <style>
+        html:not(.dark) .admin-shell { background: #f4efe5 !important; }
+        html:not(.dark) .admin-sidebar, html:not(.dark) .admin-topbar { background: #fbf8f1 !important; border-color: #e7ddca !important; }
+        html:not(.dark) .admin-card, html:not(.dark) .admin-stat-card, html:not(.dark) .admin-welcome-card { background: #fffaf0 !important; border-color: #e8dcc7 !important; }
+    </style>
     <svg aria-hidden="true" class="admin-icon-sprite">
         <symbol id="admin-i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z"/></symbol>
         <symbol id="admin-i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
@@ -41,7 +46,7 @@
                 <a class="admin-nav-link" href="@Url.Action("Products", "Admin")">
                     <span class="admin-nav-icon"><svg><use href="#admin-i-box"/></svg></span><span>لیست محصولات</span>
                 </a>
-                <a class="admin-nav-link" href="#">
+                <a class="admin-nav-link" href="@Url.Action("Categories", "Admin")">
                     <span class="admin-nav-icon"><svg><use href="#admin-i-grid"/></svg></span><span>دسته‌بندی‌ها</span>
                 </a>
                 <a class="admin-nav-link" href="#">

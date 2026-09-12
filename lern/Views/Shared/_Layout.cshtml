@@ -2265,6 +2265,22 @@
     <script src="~/assets/js/plugin/swiper/swiper-bundle.min.js" asp-append-version="true"></script>
     <script src="~/assets/js/dependencies/swiper-script.js" asp-append-version="true"></script>
     <script src="~/assets/js/dependencies/app.js" asp-append-version="true"></script>
+    <script>
+        fetch('/menu/categories').then(response => response.ok ? response.text() : '').then(html => {
+            const oldMenu = document.getElementById('mega-menu-fire-target');
+            if (!oldMenu || !html) return;
+            oldMenu.outerHTML = html;
+            const items = document.querySelectorAll('[data-mega-id]');
+            const targets = document.querySelectorAll('[data-mega-target]');
+            items.forEach(item => item.addEventListener('mouseenter', () => {
+                const id = item.getAttribute('data-mega-id');
+                items.forEach(x => x.classList.remove('bg-gray-100'));
+                targets.forEach(x => x.classList.add('hidden'));
+                item.classList.add('bg-gray-100');
+                document.querySelector(`[data-mega-target="${id}"]`)?.classList.remove('hidden');
+            }));
+        });
+    </script>
     <script src="~/assets/js/cart-store.js" asp-append-version="true"></script>
 
     <!-- initial story api -->

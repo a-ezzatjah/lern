@@ -4,6 +4,10 @@ namespace lern.Models;
 
 public class AdminProductCreateViewModel
 {
+    public int Id { get; set; }
+    public IFormFile? PrimaryImage { get; set; }
+    public string? ExistingPrimaryImageUrl { get; set; }
+    public bool IsEdit => Id > 0;
     [Required(ErrorMessage = "نام محصول را وارد کنید.")]
     public string Name { get; set; } = string.Empty;
 
