@@ -4,28 +4,88 @@
     ViewData["Title"] = "دسته‌بندی‌ها";
 }
 
-<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+<style>
+    .category-search-input { color: #1e293b !important; background: #fff !important; border: 1px solid #cbd5e1 !important; }
+    .category-search-input::placeholder { color: #64748b !important; opacity: 1; }
+    .category-search-input:focus { color: #0f172a !important; background: #fff !important; }
+    .category-dialog { position: fixed; inset: 0; width: min(34rem, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); margin: auto; padding: 0; overflow: auto; border: 1px solid #dbe3ee; border-radius: 1.25rem; color: #1e293b; background: #fff; box-shadow: 0 24px 64px rgba(15, 23, 42, .28); }
+    .category-dialog::backdrop { background: rgba(15, 23, 42, .62); backdrop-filter: blur(4px); }
+    .category-dialog-body { padding: 1.5rem; background: linear-gradient(160deg, #fff 0%, #f8fafc 100%); }
+    .category-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0; background: linear-gradient(135deg, rgba(67, 78, 206, .13), rgba(38, 146, 61, .08)); }
+    .category-dialog-field { display: block; margin-bottom: 1rem; color: #334155; font-size: .85rem; font-weight: 700; }
+    .category-dialog-field input, .category-dialog-field select { display: block; box-sizing: border-box; width: 100%; min-height: 3rem; margin-top: .5rem; padding: .7rem .85rem; border: 1px solid #cbd5e1; border-radius: .75rem; color: #1e293b; background: #fff; font: inherit; transition: border-color .18s, box-shadow .18s, background .18s; }
+    .category-dialog-field input:focus, .category-dialog-field select:focus { border-color: #434ece; box-shadow: 0 0 0 3px rgba(67, 78, 206, .14); }
+    .category-dialog-footer { display: flex; justify-content: flex-end; gap: .75rem; padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+    .category-dialog-close { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border: 0; border-radius: 50%; color: #64748b; background: rgba(255, 255, 255, .8); font-size: 1.55rem; cursor: pointer; transition: .18s; }
+    .category-dialog-close:hover { color: #1e293b; background: #e2e8f0; transform: rotate(90deg); }
+    .dark .category-search-input { color: #f8fafc !important; background: #0f172a !important; border-color: #475569 !important; }
+    .dark .category-search-input::placeholder { color: #94a3b8 !important; }
+    .dark .category-search-input:focus { color: #fff !important; background: #0f172a !important; }
+    .dark .category-dialog { border-color: #334155; color: #e2e8f0; background: #0f172a; box-shadow: 0 24px 64px rgba(0, 0, 0, .55); }
+    .dark .category-dialog-body { background: linear-gradient(160deg, #0f172a 0%, #172235 100%); }
+    .dark .category-dialog-header { border-color: #334155; background: linear-gradient(135deg, rgba(96, 111, 216, .25), rgba(38, 146, 61, .15)); }
+    .dark .category-dialog-field { color: #e2e8f0; }
+    .dark .category-dialog-field input, .dark .category-dialog-field select { border-color: #475569; color: #f8fafc; background: #172235; }
+    .dark .category-dialog-footer { border-color: #334155; background: #111b2b; }
+    .dark .category-dialog-close { color: #cbd5e1; background: #1e293b; }
+    .dark .category-dialog-close:hover { color: #fff; background: #334155; }
+    @@media (max-width: 480px) { .category-dialog { width: calc(100vw - 1rem); max-height: calc(100vh - 1rem); border-radius: 1rem; } .category-dialog-header, .category-dialog-footer { padding-inline: 1rem; } .category-dialog-body { padding: 1rem; } }
+</style>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
     <div><h1 class="text-2xl font-black dark:text-white">دسته‌بندی‌ها</h1><p class="mt-1 text-sm text-gray-500">مدیریت ساختار مگامنو و دسته‌بندی محصولات</p></div>
     <button type="button" id="new-category" class="btn bg-primary text-white">افزودن دسته‌بندی</button>
 </div>
 <div class="hidden">@Html.AntiForgeryToken()</div>
 
 <section class="admin-card p-5">
-    <form method="get" class="flex gap-2 mb-5">
-        <input class="flex-1" name="search" value="@Model.Search" placeholder="جست‌وجو در نام، slug یا دستهٔ والد" />
-        <button class="btn bg-secondary text-white" type="submit">جست‌وجو</button>
-        @if (!string.IsNullOrWhiteSpace(Model.Search)) { <a class="btn border" href="@Url.Action("Categories")">پاک کردن</a> }
+    <form method="get" class="mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60">
+        <div class="flex flex-col gap-3 sm:flex-row">
+            <label class="relative flex-1">
+                <span class="sr-only">جست‌وجوی دسته‌بندی</span>
+                <svg class="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" style="right: .75rem; z-index: 1;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input class="category-search-input w-full rounded-xl py-3 pl-4 pr-12 text-right" style="padding-right: 3rem;" name="search" value="@Model.Search" placeholder="جست‌وجو در همه دسته‌بندی‌ها، slug یا والد..." />
+            </label>
+            <button class="btn rounded-xl bg-secondary px-6 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" type="submit">جست‌وجو</button>
+            @if (!string.IsNullOrWhiteSpace(Model.Search)) { <a class="btn rounded-xl border border-slate-200 bg-white px-5 dark:border-slate-600 dark:bg-slate-900" href="@Url.Action("Categories")">پاک کردن</a> }
+        </div>
     </form>
+    <div class="mb-4 flex items-center justify-between text-sm text-slate-500"><span>نمایش @Model.Categories.Count مورد از @Model.TotalCount دسته‌بندی</span>@if (!string.IsNullOrWhiteSpace(Model.Search)){<span>نتیجه جست‌وجو برای «@Model.Search»</span>}</div>
     <div id="category-message" class="admin-alert mb-4" hidden></div>
-    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="border-b"><tr><th class="p-3">نام</th><th class="p-3">والد</th><th class="p-3">Slug</th><th class="p-3">ترتیب</th><th class="p-3">عملیات</th></tr></thead><tbody>
+    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="border-b border-slate-200 dark:border-slate-700"><tr><th class="p-3">نام</th><th class="p-3">والد</th><th class="p-3">Slug</th><th class="p-3">ترتیب</th><th class="p-3">عملیات</th></tr></thead><tbody>
     @foreach (var item in Model.Categories)
     {
-        <tr class="border-b border-gray-100 dark:border-gray-700"><td class="p-3 font-medium dark:text-white">@item.Name</td><td class="p-3 text-sm text-gray-500">@(item.Parent?.Name ?? "دستهٔ اصلی")</td><td class="p-3 text-xs text-gray-500" dir="ltr">@item.Slug</td><td class="p-3">@(item.SortOrder ?? 0)</td><td class="p-3 whitespace-nowrap"><button type="button" class="text-primary edit-category" data-id="@item.Id" data-name="@item.Name" data-slug="@item.Slug" data-parent="@item.ParentId" data-sort="@(item.SortOrder ?? 0)">ویرایش</button><button type="button" class="mr-3 text-red-600 delete-category" data-id="@item.Id" data-name="@item.Name">حذف</button></td></tr>
+        <tr class="border-b border-gray-100 transition hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-slate-800/50"><td class="p-3 font-medium dark:text-white">@item.Name</td><td class="p-3 text-sm text-gray-500">@(item.Parent?.Name ?? "دستهٔ اصلی")</td><td class="p-3 text-xs text-gray-500" dir="ltr">@item.Slug</td><td class="p-3">@(item.SortOrder ?? 0)</td><td class="p-3 whitespace-nowrap"><div class="flex items-center gap-2"><button type="button" class="edit-category inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white" data-id="@item.Id" data-name="@item.Name" data-slug="@item.Slug" data-parent="@item.ParentId" data-sort="@(item.SortOrder ?? 0)" title="ویرایش دسته‌بندی"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 20 4.2-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Z"/><path d="m13.8 7.2 3 3"/></svg>ویرایش</button><button type="button" class="delete-category inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-600 hover:text-white dark:border-red-900/50 dark:bg-red-950/30" data-id="@item.Id" data-name="@item.Name" title="حذف دسته‌بندی"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>حذف</button></div></td></tr>
     }
     </tbody></table></div>
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-6 flex flex-wrap items-center justify-center gap-2" aria-label="صفحه‌بندی دسته‌بندی‌ها">
+            @if (Model.Page > 1) { <a class="rounded-lg border px-3 py-2 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800" href="@Url.Action("Categories", new { search = Model.Search, page = Model.Page - 1 })">قبلی</a> }
+            @{ var firstPage = Math.Max(1, Math.Min(Model.Page - 4, Model.TotalPages - 9));
+               var lastPage = Math.Min(Model.TotalPages, firstPage + 9); }
+            @for (var number = firstPage; number <= lastPage; number++) { <a class="rounded-lg px-3 py-2 text-sm transition @(number == Model.Page ? "bg-primary text-white shadow-sm" : "border border-slate-200 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800")" href="@Url.Action("Categories", new { search = Model.Search, page = number })">@number</a> }
+            @if (Model.Page < Model.TotalPages) { <a class="rounded-lg border px-3 py-2 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800" href="@Url.Action("Categories", new { search = Model.Search, page = Model.Page + 1 })">بعدی</a> }
+        </nav>
+    }
 </section>
 
-<dialog id="category-dialog" class="rounded-xl p-0 w-full max-w-lg backdrop:bg-black/40"><form id="category-form" method="dialog" class="p-6 space-y-4"><div class="flex items-center justify-between"><h2 id="dialog-title" class="text-xl font-bold">افزودن دسته‌بندی</h2><button type="button" onclick="categoryDialog.close()">×</button></div><input id="category-id" type="hidden" /><label class="block">نام<input id="category-name" required maxlength="100" class="mt-1 w-full" /></label><label class="block">Slug<input id="category-slug" required maxlength="100" dir="ltr" class="mt-1 w-full" placeholder="sewing-thread" /></label><label class="block">دستهٔ والد<select id="category-parent" class="mt-1 w-full"><option value="">دستهٔ اصلی</option>@foreach(var parent in Model.ParentOptions){<option value="@parent.Id">@parent.Name</option>}</select></label><label class="block">ترتیب نمایش<input id="category-sort" type="number" value="0" class="mt-1 w-full" /></label><div class="flex justify-end gap-2"><button type="button" class="btn border" onclick="categoryDialog.close()">انصراف</button><button class="btn bg-primary text-white" type="submit">ذخیره</button></div></form></dialog>
+<dialog id="category-dialog" class="category-dialog">
+    <form id="category-form" method="dialog">
+        <div class="category-dialog-header">
+            <div><p class="text-xs font-semibold text-primary">مدیریت فروشگاه</p><h2 id="dialog-title" class="mt-1 text-xl font-black">افزودن دسته‌بندی</h2></div>
+            <button type="button" aria-label="بستن" class="category-dialog-close" onclick="categoryDialog.close()">×</button>
+        </div>
+        <div class="category-dialog-body">
+            <input id="category-id" type="hidden" />
+            <label class="category-dialog-field">نام دسته‌بندی<input id="category-name" required maxlength="100" /></label>
+            <label class="category-dialog-field">Slug<input id="category-slug" required maxlength="100" dir="ltr" placeholder="sewing-thread" /></label>
+            <label class="category-dialog-field">دستهٔ والد<select id="category-parent"><option value="">دستهٔ اصلی</option>@foreach(var parent in Model.ParentOptions){<option value="@parent.Id">@parent.Name</option>}</select></label>
+            <label class="category-dialog-field">ترتیب نمایش<input id="category-sort" type="number" value="0" /></label>
+        </div>
+        <div class="category-dialog-footer"><button type="button" class="btn rounded-xl border border-slate-200 bg-white px-5 dark:border-slate-600 dark:bg-slate-900" onclick="categoryDialog.close()">انصراف</button><button class="btn rounded-xl bg-primary px-6 text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" type="submit">ذخیره دسته‌بندی</button></div>
+    </form>
+</dialog>
 
 @section Scripts {
 <script>

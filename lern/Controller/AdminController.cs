@@ -99,15 +99,20 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
     }
 
     [HttpGet("Categories")]
-    public async Task<IActionResult> Categories(string? search)
+    public async Task<IActionResult> Categories(string? search, int page = 1)
     {
         var query = _db.Categories.AsNoTracking().Include(x => x.Parent).AsQueryable();
         if (!string.IsNullOrWhiteSpace(search))
             query = query.Where(x => x.Name.Contains(search) || x.Slug.Contains(search) || (x.Parent != null && x.Parent.Name.Contains(search)));
 
-        var categories = await query.OrderBy(x => x.ParentId).ThenBy(x => x.SortOrder).ThenBy(x => x.Name).ToListAsync();
+        const int pageSize = 10;
+        var totalCount = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize));
+        page = Math.Clamp(page, 1, totalPages);
+        var categories = await query.OrderBy(x => x.ParentId).ThenBy(x => x.SortOrder).ThenBy(x => x.Name)
+            .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         var parents = await _db.Categories.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
-        return View("Categories/Index", new AdminCategoryListViewModel { Search = search, Categories = categories, ParentOptions = parents });
+        return View("Categories/Index", new AdminCategoryListViewModel { Search = search, Categories = categories, ParentOptions = parents, Page = page, PageSize = pageSize, TotalCount = totalCount });
     }
 
     [HttpPost("Categories")]

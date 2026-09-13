@@ -7,11 +7,16 @@ namespace lern.Infrastructure;
 public static class CategoryCatalogSeeder
 {
     private sealed record CatalogNode(string Name, params CatalogNode[] Children);
-    private static readonly Encoding Windows1252 = Encoding.GetEncoding(1252);
+    // Code-page encodings are not enabled by default on .NET (especially on
+    // Linux/WSL). Resolve this only after registering the provider in SeedAsync
+    // so merely loading the type cannot crash application startup.
+    private static Encoding Windows1252 => Encoding.GetEncoding(1252);
     private static readonly Encoding StrictUtf8 = new UTF8Encoding(false, true);
 
     public static async Task SeedAsync(ShopDbContext db)
     {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
         var roots = new[]
         {
             new CatalogNode("نخ",
