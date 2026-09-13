@@ -28,6 +28,7 @@ namespace Entities
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<CustomerUser> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +44,16 @@ namespace Entities
             modelBuilder.Entity<CartItem>().ToTable("CartItems");
             modelBuilder.Entity<PaymentTransaction>().ToTable("PaymentTransactions");
             modelBuilder.Entity<Address>().ToTable("Addresses");
+            modelBuilder.Entity<CustomerUser>().ToTable("Users");
+            modelBuilder.Entity<CustomerUser>().HasIndex(x => x.PhoneNumber).IsUnique();
+            modelBuilder.Entity<CustomerUser>().HasIndex(x => x.Email).IsUnique().HasFilter("[Email] IS NOT NULL");
+            modelBuilder.Entity<CustomerUser>().Property(x => x.PhoneNumber).IsRequired().HasMaxLength(11);
+            modelBuilder.Entity<CustomerUser>().Property(x => x.Email).HasMaxLength(256);
+            modelBuilder.Entity<CustomerUser>().Property(x => x.FirstName).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<CustomerUser>().Property(x => x.LastName).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<CustomerUser>().Property(x => x.PasswordHash).IsRequired().HasMaxLength(256);
+            modelBuilder.Entity<CustomerUser>().Property(x => x.PasswordSalt).IsRequired().HasMaxLength(128);
+            modelBuilder.Entity<CustomerUser>().Property(x => x.Role).IsRequired().HasMaxLength(32);
             modelBuilder.Entity<Address>().HasIndex(x => new { x.CustomerKey, x.Title });
             modelBuilder.Entity<CartItem>().HasIndex(x => new { x.CustomerKey, x.ProductVariantId }).IsUnique();
             modelBuilder.Entity<OrderItem>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);

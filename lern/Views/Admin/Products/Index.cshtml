@@ -14,27 +14,15 @@
 @if(Model.Products.Count==0){<p class="py-12 text-center text-gray-500">محصولی پیدا نشد.</p>}else{<div class="mt-3 overflow-x-auto"><table class="w-full text-start"><thead class="bg-gray-50 dark:bg-gray-700"><tr><th>#</th><th>محصول</th><th>دسته‌بندی</th><th>قیمت</th><th>موجودی</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 @foreach(var item in Model.Products.Select((value,index)=>(value,index))){var p=item.value;var image=p.ProductImages.OrderByDescending(x=>x.IsPrimary).ThenBy(x=>x.SortOrder).FirstOrDefault()?.ImageUrl;var variants=p.SaleOptions.SelectMany(x=>x.ProductVariants).ToList();var price=variants.Count==0?0:variants.Min(x=>x.Price);var stock=variants.Sum(x=>x.AvailableQuantity);<tr class="align-top hover:bg-gray-50 dark:hover:bg-gray-700/50"><td>@(item.index+1)</td><td><div class="flex min-w-[220px] items-center gap-3">@if(!string.IsNullOrWhiteSpace(image)){<img class="product-thumb" src="@image" alt="@p.Name" />}else{<span class="product-thumb grid place-items-center bg-gray-100 text-xs text-gray-400">کالا</span>}<div><div class="product-name font-medium dark:text-white" title="@p.Name">@p.Name</div><div class="text-xs text-gray-500">slug: @p.Slug</div><div class="text-xs text-gray-500">@p.SaleOptions.Count حالت فروش</div></div></div></td><td class="text-sm text-gray-500">@string.Join("، ",p.ProductCategories.Select(x=>x.Category?.Name).Where(x=>!string.IsNullOrWhiteSpace(x)).Distinct())</td><td class="whitespace-nowrap text-sm dark:text-white">@price.ToString("N0",CultureInfo.InvariantCulture) تومان</td><td class="whitespace-nowrap text-sm @(stock<=0?"text-red-600":"text-gray-500")">@stock</td><td><span class="rounded-full px-2 py-1 text-xs @(p.IsActive?"bg-green-100 text-green-700":"bg-gray-100 text-gray-600")">@(p.IsActive?"فعال":"غیرفعال")</span></td><td><button type="button" class="product-edit-button" title="ویرایش محصول"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.2-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Z"/><path d="m13.8 7.2 3 3"/></svg>ویرایش</button></td></tr><tr><td colspan="7" class="px-2 pb-2"><details class="variant-details"><summary class="cursor-pointer font-medium text-primary">مشاهده حالت‌های فروش، رنگ‌ها و تنوع‌ها</summary><div class="variant-grid grid md:grid-cols-2">@foreach(var option in p.SaleOptions){<div class="variant-box"><div class="font-semibold dark:text-white">@option.Title <span class="text-xs text-gray-500">(@option.SaleType)</span></div><div class="mt-2 flex flex-wrap gap-2">@foreach(var color in option.SaleOptionColors.DistinctBy(x=>x.Id)){<span class="rounded-full border px-2 py-1 text-xs" style="border-color:@(color.HexCode??"#d1d5db")">@color.Color</span>}</div><div class="mt-2 space-y-1">@foreach(var variant in option.ProductVariants){<div class="flex justify-between gap-2 text-xs text-gray-600 dark:text-gray-300"><span class="truncate">SKU: @variant.Sku</span><span class="whitespace-nowrap">@variant.Price.ToString("N0",CultureInfo.InvariantCulture) تومان · @variant.AvailableQuantity</span></div>}</div></div>}</div></details></td></tr>}
 </tbody></table></div>}
-@if (Model.TotalCount > 0)
+@if (Model.TotalPages > 1)
 {
-    var firstItem = (Model.Page - 1) * Model.PageSize + 1;
-    var lastItem = Math.Min(Model.Page * Model.PageSize, Model.TotalCount);
-    <div class="mt-4 flex flex-col gap-3 border-t border-gray-200 pt-4 text-sm dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
-        <span class="text-gray-500">نمایش @firstItem تا @lastItem از @Model.TotalCount محصول</span>
-        <nav class="flex items-center gap-1" aria-label="صفحه‌بندی محصولات">
-            @if (Model.Page > 1)
-            {
-                <a class="admin-secondary-button !min-h-0 !px-3 !py-2" href="@Url.Action("Products", "Admin", new { search = Model.Search, page = Model.Page - 1 })">قبلی</a>
-            }
-            @for (var pageNumber = Math.Max(1, Model.Page - 2); pageNumber <= Math.Min(Model.TotalPages, Model.Page + 2); pageNumber++)
-            {
-                <a class="@(pageNumber == Model.Page ? "admin-primary-button" : "admin-secondary-button") !min-h-0 !px-3 !py-2" href="@Url.Action("Products", "Admin", new { search = Model.Search, page = pageNumber })">@pageNumber</a>
-            }
-            @if (Model.Page < Model.TotalPages)
-            {
-                <a class="admin-secondary-button !min-h-0 !px-3 !py-2" href="@Url.Action("Products", "Admin", new { search = Model.Search, page = Model.Page + 1 })">بعدی</a>
-            }
-        </nav>
-    </div>
+    <nav class="mt-6 flex flex-wrap items-center justify-center gap-2" aria-label="صفحه‌بندی محصولات">
+        @if (Model.Page > 1) { <a class="rounded-lg border px-3 py-2 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800" href="@Url.Action("Products", "Admin", new { search = Model.Search, page = Model.Page - 1 })">قبلی</a> }
+        @{ var firstPage = Math.Max(1, Math.Min(Model.Page - 4, Model.TotalPages - 9));
+           var lastPage = Math.Min(Model.TotalPages, firstPage + 9); }
+        @for (var pageNumber = firstPage; pageNumber <= lastPage; pageNumber++) { <a class="rounded-lg px-3 py-2 text-sm transition @(pageNumber == Model.Page ? "bg-primary text-white shadow-sm" : "border border-slate-200 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800")" href="@Url.Action("Products", "Admin", new { search = Model.Search, page = pageNumber })">@pageNumber</a> }
+        @if (Model.Page < Model.TotalPages) { <a class="rounded-lg border px-3 py-2 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800" href="@Url.Action("Products", "Admin", new { search = Model.Search, page = Model.Page + 1 })">بعدی</a> }
+    </nav>
 }
 </section></div>
 @section Scripts {
