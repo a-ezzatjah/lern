@@ -21,7 +21,7 @@ public sealed class AccountApiController : ControllerBase
     {
         var result = await _users.RegisterAsync(model);
         if (!result.Succeeded) return BadRequest(new { success = false, message = result.ErrorMessage ?? result.Errors?.FirstOrDefault() });
-        await SignInAsync(result.Data!);
+        await SignInAsync(result.Data!, true);
         return Created("/api/account/me", new { success = true, user = result.Data });
     }
 
@@ -30,7 +30,7 @@ public sealed class AccountApiController : ControllerBase
     {
         var result = await _users.LoginAsync(model);
         if (!result.Succeeded) return Unauthorized(new { success = false, message = result.ErrorMessage ?? result.Errors?.FirstOrDefault() });
-        await SignInAsync(result.Data!);
+        await SignInAsync(result.Data!, model.RememberMe);
         return Ok(new { success = true, user = result.Data });
     }
 
@@ -51,7 +51,7 @@ public sealed class AccountApiController : ControllerBase
         return user is null ? Unauthorized() : Ok(user);
     }
 
-    private Task SignInAsync(UserProfileDto user)
+    private Task SignInAsync(UserProfileDto user, bool isPersistent)
     {
         var claims = new[]
         {
@@ -61,7 +61,10 @@ public sealed class AccountApiController : ControllerBase
             new Claim(ClaimTypes.Role, user.Role)
         };
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
-        Response.Cookies.Append("customer-key", $"user-{user.Id}", new CookieOptions { HttpOnly = true, IsEssential = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddDays(14) });
-        return HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties { IsPersistent = true, AllowRefresh = true, ExpiresUtc = DateTimeOffset.UtcNow.AddDays(14) });
+        var customerKeyOptions = new CookieOptions { HttpOnly = true, IsEssential = true, SameSite = SameSiteMode.Lax };
+        if (isPersistent) customerKeyOptions.Expires = DateTimeOffset.UtcNow.AddDays(14);
+        Response.Cookies.Append("customer-key", $"user-{user.Id}", customerKeyOptions);
+        return HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+            new AuthenticationProperties { IsPersistent = isPersistent, AllowRefresh = isPersistent, ExpiresUtc = isPersistent ? DateTimeOffset.UtcNow.AddDays(14) : null });
     }
 }
