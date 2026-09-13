@@ -29,7 +29,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/login";
         options.Cookie.Name = "lern.auth";
         options.Cookie.HttpOnly = true;
+        options.Cookie.Path = "/";
         options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.IsEssential = true;
+        options.ExpireTimeSpan = TimeSpan.FromDays(14);
         options.SlidingExpiration = true;
         options.Events.OnRedirectToLogin = context =>
         {

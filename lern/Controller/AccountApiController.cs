@@ -61,10 +61,21 @@ public sealed class AccountApiController : ControllerBase
             new Claim(ClaimTypes.Role, user.Role)
         };
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
-        var customerKeyOptions = new CookieOptions { HttpOnly = true, IsEssential = true, SameSite = SameSiteMode.Lax };
-        if (isPersistent) customerKeyOptions.Expires = DateTimeOffset.UtcNow.AddDays(14);
+        var customerKeyOptions = new CookieOptions { HttpOnly = true, IsEssential = true, SameSite = SameSiteMode.Lax, Path = "/" };
+        if (isPersistent)
+        {
+            customerKeyOptions.Expires = DateTimeOffset.UtcNow.AddDays(14);
+            customerKeyOptions.MaxAge = TimeSpan.FromDays(14);
+        }
         Response.Cookies.Append("customer-key", $"user-{user.Id}", customerKeyOptions);
+        var now = DateTimeOffset.UtcNow;
         return HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-            new AuthenticationProperties { IsPersistent = isPersistent, AllowRefresh = isPersistent, ExpiresUtc = isPersistent ? DateTimeOffset.UtcNow.AddDays(14) : null });
+            new AuthenticationProperties
+            {
+                IsPersistent = isPersistent,
+                AllowRefresh = isPersistent,
+                IssuedUtc = now,
+                ExpiresUtc = isPersistent ? now.AddDays(14) : null
+            });
     }
 }
