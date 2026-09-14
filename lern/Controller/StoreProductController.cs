@@ -17,6 +17,7 @@ public class StoreProductController : Microsoft.AspNetCore.Mvc.Controller
         if (product is null)
             return NotFound();
 
-        return View(StoreProductDetailsViewModel.FromProduct(product));
+        var relatedProducts = await _products.GetRelatedProductCardsAsync(id, take: 10);
+        return View(StoreProductDetailsViewModel.FromProduct(product, relatedProducts));
     }
 }

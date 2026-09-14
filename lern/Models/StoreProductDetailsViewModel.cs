@@ -13,12 +13,15 @@ public class StoreProductDetailsViewModel
     public List<ProductGalleryImageViewModel> Gallery { get; init; } = new();
     public List<ProductCategoryViewModel> Categories { get; init; } = new();
     public List<ProductOptionViewModel> Options { get; init; } = new();
+    public List<ProductCardDto> RelatedProducts { get; init; } = new();
     public ProductVariantOptionViewModel? SelectedVariant { get; init; }
 
     public string PrimaryImageUrl =>
         Gallery.FirstOrDefault()?.ImageUrl ?? "/assets/images/placeholder.png";
 
-    public static StoreProductDetailsViewModel FromProduct(ProductPageViewModel product)
+    public static StoreProductDetailsViewModel FromProduct(
+        ProductPageViewModel product,
+        IEnumerable<ProductCardDto>? relatedProducts = null)
     {
         var variants = product.ProductVariants
             .GroupBy(x => x.Id)
@@ -93,6 +96,7 @@ public class StoreProductDetailsViewModel
                 Slug = x.Slug
             }).ToList(),
             Options = options.Where(x => x.Choices.Count > 0).ToList(),
+            RelatedProducts = relatedProducts?.Take(10).ToList() ?? new List<ProductCardDto>(),
             SelectedVariant = selectedVariant
         };
     }

@@ -35,5 +35,7 @@ namespace ServiceContract.Interfaces
 
         public Task<List<ProductCardDto>> GetDiscountedProductCardsAsync(int take = 8);
 
+        public Task<List<ProductCardDto>> GetRelatedProductCardsAsync(int productId, int take = 10);
+
     }
 }

@@ -114,6 +114,95 @@
         box-shadow: 0 0 0 3px rgba(129, 140, 248, .22), 0 6px 12px rgba(15, 23, 42, .35);
     }
 
+    .product-gallery-actions {
+        display: flex;
+        flex-direction: column;
+        gap: .45rem;
+        padding: .35rem;
+        border: 1px solid rgba(148, 163, 184, .26);
+        border-radius: .85rem;
+        background: rgba(255, 255, 255, .82);
+        box-shadow: 0 8px 22px rgba(15, 23, 42, .1);
+        backdrop-filter: blur(8px);
+    }
+
+    .gallery-action-button {
+        display: grid;
+        width: 2.25rem;
+        height: 2.25rem;
+        place-items: center;
+        border: 0;
+        border-radius: .65rem;
+        color: #475569;
+        background: transparent;
+        cursor: pointer;
+        transition: .18s ease;
+    }
+
+    .gallery-action-button:hover,
+    .gallery-action-button:focus-visible {
+        color: #434ece;
+        background: #eef0ff;
+        outline: none;
+    }
+
+    .gallery-action-button.is-favorite {
+        color: #e11d48;
+        background: #fff1f2;
+    }
+
+    #productGalleryTwo .product-gallery-nav-button {
+        width: 2rem !important;
+        height: 2rem !important;
+        top: calc(50% - 10px) !important;
+        margin-top: 0 !important;
+        transform: translateY(-50%);
+        border: 0 !important;
+        border-radius: .55rem;
+        color: #334155;
+        background: rgba(255, 255, 255, .9);
+        box-shadow: 0 5px 14px rgba(15, 23, 42, .14);
+        transition: .18s ease;
+    }
+
+    #productGalleryTwo .product-gallery-nav-button::after {
+        font-size: .75rem !important;
+        font-weight: 900;
+    }
+
+    #productGalleryTwo .product-gallery-nav-button:hover {
+        color: #fff;
+        background: #434ece;
+        box-shadow: 0 8px 18px rgba(67, 78, 206, .28);
+    }
+
+    .dark .product-gallery-actions {
+        border-color: rgba(148, 163, 184, .22);
+        background: rgba(30, 41, 59, .8);
+    }
+
+    .dark .gallery-action-button { color: #cbd5e1; }
+    .dark .gallery-action-button:hover,
+    .dark .gallery-action-button:focus-visible { color: #fff; background: #334155; }
+    .dark .gallery-action-button.is-favorite { color: #fda4af; background: rgba(225, 29, 72, .18); }
+    .dark #productGalleryTwo .product-gallery-nav-button { color: #e2e8f0; background: rgba(30, 41, 59, .92); }
+    .dark #productGalleryTwo .product-gallery-nav-button:hover { color: #fff; background: #6366f1; }
+
+    #product-share-dialog { z-index: 2147483647; }
+
+    #shop-features .grid > article { display: flex; }
+    #shop-features .grid > article > div {
+        width: 100%;
+        height: 100%;
+        min-height: 8.25rem;
+    }
+    #shop-features .grid > article h3 {
+        display: flex;
+        min-height: 2.5rem;
+        align-items: center;
+        justify-content: center;
+    }
+
     @@media (min-width: 1024px) {
         #product-gallery-column {
             align-self: start;
@@ -203,11 +292,13 @@
                 <section id="product-gallery-column" class="lg:col-span-2 col-span-6 pb-10 w-full lg:sticky top-24" itemprop="image" itemscope
                          itemtype="https://schema.org/ImageGallery">
                     <header class="flex items-center relative z-10 ms-3 mt-2 justify-between">
-                        <div class="flex flex-col bg-white absolute top-1 start-0 p-1 rounded space-y-3  dark:bg-transparent">
-                            <button class="hover:text-gray-400 relative group cursor-pointer"
+                        <div class="product-gallery-actions absolute start-0 top-1">
+                            <button id="favorite-product-button" type="button" class="gallery-action-button relative group"
+                                    data-product-id="@Model.Id"
+                                    aria-pressed="false"
                                     aria-label="افزودن به علاقه‌مندی‌ها">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
+                                     stroke-width="1.8" stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                           d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                                 </svg>
@@ -216,26 +307,14 @@
                               افزودن به علاقه‌مندی‌ها
                               </span>
                             </button>
-                            <button data-modal-target="shareModal" class="modal-trigger hover:text-gray-400 cursor-pointer relative group"
+                            <button id="open-product-share" type="button" class="gallery-action-button relative group"
                                     aria-label="اشتراک گذاری">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
                                 </svg>
                                 <span class="absolute text-nowrap start-full ms-2 top-1/2 -translate-y-1/2 hidden group-hover:block bg-gray-900 text-white text-sm py-1 px-2 rounded-md shadow-lg">
                               <span class="absolute end-full top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-e-4 border-e-gray-900"></span>
                               اشتراک گذاری
-                              </span>
-                            </button>
-                            <button class="hover:text-gray-400 cursor-pointer relative group"
-                                    aria-label="مقایسه محصول">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/>
-                                </svg>
-                                <span class="absolute text-nowrap start-full ms-2 top-1/2 -translate-y-1/2 hidden group-hover:block bg-gray-900 text-white text-sm py-1 px-2 rounded-md shadow-lg">
-                              <span class="absolute end-full top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-e-4 border-e-gray-900"></span>
-                              مقایسه محصول
                               </span>
                             </button>
                         </div>
@@ -285,9 +364,9 @@
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
                         </div>
-                        <div class="swiper-button-prev bg-white rounded-full dark:bg-zinc-800 border border-gray-200 !size-12 after:!text-xl px-3 after:text-primary"
+                        <div class="swiper-button-prev product-gallery-nav-button"
                              aria-label="اسلاید بعدی"></div>
-                        <div class="swiper-button-next bg-white rounded-full dark:bg-zinc-800 border border-gray-200 !size-12 after:!text-xl px-3 after:text-primary"
+                        <div class="swiper-button-next product-gallery-nav-button"
                              aria-label="اسلاید قبلی"></div>
                     </div>
                     <div id="productGalleryOne" class="swiper" style="padding-left: 10px!important;">
@@ -334,6 +413,23 @@
                                      class="rounded-lg cursor-pointer border border-gray-300 p-2" itemprop="contentUrl">
                                 <meta itemprop="caption" content="گوشی موبایل اپل مدل iPhone 13 Pro Max">
                             </div>
+                        </div>
+                    </div>
+
+                    <div id="product-share-dialog" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="product-share-title">
+                        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-700 dark:bg-slate-800">
+                            <div class="mb-4 flex items-center justify-between gap-4">
+                                <h2 id="product-share-title" class="text-lg font-bold text-slate-800 dark:text-white">اشتراک‌گذاری محصول</h2>
+                                <button id="close-product-share" type="button" class="gallery-action-button" aria-label="بستن پنجره اشتراک‌گذاری">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 6 12 12M18 6 6 18" /></svg>
+                                </button>
+                            </div>
+                            <p class="mb-3 text-sm text-slate-500 dark:text-slate-300">لینک محصول را کپی کنید و برای دیگران بفرستید.</p>
+                            <div class="flex gap-2">
+                                <input id="product-share-link" type="text" readonly class="min-w-0 flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-left text-sm text-slate-600 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200" dir="ltr">
+                                <button id="copy-product-share-link" type="button" class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white transition hover:bg-primary-600">کپی</button>
+                            </div>
+                            <p id="product-share-status" class="mt-3 min-h-5 text-sm text-green-600" aria-live="polite"></p>
                         </div>
                     </div>
                 </section>
@@ -523,8 +619,8 @@
 
                                 <!-- Prices -->
                                 <div class="flex items-center space-x-4 justify-between mt-4 mb-2">
-                                    <a href="#otherSeller" class="text-sky-500 flex space-x-2 text-sm">
-                                        <span>مشاهده قیمت های دیگر</span>
+                                    <a href="#relatedProducts" class="text-sky-500 flex space-x-2 text-sm">
+                                        <span>مشاهده محصولات مشابه</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" class="size-4">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -730,6 +826,7 @@
 </section>
 <!-- ================= end content section ================= -->
 
+@* فروشندگان برای فروشگاه تک‌فروشنده نمایش داده نمی‌شوند.
 <!-- ================= start seller section ================= -->
 <section id="otherSeller" class="py-5" itemscope itemtype="https://schema.org/CollectionPage">
     <div class="container">
@@ -881,6 +978,48 @@
     </div>
 </section>
 <!-- ================= end seller section ================= -->
+*@
+
+<section id="relatedProducts" class="py-5" aria-labelledby="related-products-title">
+    <div class="container">
+        <div class="mb-5">
+            <header class="grid grid-cols-6 place-items-center gap-y-10">
+                <div class="section-heading relative col-span-6 w-full space-y-3 ps-15 before:start-0 sm:col-span-4">
+                    <h2 id="related-products-title" class="font-black text-2xl">
+                        <span class="dark:text-white">محصولات</span>
+                        <span class="font-bold text-primary">مشابه</span>
+                    </h2>
+                    <p class="text-neutral-600 dark:text-white">محصولاتی از دسته‌بندی‌های همین کالا</p>
+                </div>
+                <div class="col-span-6 w-full sm:col-span-2">
+                    <div class="text-start sm:text-end">
+                        <a href="/shop/categories" class="btn border-2 border-secondary bg-transparent hover:bg-secondary hover:text-white dark:border-white dark:text-white">
+                            مشاهده همه
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+
+        @if (Model.RelatedProducts.Count > 0)
+        {
+            <div class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4" aria-label="فهرست محصولات مشابه">
+                @foreach (var relatedProduct in Model.RelatedProducts)
+                {
+                    <div class="w-64 shrink-0 snap-start sm:w-72">
+                        @await Html.PartialAsync("_ProductCard", relatedProduct)
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="rounded-lg border border-gray-200 bg-white p-6 text-center text-neutral-600 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                محصولی وجود ندارد.
+            </div>
+        }
+    </div>
+</section>
 
 <!-- ================= start section product review ================= -->
 <section id="metaData" class="py-5">
@@ -901,23 +1040,6 @@
                 <li role="presentation">
                     <button class="bg-white tab-button px-15 py-5 rounded-xl transition-colors tab-button dark:bg-zinc-700"
                             role="tab"
-                            data-tab="Specifications"
-                            aria-controls="specs"
-                            itemprop="additionalProperty">
-                        مشخصات کالا
-                    </button>
-                </li>
-                <li role="presentation">
-                    <button class="bg-white tab-button px-15 py-5 rounded-xl transition-colors tab-button dark:bg-zinc-700"
-                            role="tab"
-                            data-tab="Additional"
-                            aria-controls="additional">
-                        توضیحات تکمیلی
-                    </button>
-                </li>
-                <li role="presentation">
-                    <button class="bg-white tab-button px-15 py-5 rounded-xl transition-colors tab-button dark:bg-zinc-700"
-                            role="tab"
                             data-tab="Comments"
                             aria-controls="reviews"
                             itemprop="aggregateRating"
@@ -925,16 +1047,6 @@
                             itemtype="https://schema.org/AggregateRating">
                         نظرات <span class="bg-secondary-500 size-5 text-sm text-center inline-block rounded text-white ms-1"
                                     itemprop="reviewCount">7</span>
-                    </button>
-                </li>
-                <li role="presentation">
-                    <button class="bg-white tab-button px-15 py-5 rounded-xl transition-colors tab-button dark:bg-zinc-700"
-                            role="tab"
-                            data-tab="Questions"
-                            aria-controls="faq"
-                            itemscope
-                            itemtype="https://schema.org/FAQPage">
-                        پرسش و پاسخ
                     </button>
                 </li>
             </ul>
@@ -951,6 +1063,7 @@
                     </p>
                 </div>
             </div>
+            @* مشخصات کالا از صفحهٔ محصول حذف شده است.
             <!-- Specifications -->
             <div id="Specifications" class="p-5 bg-white dark:bg-gray-800 dark:text-white rounded-xl hidden tab-content border border-gray-300 drop-shadow tab-content">
                 <div class="space-y-5">
@@ -1273,6 +1386,8 @@
                     </div>
                 </div>
             </div>
+            *@
+            @* توضیحات تکمیلی از صفحهٔ محصول حذف شده است.
             <!-- Additional -->
             <div id="Additional" class="p-5 bg-white dark:bg-gray-800 dark:text-white rounded-xl hidden tab-content border border-gray-300 drop-shadow tab-content" data-content="3">
                 <h2 class="text-2xl pb-3 font-black text-zinc-800 relative before:absolute before:bottom-0 before:start-0 before:h-1 before:w-22 before:bg-primary-500 before:rounded dark:text-white">
@@ -1582,6 +1697,8 @@
                     </div>
                 </div>
             </div>
+            *@
+            @* پرسش و پاسخ از صفحهٔ محصول حذف شده است.
             <!-- Questions and Answers -->
             <div id="Questions" class="p-5 bg-white dark:bg-gray-800 dark:text-white rounded-xl hidden tab-content border border-gray-300 drop-shadow tab-content" data-content="5">
                 <div class="space-y-4">
@@ -1796,6 +1913,7 @@
                     </div>
                 </div>
             </div>
+            *@
         </div>
 
     </div>
@@ -2424,6 +2542,7 @@
             const discountElement = document.getElementById('selected-variant-discount');
             const originalPriceElement = document.getElementById('selected-variant-original-price');
             const discountPercentElement = document.getElementById('selected-variant-discount-percent');
+            let syncGalleryToImage = () => { };
 
             if (gallery.length && window.Swiper) {
                 const slides = gallery.map(image => `
@@ -2446,9 +2565,116 @@
                 });
                 window.swiperProductGalleryTwo = new Swiper('#productGalleryTwo', {
                     spaceBetween: 10,
-                    thumbs: { swiper: window.swiperProductGalleryOne }
+                    thumbs: { swiper: window.swiperProductGalleryOne },
+                    navigation: {
+                        nextEl: '#productGalleryTwo .swiper-button-next',
+                        prevEl: '#productGalleryTwo .swiper-button-prev'
+                    }
+                });
+
+                const normalizeImageUrl = (url) => {
+                    try {
+                        return new URL(url, window.location.href).href;
+                    } catch {
+                        return url;
+                    }
+                };
+
+                syncGalleryToImage = (imageUrl) => {
+                    if (!imageUrl) return;
+                    const imageIndex = gallery.findIndex(image =>
+                        normalizeImageUrl(image.ImageUrl) === normalizeImageUrl(imageUrl));
+
+                    if (imageIndex >= 0) {
+                        window.swiperProductGalleryTwo.slideTo(imageIndex);
+                        return;
+                    }
+
+                    const activeSlide = window.swiperProductGalleryTwo.slides[
+                        window.swiperProductGalleryTwo.activeIndex
+                    ];
+                    const activeImage = activeSlide?.querySelector('img');
+                    if (activeImage) activeImage.src = imageUrl;
+                };
+            }
+
+            const favoriteButton = document.getElementById('favorite-product-button');
+            const favoriteStorageKey = 'store-favorite-product-ids';
+            const setFavoriteState = (isFavorite) => {
+                if (!favoriteButton) return;
+                favoriteButton.classList.toggle('is-favorite', isFavorite);
+                favoriteButton.setAttribute('aria-pressed', String(isFavorite));
+                favoriteButton.setAttribute('aria-label', isFavorite ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها');
+                favoriteButton.querySelector('svg')?.setAttribute('fill', isFavorite ? 'currentColor' : 'none');
+            };
+
+            if (favoriteButton) {
+                const productId = favoriteButton.dataset.productId;
+                let favoriteProductIds = [];
+                try {
+                    favoriteProductIds = JSON.parse(localStorage.getItem(favoriteStorageKey) || '[]');
+                    if (!Array.isArray(favoriteProductIds)) favoriteProductIds = [];
+                } catch {
+                    favoriteProductIds = [];
+                }
+
+                setFavoriteState(favoriteProductIds.includes(productId));
+                favoriteButton.addEventListener('click', () => {
+                    const isFavorite = favoriteProductIds.includes(productId);
+                    favoriteProductIds = isFavorite
+                        ? favoriteProductIds.filter(id => id !== productId)
+                        : [...favoriteProductIds, productId];
+                    try {
+                        localStorage.setItem(favoriteStorageKey, JSON.stringify(favoriteProductIds));
+                    } catch { }
+                    setFavoriteState(!isFavorite);
                 });
             }
+
+            const shareDialog = document.getElementById('product-share-dialog');
+            const openShareButton = document.getElementById('open-product-share');
+            const closeShareButton = document.getElementById('close-product-share');
+            const shareLinkInput = document.getElementById('product-share-link');
+            const copyShareButton = document.getElementById('copy-product-share-link');
+            const shareStatus = document.getElementById('product-share-status');
+
+            const closeShareDialog = () => {
+                shareDialog?.classList.add('hidden');
+                shareDialog?.classList.remove('flex');
+            };
+
+            openShareButton?.addEventListener('click', () => {
+                if (!shareDialog || !shareLinkInput) return;
+                if (shareDialog.parentElement !== document.body) {
+                    document.body.appendChild(shareDialog);
+                }
+                shareLinkInput.value = window.location.href;
+                shareStatus.textContent = '';
+                shareDialog.classList.remove('hidden');
+                shareDialog.classList.add('flex');
+                shareLinkInput.focus();
+                shareLinkInput.select();
+            });
+
+            closeShareButton?.addEventListener('click', closeShareDialog);
+            shareDialog?.addEventListener('click', event => {
+                if (event.target === shareDialog) closeShareDialog();
+            });
+
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') closeShareDialog();
+            });
+
+            copyShareButton?.addEventListener('click', async () => {
+                if (!shareLinkInput) return;
+                try {
+                    await navigator.clipboard.writeText(shareLinkInput.value);
+                } catch {
+                    shareLinkInput.select();
+                    document.execCommand('copy');
+                }
+                shareStatus.textContent = 'لینک محصول کپی شد.';
+            });
 
             const selectVariant = (button) => {
                 if (!button || button.disabled) return;
@@ -2485,10 +2711,7 @@
                     x.classList.toggle('is-selected', x.closest('[data-sale-option]') === selectedSaleOption);
                 });
                 const imageUrl = button.dataset.imageUrl;
-                if (imageUrl) {
-                    const image = document.querySelector('#productGalleryTwo img');
-                    if (image) image.src = imageUrl;
-                }
+                syncGalleryToImage(imageUrl);
                 cartButton.disabled = !button.dataset.maxQuantity || Number(button.dataset.maxQuantity) <= 0;
             };
 

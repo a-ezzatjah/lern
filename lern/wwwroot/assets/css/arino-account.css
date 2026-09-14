@@ -198,6 +198,7 @@
     --color-text-primary-dark: #F8FAFC;
   }
 }
+
 @layer base {
   *, ::after, ::before, ::backdrop, ::file-selector-button {
     box-sizing: border-box;
@@ -7803,4 +7804,11 @@
       --tw-content: "";
     }
   }
+}
+
+/* Final light-mode card borders: keep account pages aligned with the blue brand outline. */
+html:not(.dark) article.bg-white,
+html:not(.dark) .bg-white[class*="rounded-"],
+html:not(.dark) .bg-card-light[class*="rounded-"] {
+  border: 1px solid #434ece !important;
 }

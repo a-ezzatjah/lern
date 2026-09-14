@@ -500,6 +500,39 @@ public async Task<List<ProductCardDto>> GetNewestProductCardsAsync(int take = 8)
         .ToList();
 }
 
+public async Task<List<ProductCardDto>> GetRelatedProductCardsAsync(int productId, int take = 10)
+{
+    take = Math.Clamp(take, 1, 50);
+
+    var categoryIds = await _shopDbContext.ProductCategories
+        .AsNoTracking()
+        .Where(productCategory => productCategory.ProductId == productId)
+        .Select(productCategory => productCategory.CategoryId)
+        .ToListAsync();
+
+    if (categoryIds.Count == 0)
+        return new List<ProductCardDto>();
+
+    var products = await _shopDbContext.Products
+        .AsNoTracking()
+        .Where(product => product.IsActive &&
+                          product.Id != productId &&
+                          product.ProductCategories.Any(productCategory => categoryIds.Contains(productCategory.CategoryId)))
+        .OrderByDescending(product => product.CreatedAt)
+        .ThenByDescending(product => product.Id)
+        .Take(take)
+        .Include(product => product.SaleOptions)
+            .ThenInclude(saleOption => saleOption.ProductVariants)
+        .Include(product => product.SaleOptions)
+            .ThenInclude(saleOption => saleOption.SaleOptionColors)
+                .ThenInclude(color => color.ProductVariants)
+        .Include(product => product.ProductImages)
+        .AsSplitQuery()
+        .ToListAsync();
+
+    return products.Select(CreateProductCard).ToList();
+}
+
 
 
 

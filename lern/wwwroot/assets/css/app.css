@@ -206,7 +206,7 @@ html:not(.dark) body:not(.admin-shell) > section[itemtype*="WPFooter"],
 html:not(.dark) body:not(.admin-shell) nav.fixed { background-color: #fffaf0 !important; box-shadow: 0 4px 18px rgba(120,90,40,.10); }
 html:not(.dark) body:not(.admin-shell) .bg-white.rounded-lg,
 html:not(.dark) body:not(.admin-shell) .bg-white.rounded-xl,
-html:not(.dark) body:not(.admin-shell) .bg-white.rounded-2xl { background-color: #fffdf7 !important; border-color: #eee5d5; box-shadow: 0 3px 14px rgba(120,90,40,.09); }
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-2xl { background-color: #fffdf7 !important; border: 1px solid #eee5d5; box-shadow: 0 3px 14px rgba(120,90,40,.09); }
 
 /* Final storefront palette and address validation contrast. */
 html:not(.dark) body:not(.admin-shell) { background-color: #edf1f4 !important; }
@@ -214,7 +214,7 @@ html:not(.dark) body:not(.admin-shell) .bg-white,
 html:not(.dark) body:not(.admin-shell) [class~="bg-white"] { background-color: #f8f5ee !important; }
 html:not(.dark) body:not(.admin-shell) .bg-white.rounded-lg,
 html:not(.dark) body:not(.admin-shell) .bg-white.rounded-xl,
-html:not(.dark) body:not(.admin-shell) .bg-white.rounded-2xl { background-color: #fff8e9 !important; border-color: #e8dcc7 !important; box-shadow: 0 4px 16px rgba(100,80,40,.12) !important; }
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-2xl { background-color: #fff8e9 !important; border: 1px solid #e8dcc7 !important; box-shadow: 0 4px 16px rgba(100,80,40,.12) !important; }
 html:not(.dark) body:not(.admin-shell) #topHeader,
 html:not(.dark) body:not(.admin-shell) > section[itemtype*="WPFooter"] { background-color: #f5efe3 !important; }
 html:not(.dark) .address-limit-message { border: 2px solid #fca5a5; background: #fef2f2; color: #b91c1c; }
@@ -230,9 +230,14 @@ html:not(.dark) nav.fixed {
 }
 html:not(.dark) .bg-white.rounded-lg,
 html:not(.dark) .bg-white.rounded-xl,
-html:not(.dark) .bg-white.rounded-2xl {
+html:not(.dark) .bg-white.rounded-2xl,
+html:not(.dark) .bg-white.rounded-3xl,
+html:not(.dark) .bg-card-light.rounded-lg,
+html:not(.dark) .bg-card-light.rounded-xl,
+html:not(.dark) .bg-card-light.rounded-2xl,
+html:not(.dark) .bg-card-light.rounded-3xl {
   background-color: #fffdf7 !important;
-  border-color: #eee5d5;
+  border: 1px solid #e8dcc7 !important;
   box-shadow: 0 3px 14px rgba(120, 90, 40, .09);
 }
 @layer base {
@@ -7880,10 +7885,10 @@ html:not(.dark) .bg-white.rounded-2xl {
   min-width: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid #e8dcc7;
   border-radius: 1.25rem;
-  background: #fff;
-  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+  background: #fff8e9;
+  box-shadow: 0 8px 30px rgba(100, 80, 40, 0.09);
   transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
 
@@ -7898,7 +7903,7 @@ html:not(.dark) .bg-white.rounded-2xl {
   aspect-ratio: 1 / 0.86;
   overflow: hidden;
   background:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.82));
+    radial-gradient(circle at center, #fffdf7, #f5ead6);
 }
 
 .store-product-image {
@@ -8906,4 +8911,16 @@ html:not(.dark) body:not(.admin-shell) #topHeader {
       --tw-content: "";
     }
   }
+}
+
+/* Final light-mode card borders: shared blue brand outline across storefront and dashboards. */
+html:not(.dark) .store-product-card,
+html:not(.dark) .admin-card,
+html:not(.dark) .admin-stat-card,
+html:not(.dark) .admin-welcome-card,
+html:not(.dark) .admin-placeholder-grid article,
+html:not(.dark) article.bg-white,
+html:not(.dark) .bg-white[class*="rounded-"],
+html:not(.dark) .bg-card-light[class*="rounded-"] {
+  border: 1px solid #434ece !important;
 }
