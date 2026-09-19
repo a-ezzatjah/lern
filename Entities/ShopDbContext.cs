@@ -29,6 +29,9 @@ namespace Entities
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<CustomerUser> Users { get; set; }
+        public DbSet<ProductRating> ProductRatings { get; set; }
+        public DbSet<ProductComment> ProductComments { get; set; }
+        public DbSet<ProductViewHistory> ProductViewHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +48,9 @@ namespace Entities
             modelBuilder.Entity<PaymentTransaction>().ToTable("PaymentTransactions");
             modelBuilder.Entity<Address>().ToTable("Addresses");
             modelBuilder.Entity<CustomerUser>().ToTable("Users");
+            modelBuilder.Entity<ProductRating>().ToTable("ProductRatings");
+            modelBuilder.Entity<ProductComment>().ToTable("ProductComments");
+            modelBuilder.Entity<ProductViewHistory>().ToTable("ProductViewHistories");
             modelBuilder.Entity<CustomerUser>().HasIndex(x => x.PhoneNumber).IsUnique();
             modelBuilder.Entity<CustomerUser>().HasIndex(x => x.Email).IsUnique().HasFilter("[Email] IS NOT NULL");
             modelBuilder.Entity<CustomerUser>().Property(x => x.PhoneNumber).IsRequired().HasMaxLength(11);
@@ -56,6 +62,20 @@ namespace Entities
             modelBuilder.Entity<CustomerUser>().Property(x => x.Role).IsRequired().HasMaxLength(32);
             modelBuilder.Entity<Address>().HasIndex(x => new { x.CustomerKey, x.Title });
             modelBuilder.Entity<CartItem>().HasIndex(x => new { x.CustomerKey, x.ProductVariantId }).IsUnique();
+            modelBuilder.Entity<ProductRating>().HasIndex(x => new { x.CustomerKey, x.ProductId }).IsUnique();
+            modelBuilder.Entity<ProductComment>().HasIndex(x => new { x.CustomerKey, x.ProductId });
+            modelBuilder.Entity<ProductComment>().HasIndex(x => new { x.ProductId, x.IsApproved, x.CreatedAt });
+            modelBuilder.Entity<ProductViewHistory>().HasIndex(x => new { x.CustomerKey, x.ProductId }).IsUnique();
+            modelBuilder.Entity<ProductRating>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProductComment>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProductViewHistory>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProductRating>().Property(x => x.CustomerKey).IsRequired().HasMaxLength(64);
+            modelBuilder.Entity<ProductComment>().Property(x => x.CustomerKey).IsRequired().HasMaxLength(64);
+            modelBuilder.Entity<ProductComment>().Property(x => x.AuthorName).IsRequired().HasMaxLength(200);
+            modelBuilder.Entity<ProductComment>().Property(x => x.Title).HasMaxLength(150);
+            modelBuilder.Entity<ProductComment>().Property(x => x.Body).IsRequired().HasMaxLength(2000);
+            modelBuilder.Entity<ProductViewHistory>().Property(x => x.CustomerKey).IsRequired().HasMaxLength(64);
+            modelBuilder.Entity<ProductRating>().Property(x => x.Score).IsRequired();
             modelBuilder.Entity<OrderItem>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<OrderItem>().HasOne(x => x.ProductVariant).WithMany().HasForeignKey(x => x.ProductVariantId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<CartItem>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);

@@ -473,60 +473,36 @@ function increment(id) {
  */
 // Wait for the DOM to fully load before executing the script
 document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.tab-button');
-    const contents = document.querySelectorAll('.tab-content');
+    document.querySelectorAll('[role="tablist"]').forEach(tabList => {
+        const tabs = Array.from(tabList.querySelectorAll('[role="tab"][data-tab]'));
+        const contents = tabs
+            .map(tab => document.getElementById(tab.dataset.tab))
+            .filter(Boolean);
 
-    // Check if elements exist
-    if (!tabs.length || !contents.length) return;
+        if (!tabs.length || !contents.length) return;
 
-    // Initialize first tab
-    activateTab(tabs[0], contents[0]);
+        function activateTab(tabElement) {
+            const content = document.getElementById(tabElement.dataset.tab);
+            if (!content) return;
 
-    // Add click handlers
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function () {
-            const tabId = this.dataset.tab || this.getAttribute('onclick').match(/'([^']+)'/)[1];
-            const content = document.getElementById(tabId);
+            tabs.forEach(tab => {
+                const isActive = tab === tabElement;
+                tab.classList.toggle('active', isActive);
+                tab.classList.toggle('bg-primary-grad', isActive);
+                tab.classList.toggle('text-white', isActive);
+                tab.classList.toggle('bg-primary/10', isActive);
+                tab.classList.toggle('dark:text-primary-white', isActive);
+                tab.classList.toggle('bg-white', !isActive);
+                tab.setAttribute('aria-selected', String(isActive));
+            });
 
-            if (!content) {
-                // console.error('Content element not found for tab:', tabId);
-                return;
-            }
+            contents.forEach(panel => panel.classList.toggle('hidden', panel !== content));
+        }
 
-            // Reset all tabs
-            resetTabs(tabs, contents);
+        tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab)));
 
-            // Activate current tab
-            activateTab(this, content);
-        });
+        activateTab(tabs.find(tab => tab.classList.contains('active')) || tabs[0]);
     });
-
-    function resetTabs(tabsArray, contentsArray) {
-        tabsArray.forEach(t => {
-            t.classList.remove(
-                'active',
-                'bg-primary-grad',
-                'text-white',
-                'bg-primary/10',
-                'dark:text-primary-dark'
-            );
-            t.classList.add('bg-white');
-        });
-
-        contentsArray.forEach(c => c.classList.add('hidden'));
-    }
-
-    function activateTab(tabElement, contentElement) {
-        tabElement.classList.add(
-            'active',
-            'bg-primary-grad',
-            'text-white',
-            'bg-primary/10',
-            'dark:text-primary-white'
-        );
-        tabElement.classList.remove('bg-white');
-        contentElement.classList.remove('hidden');
-    }
 });
 
 

@@ -188,6 +188,102 @@
     .dark #productGalleryTwo .product-gallery-nav-button { color: #e2e8f0; background: rgba(30, 41, 59, .92); }
     .dark #productGalleryTwo .product-gallery-nav-button:hover { color: #fff; background: #6366f1; }
 
+    .product-review-panel {
+        border: 1px solid #e2e8f0;
+        background: linear-gradient(145deg, #ffffff, #f8fafc);
+        box-shadow: 0 14px 34px rgba(15, 23, 42, .08);
+    }
+
+    .review-score-button {
+        display: grid;
+        width: 2.65rem;
+        height: 2.65rem;
+        place-items: center;
+        border: 1px solid #cbd5e1;
+        border-radius: .8rem;
+        color: #94a3b8;
+        background: #fff;
+        cursor: pointer;
+        transition: transform .18s ease, color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+
+    .review-score-button:hover, .review-score-button.is-selected {
+        color: #f59e0b;
+        border-color: #fbbf24;
+        background: #fffbeb;
+        box-shadow: 0 5px 14px rgba(245, 158, 11, .22);
+        transform: translateY(-2px);
+    }
+
+    .review-card { border: 1px solid #e2e8f0; background: #fff; }
+    .dark .product-review-panel, .dark .review-card { border-color: #374151; background: #111827; }
+    .dark .review-score-button { border-color: #475569; color: #94a3b8; background: #1f2937; }
+    .dark .review-score-button:hover, .dark .review-score-button.is-selected { color: #fbbf24; border-color: #f59e0b; background: #3b2f12; }
+
+    /* Product review tab: independent of the template's utility-color overrides. */
+    #Comments.product-review-panel {
+        overflow: hidden;
+        border: 1px solid #dbe4f0;
+        border-radius: 1.5rem;
+        background: linear-gradient(145deg, #ffffff 0%, #f5f8ff 100%);
+        box-shadow: 0 18px 50px rgba(30, 41, 59, .10);
+    }
+
+    #Comments .review-header {
+        margin: -1.25rem -1.25rem 1.75rem;
+        padding: 1.5rem;
+        color: #fff;
+        background: radial-gradient(circle at top right, #818cf8, transparent 42%), linear-gradient(120deg, #312e81, #4f46e5 55%, #0891b2);
+    }
+
+    #Comments .review-header h2, #Comments .review-header p { color: #fff !important; }
+    #Comments .review-summary { color: #fef3c7; }
+    #open-product-comment-form {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        min-height: 3rem;
+        border: 1px solid rgba(255, 255, 255, .38) !important;
+        border-radius: .9rem !important;
+        color: #312e81 !important;
+        background: #fff !important;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, .24) !important;
+    }
+
+    #open-product-comment-form:hover { color: #fff !important; background: #1e1b4b !important; transform: translateY(-2px); }
+    #product-comment-form {
+        border: 1px solid #dbe4f0 !important;
+        border-radius: 1.25rem !important;
+        background: #fff !important;
+        box-shadow: 0 14px 30px rgba(30, 41, 59, .08) !important;
+    }
+    #product-comment-form:not(.hidden) { display: block !important; animation: review-form-in .22s ease-out; }
+    #product-comment-form input, #product-comment-form textarea {
+        border: 1px solid #cbd5e1 !important;
+        border-radius: .8rem !important;
+        color: #172554 !important;
+        background: #f8fafc !important;
+    }
+    #product-comment-form input:focus, #product-comment-form textarea:focus { border-color: #6366f1 !important; background: #fff !important; }
+    #review-body { min-height: 13.5rem !important; }
+    #product-comments-column { padding-top: .75rem; }
+    @@media (min-width: 1024px) {
+        #product-comments-column { grid-column: span 3 / span 3; }
+        #product-comments-column.is-wide { grid-column: 1 / -1; }
+    }
+    #submit-product-comment { border-radius: .8rem !important; background: linear-gradient(135deg, #4f46e5, #7c3aed) !important; box-shadow: 0 10px 20px rgba(79, 70, 229, .28); }
+    #product-comments-list .review-card { border-radius: 1.15rem; box-shadow: 0 8px 18px rgba(30, 41, 59, .05); }
+    @@keyframes review-form-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .dark #Comments.product-review-panel { border-color: #334155; background: linear-gradient(145deg, #0f172a, #111827); box-shadow: 0 18px 50px rgba(0, 0, 0, .30); }
+    .dark #Comments .review-header { background: radial-gradient(circle at top right, #67e8f9, transparent 38%), linear-gradient(120deg, #0f172a, #312e81 55%, #164e63); }
+    .dark #open-product-comment-form { color: #fff !important; background: #172554 !important; border-color: #818cf8 !important; }
+    .dark #open-product-comment-form:hover { background: #4f46e5 !important; }
+    .dark #product-comment-form { border-color: #334155 !important; background: #111827 !important; box-shadow: 0 14px 30px rgba(0, 0, 0, .25) !important; }
+    .dark #product-comment-form input, .dark #product-comment-form textarea { border-color: #475569 !important; color: #f8fafc !important; background: #1e293b !important; }
+    .dark #product-comment-form input:focus, .dark #product-comment-form textarea:focus { border-color: #818cf8 !important; background: #0f172a !important; }
+
     #product-share-dialog { z-index: 2147483647; }
 
     #shop-features .grid > article { display: flex; }
@@ -1031,7 +1127,7 @@
                     <button class="bg-white tab-button px-15 py-5 rounded-xl transition-colors tab-button dark:bg-zinc-700 active"
                             role="tab"
                             data-tab="Intro"
-                            aria-controls="description"
+                            aria-controls="Intro"
                             aria-selected="true"
                             itemprop="description">
                         توضیحات کالا
@@ -1041,12 +1137,13 @@
                     <button class="bg-white tab-button px-15 py-5 rounded-xl transition-colors tab-button dark:bg-zinc-700"
                             role="tab"
                             data-tab="Comments"
-                            aria-controls="reviews"
+                            aria-controls="Comments"
+                            aria-selected="false"
                             itemprop="aggregateRating"
                             itemscope
                             itemtype="https://schema.org/AggregateRating">
-                        نظرات <span class="bg-secondary-500 size-5 text-sm text-center inline-block rounded text-white ms-1"
-                                    itemprop="reviewCount">7</span>
+                        نظرات <span id="product-review-count" class="bg-secondary-500 size-5 text-sm text-center inline-block rounded text-white ms-1"
+                                    itemprop="reviewCount">۰</span>
                     </button>
                 </li>
             </ul>
@@ -1058,9 +1155,68 @@
             <div id="Intro" class="p-5 bg-white dark:bg-gray-800 dark:text-white rounded-xl hidden tab-content border border-gray-300 drop-shadow tab-content">
                 <div class="space-y-5">
                     <h2 class="text-2xl pb-3 font-black text-zinc-800 relative before:absolute before:bottom-0 before:start-0 before:h-1 before:w-22 before:bg-primary-500 before:rounded dark:text-white">معرفی محصول</h2>
-                    <p class="text-neutral-700 leading-9 text-justify text-lg dark:text-white">
+                    @if (string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p class="text-neutral-600 leading-9 text-justify text-lg dark:text-gray-300">@(Model.ShortDescription ?? "توضیحات کاملی برای این محصول ثبت نشده است.")</p>
+                    }
+                    else
+                    {
+                        <div class="whitespace-pre-line text-neutral-700 leading-9 text-justify text-lg dark:text-gray-100" itemprop="description">@Model.Description</div>
+                    }
+                    <p class="hidden text-neutral-700 leading-9 text-justify text-lg dark:text-white">
                         اگر به دنبال تهیه یک هدفون بی‌سیم گیمینگ هستید، هدفون بلوتوثی مدل K55 به‌عنوان یکی از جدیدترین گزینه‌های موجود در بازار ارزش بررسی را دارد. این مدل با ابعادی کوچک تولید شده است. ابعاد و وزن کم آن، جابه‌جایی این وسیله و استفاده طولانی‌مدت از آن را آسان می‌کند و باعث خستگی گوش‌ها نخواهد شد. این مدل برای اتصال به دستگاه‌ به بلوتوث نسخه 5.0 مجهز شده است و در مدت زمان اندکی، اتصال با گوشی موبایل اندروید یا ios شما برقرار خواهد شد. هدفون بی سیم K55 دارای یک میکروفون با کیفیت است و و این ویژگی، آن را برای مکالمه مناسب می‌سازد. از ویژگی‌های اصلی این محصول محفظه نگهدارنده یا همان کیس آن است. این کیس قابلیت شارژ هدفون را دارد. برای شارژ آن کافی است از درگاه USB-C تعبیه شده بر روی کیس و کابل شارژ درون بسته‌بندی استفاده کنید. گفتنی است باتری 400 میلی‌آمپر ساعتی این هدفون در حدود 4-6 ساعت مکالمه و 4-6 ساعت پخش موسیقی را پاسخ‌گو خواهد بود.
                     </p>
+                </div>
+            </div>
+            <div id="Comments" class="product-review-panel p-5 dark:text-white rounded-xl hidden tab-content" data-content="4">
+                <div class="review-header flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 dark:text-white">دیدگاه کاربران</h2>
+                        <p class="mt-2 text-sm leading-7 text-slate-500 dark:text-slate-300">تجربهٔ خود از این محصول را با دیگران به اشتراک بگذارید.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="review-summary flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-sm">
+                            <span id="product-average-score" class="text-2xl font-black">—</span>
+                            <span class="text-sm"><span id="product-rating-count">۰</span> امتیاز ثبت‌شده</span>
+                        </div>
+                        <button id="open-product-comment-form" type="button" class="px-5 py-3 text-sm font-bold transition focus:outline-none">
+                            <span class="text-lg leading-none">+</span> افزودن دیدگاه
+                        </button>
+                    </div>
+                </div>
+                <p id="product-review-notice" class="hidden mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-300" role="status"></p>
+
+                <div class="mt-8 grid gap-10 lg:grid-cols-5">
+                    <form id="product-comment-form" data-product-id="@Model.Id" class="hidden p-6 lg:col-span-2">
+                        <div class="flex items-center justify-between gap-3">
+                            <h3 class="font-bold text-slate-800 dark:text-white">دیدگاه خود را بنویسید</h3>
+                            <button id="close-product-comment-form" type="button" class="grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="بستن فرم دیدگاه">×</button>
+                        </div>
+                        <p class="mt-1 text-xs leading-6 text-slate-500 dark:text-slate-400">پس از بررسی، دیدگاه شما نمایش داده می‌شود.</p>
+                        <label class="mt-5 block text-sm font-medium">امتیاز شما</label>
+                        <div id="review-score-picker" class="mt-2 flex gap-2" role="radiogroup" aria-label="امتیاز شما">
+                            @for (var score = 1; score <= 5; score++)
+                            {
+                                <button type="button" class="review-score-button" data-score="@score" aria-label="@score ستاره" aria-pressed="false">★</button>
+                            }
+                        </div>
+                        <label for="review-title" class="mt-5 block text-sm font-medium">عنوان (اختیاری)</label>
+                        <input id="review-title" maxlength="150" class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-slate-600 dark:bg-slate-800 dark:focus:ring-indigo-900" placeholder="مثلاً کیفیت عالی" />
+                        <label for="review-body" class="mt-4 block text-sm font-medium">متن دیدگاه</label>
+                        <textarea id="review-body" maxlength="2000" required class="mt-2 h-52 w-full resize-y rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm leading-7 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-slate-600 dark:bg-slate-800 dark:focus:ring-indigo-900" placeholder="تجربهٔ خود از محصول را بنویسید..."></textarea>
+                        <button id="submit-product-comment" type="submit" class="mt-4 w-full rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60">ثبت دیدگاه</button>
+                        <p id="product-comment-status" class="mt-3 text-sm" role="status"></p>
+                    </form>
+
+                    <div id="product-comments-column" class="is-wide">
+                        <div class="mb-6 flex items-center justify-between">
+                            <h3 class="font-bold text-slate-800 dark:text-white">دیدگاه‌های تأییدشده</h3>
+                            <span id="product-comment-count" class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-300">۰ دیدگاه</span>
+                        </div>
+                        <div id="product-comments-list" class="space-y-4" aria-live="polite">
+                            <div class="rounded-2xl border border-slate-200 p-5 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">در حال دریافت دیدگاه‌ها…</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             @* مشخصات کالا از صفحهٔ محصول حذف شده است.
@@ -1507,7 +1663,7 @@
                     <div class="lg:col-span-3 col-span-4">
                         <!-- form -->
                         <div class="w-full pb-4 border-b border-b-gray-300">
-                            <form action="">
+                            <form id="product-rating-form" data-product-id="@Model.Id">
                                 <div class="grid sm:grid-cols-2 grid-cols-1 gap-4 mb-4">
                                     <div>
                                         <label for="name" class="mb-3 inline-block">نام و نام خانوادگی:</label>
@@ -1589,7 +1745,7 @@
                                             </div>
                                 </div>
                                 </div>
-                                <button class="bg-primary-grad text-white py-3 px-20 rounded-lg">ثبت نظر</button>
+                                <button type="submit" class="bg-primary-grad text-white py-3 px-20 rounded-lg">ثبت نظر</button>
                             </form>
                         </div>
                         <!-- comment -->
@@ -2724,6 +2880,176 @@
             document.querySelectorAll('.variant-choice').forEach(button => {
                 button.addEventListener('click', () => selectVariant(button));
             });
+
+            const ratingForm = document.getElementById('product-rating-form');
+            ratingForm?.addEventListener('submit', async event => {
+                event.preventDefault();
+                const score = Number(ratingForm.querySelector('input[name="rating"]:checked')?.value);
+                if (!score) {
+                    alert('لطفاً امتیاز خود را انتخاب کنید.');
+                    return;
+                }
+
+                const response = await fetch(`/api/products/${ratingForm.dataset.productId}/rating`, {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ score })
+                });
+
+                if (response.status === 401) {
+                    location.assign('/login');
+                    return;
+                }
+
+                if (!response.ok) {
+                    alert('ثبت امتیاز انجام نشد. لطفاً دوباره تلاش کنید.');
+                    return;
+                }
+
+                alert('امتیاز شما ثبت شد.');
+            });
+
+            const commentForm = document.getElementById('product-comment-form');
+            const openCommentFormButton = document.getElementById('open-product-comment-form');
+            const closeCommentFormButton = document.getElementById('close-product-comment-form');
+            const commentsColumn = document.getElementById('product-comments-column');
+            const scorePicker = document.getElementById('review-score-picker');
+            const commentList = document.getElementById('product-comments-list');
+            const commentCount = document.getElementById('product-comment-count');
+            const reviewTabCount = document.getElementById('product-review-count');
+            const ratingCount = document.getElementById('product-rating-count');
+            const averageScore = document.getElementById('product-average-score');
+            const commentStatus = document.getElementById('product-comment-status');
+            const reviewNotice = document.getElementById('product-review-notice');
+            let selectedReviewScore = 0;
+
+            const setCommentFormVisibility = visible => {
+                if (!commentForm) return;
+                commentForm.classList.toggle('hidden', !visible);
+                commentsColumn?.classList.toggle('is-wide', !visible);
+                openCommentFormButton?.classList.toggle('hidden', visible);
+                if (visible) {
+                    commentForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    window.setTimeout(() => document.getElementById('review-title')?.focus(), 250);
+                }
+            };
+
+            openCommentFormButton?.addEventListener('click', () => setCommentFormVisibility(true));
+            closeCommentFormButton?.addEventListener('click', () => setCommentFormVisibility(false));
+
+            const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[character]));
+
+            const formatPersianDate = value => new Intl.DateTimeFormat('fa-IR', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            }).format(new Date(value));
+
+            const renderComments = data => {
+                const total = Number(data.totalCount) || 0;
+                const ratingTotal = Number(data.ratingCount) || 0;
+                const average = Number(data.averageScore) || 0;
+                commentCount.textContent = `${total.toLocaleString('fa-IR')} دیدگاه`;
+                reviewTabCount.textContent = total.toLocaleString('fa-IR');
+                ratingCount.textContent = ratingTotal.toLocaleString('fa-IR');
+                averageScore.textContent = ratingTotal ? average.toLocaleString('fa-IR', { maximumFractionDigits: 1 }) : '—';
+
+                if (!data.comments?.length) {
+                    commentList.innerHTML = '<div class="review-card rounded-2xl p-8 text-center text-sm leading-7 text-slate-500 dark:text-slate-400">هنوز دیدگاه تأییدشده‌ای برای این محصول ثبت نشده است. شما اولین نفر باشید.</div>';
+                    return;
+                }
+
+                commentList.innerHTML = data.comments.map(comment => `
+                    <article class="review-card rounded-2xl p-5">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="min-w-0">
+                                <div class="min-w-0">
+                                    <h4 class="truncate font-bold text-slate-800 dark:text-white">${escapeHtml(comment.authorName)}</h4>
+                                    <time class="text-xs text-slate-500 dark:text-slate-400">${formatPersianDate(comment.createdAt)}</time>
+                                </div>
+                            </div>
+                            <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300">تأییدشده</span>
+                        </div>
+                        ${comment.title ? `<h5 class="mt-4 font-bold text-slate-700 dark:text-slate-100">${escapeHtml(comment.title)}</h5>` : ''}
+                        <p class="mt-2 whitespace-pre-line text-sm leading-8 text-slate-600 dark:text-slate-300">${escapeHtml(comment.body)}</p>
+                    </article>`).join('');
+            };
+
+            const loadComments = async () => {
+                if (!commentForm) return;
+                try {
+                    const response = await fetch(`/api/products/${commentForm.dataset.productId}/comments?page=1&pageSize=20`, { credentials: 'same-origin' });
+                    if (!response.ok) throw new Error();
+                    renderComments(await response.json());
+                } catch {
+                    commentList.innerHTML = '<div class="review-card rounded-2xl p-6 text-center text-sm text-rose-600 dark:text-rose-300">دریافت دیدگاه‌ها با خطا روبه‌رو شد. لطفاً دوباره تلاش کنید.</div>';
+                }
+            };
+
+            scorePicker?.querySelectorAll('[data-score]').forEach(button => {
+                button.addEventListener('click', () => {
+                    selectedReviewScore = Number(button.dataset.score);
+                    scorePicker.querySelectorAll('[data-score]').forEach(item => {
+                        const active = Number(item.dataset.score) <= selectedReviewScore;
+                        item.classList.toggle('is-selected', active);
+                        item.setAttribute('aria-pressed', String(Number(item.dataset.score) === selectedReviewScore));
+                    });
+                });
+            });
+
+            commentForm?.addEventListener('submit', async event => {
+                event.preventDefault();
+                const title = document.getElementById('review-title').value.trim();
+                const body = document.getElementById('review-body').value.trim();
+                const submitButton = document.getElementById('submit-product-comment');
+
+                if (!selectedReviewScore) {
+                    commentStatus.textContent = 'لطفاً امتیاز خود را انتخاب کنید.';
+                    commentStatus.className = 'mt-3 text-sm text-rose-600 dark:text-rose-300';
+                    return;
+                }
+                if (!body) return;
+
+                submitButton.disabled = true;
+                commentStatus.textContent = 'در حال ثبت دیدگاه…';
+                commentStatus.className = 'mt-3 text-sm text-slate-500 dark:text-slate-400';
+                try {
+                    const response = await fetch(`/api/products/${commentForm.dataset.productId}/comments`, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title: title || null, body, score: selectedReviewScore })
+                    });
+                    if (response.status === 401) {
+                        location.assign(`/login?returnUrl=${encodeURIComponent(location.pathname)}`);
+                        return;
+                    }
+                    const result = await response.json().catch(() => ({}));
+                    if (!response.ok) throw new Error(result.message || 'ثبت دیدگاه انجام نشد.');
+
+                    commentForm.reset();
+                    selectedReviewScore = 0;
+                    scorePicker.querySelectorAll('[data-score]').forEach(item => {
+                        item.classList.remove('is-selected');
+                        item.setAttribute('aria-pressed', 'false');
+                    });
+                    commentStatus.textContent = result.message || 'دیدگاه شما برای بررسی ارسال شد.';
+                    commentStatus.className = 'mt-3 text-sm text-emerald-600 dark:text-emerald-300';
+                    await loadComments();
+                    reviewNotice.textContent = result.message || 'دیدگاه شما با موفقیت ثبت شد.';
+                    reviewNotice.classList.remove('hidden');
+                    setCommentFormVisibility(false);
+                    document.getElementById('product-comments-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } catch (error) {
+                    commentStatus.textContent = error.message || 'ثبت دیدگاه انجام نشد. لطفاً دوباره تلاش کنید.';
+                    commentStatus.className = 'mt-3 text-sm text-rose-600 dark:text-rose-300';
+                } finally {
+                    submitButton.disabled = false;
+                }
+            });
+
+            loadComments();
 
             if (!cartButton) return;
 
