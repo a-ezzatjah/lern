@@ -5,7 +5,8 @@
 }
 
 <style>
-    .product-description { min-height: 10rem; resize: vertical; line-height: 1.9; }
+    html:has(.product-editor-form), body.admin-shell:has(.product-editor-form) { overflow-x:hidden; }
+    .product-description { min-height: 18rem; resize: vertical; line-height: 1.9; }
     .admin-field-grid textarea { width:100%; padding:.6rem .7rem; border:1px solid #d4deea; border-radius:.65rem; color:#334155; background:#f6f8fb; font:inherit; font-size:.78rem; }.dark .admin-field-grid textarea { color:#f8fafc; border-color:#475569; background:#172235; }
     .product-category-picker { display:flex; align-items:center; justify-content:space-between; gap:.75rem; width:100%; min-height:2.55rem; padding:.45rem .55rem .45rem .7rem; border:1px solid #d4deea; border-radius:.65rem; color:#334155; background:#f6f8fb; font:inherit; font-size:.78rem; text-align:right; cursor:pointer; }
     .product-category-picker span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.product-category-picker .admin-secondary-button { min-height:1.7rem; padding:.3rem .55rem; }
@@ -14,6 +15,68 @@
     .product-category-search { width:100%; min-height:2.55rem; padding:.6rem .7rem; border:1px solid #d4deea; border-radius:.65rem; color:#334155; background:#fff; font:inherit; }.product-category-options { display:grid; gap:.45rem; margin-top:1rem; }.product-category-option { display:flex; align-items:center; gap:.65rem; padding:.75rem; border:1px solid #e2e8f0; border-radius:.7rem; color:#334155; background:#fff; cursor:pointer; }.product-category-option.child { margin-right:1.5rem; }.product-category-option input { accent-color:#434ece; }.product-category-option small { margin-right:auto; color:#94a3b8; }.product-dialog-close { border:0; color:#64748b; background:transparent; font-size:1.5rem; cursor:pointer; }
     .seo-accordion { padding:0; overflow:hidden; }.seo-accordion summary { display:flex; align-items:center; gap:.7rem; padding:1.1rem 1.25rem; cursor:pointer; list-style:none; }.seo-accordion summary::-webkit-details-marker { display:none; }.seo-accordion summary::after { content:'⌄'; margin-right:auto; color:#94a3b8; font-size:1.1rem; transition:transform .2s; }.seo-accordion[open] summary::after { transform:rotate(180deg); }.seo-accordion-content { padding:0 1.25rem 1.25rem; }.seo-switches { display:flex; flex-wrap:wrap; gap:.65rem; grid-column:1/-1; }.seo-switch { display:inline-flex; align-items:center; gap:.45rem; padding:.35rem .6rem; border:1px solid #dbe4ee; border-radius:999px; color:#64748b; background:#f8fafc; font-size:.7rem; font-weight:700; cursor:pointer; }.seo-switch input { position:absolute; opacity:0; pointer-events:none; }.seo-switch span { position:relative; display:inline-block; width:1.8rem; height:1rem; border-radius:999px; background:#cbd5e1; transition:.2s; }.seo-switch span::after { content:''; position:absolute; top:.15rem; right:.15rem; width:.7rem; height:.7rem; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(15,23,42,.2); transition:.2s; }.seo-switch input:checked + span { background:#434ece; }.seo-switch input:checked + span::after { right:.95rem; }.seo-switch:has(input:checked) { color:#3730a3; border-color:#c7d2fe; background:#eef0ff; }
     .dark .product-category-picker,.dark .product-category-search,.dark .product-category-option { color:#f8fafc; border-color:#475569; background:#172235; }.dark .product-category-dialog { color:#e2e8f0; border-color:#334155; background:#0f172a; }.dark .product-category-dialog main { background:#172235; }.dark .product-category-dialog footer { border-color:#334155; background:#111b2b; }
+
+    /* Product editor: full-width cards with the guide first and the submit action last. */
+    .product-editor-form .admin-form-grid { display:flex; flex-direction:column; gap:1.25rem; align-items:stretch; }
+    .product-editor-form .admin-form-main,
+    .product-editor-form .admin-form-side { display:contents; }
+    .product-editor-form,
+    .product-editor-form .admin-form-grid,
+    .product-editor-form .admin-card { width:100%; min-width:0; max-width:100%; box-sizing:border-box; }
+    .admin-main:has(.product-editor-form),
+    .admin-content:has(.product-editor-form),
+    .product-editor-form { overflow-x:hidden; overflow-x:clip; }
+    .admin-content:has(.product-editor-form) { min-width:0; }
+    .admin-page-heading:has(+ #ajax-message) > div { min-width:0; }
+    .admin-page-heading:has(+ #ajax-message) h1,
+    .admin-page-heading:has(+ #ajax-message) p { overflow-wrap:anywhere; }
+    .product-editor-form * { min-width:0; max-width:100%; box-sizing:border-box; }
+    .product-editor-form .admin-field-grid,
+    .product-editor-form .admin-variant-row,
+    .product-editor-form .admin-card-heading,
+    .product-editor-form .admin-help-card { min-width:0; max-width:100%; }
+    .product-editor-form .admin-card-heading > div,
+    .product-editor-form .admin-help-card > * { min-width:0; }
+    .product-editor-form .admin-card-heading p,
+    .product-editor-form .admin-submit-card p,
+    .product-editor-form .admin-help-card p { overflow-wrap:anywhere; }
+    .product-editor-form .admin-form-side .admin-help-card { order:-1; }
+    .product-editor-form .admin-form-side .admin-submit-card { order:999; position:static; }
+    .product-editor-form .admin-card { width:100%; padding:1.5rem; border-radius:1.25rem; border-color:#d7e1ec; background:linear-gradient(145deg,#ffffff,#f8fbff); box-shadow:0 14px 32px rgba(15,23,42,.07); }
+    .product-editor-form .admin-card:hover { transform:translateY(-1px); box-shadow:0 18px 38px rgba(15,23,42,.1); transition:transform .18s ease, box-shadow .18s ease; }
+    .product-editor-form .admin-card-heading h2,
+    .product-editor-form .admin-submit-card h2 { font-size:1.1rem; }
+    .product-editor-form .admin-card-heading p,
+    .product-editor-form .admin-submit-card p { font-size:.84rem; line-height:1.8; }
+    .product-editor-form .admin-field-grid label,
+    .product-editor-form .admin-switch { font-size:.84rem; }
+    .product-editor-form .admin-field-grid input,
+    .product-editor-form .admin-field-grid select,
+    .product-editor-form .admin-field-grid textarea,
+    .product-editor-form .product-category-picker { min-height:2.85rem; font-size:.88rem; }
+    .product-editor-form .admin-field-grid textarea.product-description { min-height:20rem; height:20rem; }
+    .product-editor-form .admin-primary-button,
+    .product-editor-form .admin-secondary-button { min-height:2.85rem; font-size:.88rem; }
+    .product-editor-form .admin-help-card { display:grid; grid-template-columns:auto 1fr; column-gap:.8rem; align-items:center; text-align:right; }
+    .product-editor-form .admin-help-card .admin-help-icon { grid-row:span 2; margin:0; }
+    .product-editor-form .admin-help-card h3 { font-size:1rem; }
+    .product-editor-form .admin-help-card p { margin:.25rem 0 0; font-size:.84rem; line-height:1.9; }
+    .dark .product-editor-form .admin-card { border-color:#334155; background:linear-gradient(145deg,#172235,#111b2b); box-shadow:0 14px 32px rgba(2,6,23,.24); }
+    .primary-image-upload-field { gap:.55rem !important; }
+    .primary-image-upload-box { display:flex; align-items:center; justify-content:center; gap:.85rem; width:100%; max-width:100%; min-height:7rem; padding:1rem; border:2px dashed #b9c8dd; border-radius:1rem; color:#64748b; background:linear-gradient(135deg,#f8fbff,#eef4fb); cursor:pointer; transition:.2s ease; }
+    .primary-image-upload-box:hover { border-color:#434ece; color:#434ece; background:linear-gradient(135deg,#f0f3ff,#edf9ef); transform:translateY(-1px); }
+    .primary-image-upload-box svg { width:2.5rem; height:2.5rem; flex:none; color:#434ece; }
+    .primary-image-upload-box strong { display:block; color:#334155; font-size:.95rem; }
+    .primary-image-upload-box span span { display:block; margin-top:.25rem; color:#94a3b8; font-size:.78rem; font-weight:600; }
+    .primary-image-input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+    .primary-image-preview { max-width:12rem; max-height:9rem; margin-top:.35rem; border:1px solid #dbe4ee; border-radius:.85rem; object-fit:cover; box-shadow:0 8px 18px rgba(15,23,42,.1); }
+    .variant-image-upload-field { gap:.4rem !important; }
+    .variant-image-upload-box { min-height:5.5rem; padding:.7rem; border-radius:.8rem; }
+    .variant-image-upload-box svg { width:2rem; height:2rem; }
+    .variant-image-upload-box strong { font-size:.84rem; }
+    .variant-image-upload-box span span { font-size:.7rem; }
+    .dark .primary-image-upload-box { border-color:#475569; color:#cbd5e1; background:linear-gradient(135deg,#172235,#111b2b); }
+    .dark .primary-image-upload-box strong { color:#f8fafc; }
 </style>
 
 <div class="admin-page-heading">
@@ -28,7 +91,7 @@
 <div id="ajax-message" class="admin-alert" hidden></div>
 <div class="admin-validation" asp-validation-summary="ModelOnly"></div>
 
-<form id="product-form" action="@(Model.IsEdit ? Url.Action("EditProduct", "Admin", new { id = Model.Id }) : Url.Action("CreateProduct", "Admin"))" method="post" enctype="multipart/form-data">
+<form id="product-form" class="product-editor-form" action="@(Model.IsEdit ? Url.Action("EditProduct", "Admin", new { id = Model.Id }) : Url.Action("CreateProduct", "Admin"))" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
     <input asp-for="Id" type="hidden" />
     <div class="admin-form-grid">
@@ -47,7 +110,15 @@
                     <label class="full">توضیحات کامل محصول
                         <textarea asp-for="Description" class="product-description" placeholder="این متن در تب «معرفی محصول» صفحهٔ محصول نمایش داده می‌شود."></textarea>
                     </label>
-                    <label class="full">تصویر اصلی محصول (نمایش در کارت محصول)<input asp-for="PrimaryImage" type="file" accept=".jpg,.jpeg,.png,.webp" /><small>مستقل از عکس Variantها؛ حداکثر ۵ مگابایت.</small>@if (!string.IsNullOrWhiteSpace(Model.ExistingPrimaryImageUrl)){<img src="@Model.ExistingPrimaryImageUrl" alt="تصویر اصلی فعلی" class="mt-2 h-20 w-20 rounded-lg border object-cover" />}</label>
+                    <label class="full primary-image-upload-field">تصویر اصلی محصول (نمایش در کارت محصول)
+                        <span class="primary-image-upload-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m3 17 4.5-4.5 3.5 3.5 2.5-2.5L21 18"/><path d="M18 5v5m-2.5-2.5h5"/></svg>
+                            <span><strong>انتخاب تصویر اصلی</strong><span>برای بارگذاری تصویر کلیک کنید</span></span>
+                        </span>
+                        <input asp-for="PrimaryImage" class="primary-image-input" type="file" accept=".jpg,.jpeg,.png,.webp" />
+                        <small>مستقل از عکس Variantها؛ حداکثر ۵ مگابایت.</small>
+                        @if (!string.IsNullOrWhiteSpace(Model.ExistingPrimaryImageUrl)){<img src="@Model.ExistingPrimaryImageUrl" alt="تصویر اصلی فعلی" class="primary-image-preview" />}
+                    </label>
                 </div>
             </section>
 
@@ -157,7 +228,15 @@
         row.querySelector(".remove-variant").hidden = list.children.length === 1;
     });
     add.addEventListener("click", () => { list.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("Variants[-1]", `Variants[${list.children.length}]`)); reindex(); });
-    list.addEventListener("click", e => { if (e.target.closest(".remove-variant")) { e.target.closest("[data-variant-row]").remove(); reindex(); } });
+    list.addEventListener("click", e => {
+        const removeButton = e.target.closest(".remove-variant");
+        if (!removeButton) return;
+        const row = removeButton.closest("[data-variant-row]");
+        const title = row?.querySelector('input[name$=".SaleTitle"]')?.value?.trim() || "این ویژگی";
+        if (!window.confirm(`آیا مطمئن هستید می‌خواهید «${title}» حذف شود؟\nبا ذخیرهٔ محصول، این ویژگی از دیتابیس نیز حذف خواهد شد.`)) return;
+        row.remove();
+        reindex();
+    });
     form.addEventListener("submit", async e => {
         e.preventDefault(); message.hidden = true; submit.disabled = true;
         try {

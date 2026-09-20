@@ -85,6 +85,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             .Include(x => x.ProductImages)
             .Include(x => x.ProductCategories).ThenInclude(x => x.Category)
             .Include(x => x.SaleOptions).ThenInclude(x => x.SaleOptionColors)
+            .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -112,6 +113,12 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         var parents = await _db.Categories.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
         return View("Categories/Index", new AdminCategoryListViewModel { Search = search, Categories = categories, ParentOptions = parents, Page = page, PageSize = pageSize, TotalCount = totalCount });
+    }
+
+    [HttpGet("Users")]
+    public IActionResult Users()
+    {
+        return View("Users/Index");
     }
 
     [HttpPost("Categories")]

@@ -27,6 +27,45 @@
 </section></div>
 @section Scripts {
 <script>
+const normalizeNumber = value => Number(String(value)
+    .replace(/[۰-۹]/g, digit => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit))
+    .replace(/[٠-٩]/g, digit => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit))
+    .replace(/[^0-9.-]/g, ''));
+
+const markUnavailable = productRow => {
+    productRow.cells[4].textContent = 'ناموجود';
+    productRow.cells[4].classList.remove('text-gray-500');
+    productRow.cells[4].classList.add('text-red-600');
+    const status = productRow.cells[5].firstElementChild;
+    status.textContent = 'ناموجود';
+    status.className = 'rounded-full bg-red-100 px-2 py-1 text-xs text-red-700';
+};
+
+document.querySelectorAll('tr.align-top').forEach(productRow => {
+    const variantRows = productRow.nextElementSibling?.querySelectorAll('.space-y-1 > div') ?? [];
+    const variants = [...variantRows].map(row => {
+        const text = row.lastElementChild?.textContent ?? '';
+        const [priceText, stockText] = text.split('·');
+        return { price: normalizeNumber(priceText), stock: Math.max(0, normalizeNumber(stockText)) };
+    }).filter(variant => Number.isFinite(variant.price) && Number.isFinite(variant.stock));
+
+    if (!variants.length) {
+        markUnavailable(productRow);
+        return;
+    }
+
+    const minimumPrice = Math.min(...variants.map(variant => variant.price));
+    const maximumStock = Math.max(...variants.map(variant => variant.stock));
+    productRow.cells[3].textContent = `${minimumPrice.toLocaleString('en-US')} تومان`;
+
+    if (maximumStock > 0) {
+        productRow.cells[4].textContent = maximumStock.toLocaleString('en-US');
+        return;
+    }
+
+    markUnavailable(productRow);
+});
+
 document.querySelectorAll('.product-edit-button').forEach(button => button.addEventListener('click', () => {
     const slug = [...button.closest('tr').querySelectorAll('.text-xs')].map(x => x.textContent.trim()).find(x => x.startsWith('slug:'));
     if (slug) window.location.href = `/Admin/Products/Edit?slug=${encodeURIComponent(slug.substring(5).trim())}`;
