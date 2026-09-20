@@ -84,7 +84,6 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         var query = _db.Products.AsNoTracking()
             .Include(x => x.ProductImages)
             .Include(x => x.ProductCategories).ThenInclude(x => x.Category)
-            .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants)
             .Include(x => x.SaleOptions).ThenInclude(x => x.SaleOptionColors)
             .AsQueryable();
 
@@ -203,6 +202,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             .Include(x => x.ProductImages)
             .Include(x => x.ProductCategories)
             .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants).ThenInclude(x => x.saleoptioncolor)
+            .Include(x => x.SaleOptions).ThenInclude(x => x.SaleOptionColors)
             .FirstOrDefaultAsync(x => x.Id == id);
         if (product is null) return NotFound();
 
@@ -223,7 +223,11 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             IsActive = product.IsActive,
             ProductDiscountValue = product.DiscountValue,
             ProductDiscountType = product.DiscountType is null ? null : (int)product.DiscountType.Value,
-            ExistingPrimaryImageUrl = product.ProductImages.OrderByDescending(x => x.IsPrimary).ThenBy(x => x.SortOrder).FirstOrDefault()?.ImageUrl,
+            ExistingPrimaryImageUrl = product.ProductImages
+                .Where(x => IsValidImageUrl(x.ImageUrl))
+                .OrderByDescending(x => x.IsPrimary).ThenBy(x => x.SortOrder)
+                .Select(x => x.ImageUrl)
+                .FirstOrDefault(),
             Variants = product.SaleOptions.SelectMany(option => option.ProductVariants.Select(variant => new AdminVariantInputViewModel
             {
                 SaleTitle = option.Title,
@@ -251,7 +255,8 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         var product = await _db.Products
             .Include(x => x.ProductImages)
             .Include(x => x.ProductCategories)
-            .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants)
+            .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants).ThenInclude(x => x.saleoptioncolor)
+            .Include(x => x.SaleOptions).ThenInclude(x => x.SaleOptionColors)
             .FirstOrDefaultAsync(x => x.Id == id);
         if (product is null) return NotFound();
 
@@ -270,19 +275,69 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         _db.ProductCategories.RemoveRange(product.ProductCategories);
         product.ProductCategories = model.CategoryIds.Distinct().Select(categoryId => new ProductCategory { Product = product, CategoryId = categoryId }).ToList();
 
-        var oldVariantIds = product.SaleOptions.SelectMany(x => x.ProductVariants).Select(x => x.Id).ToList();
-        if (oldVariantIds.Count > 0) await _db.ProductImages.Where(x => x.VariantId.HasValue && oldVariantIds.Contains(x.VariantId.Value)).ExecuteDeleteAsync();
-        _db.ProductSaleOptions.RemoveRange(product.SaleOptions);
-        var createdVariants = AddVariants(product, variants, now);
-        await _db.SaveChangesAsync();
-
-        if (model.PrimaryImage is not null)
+        try
         {
-            foreach (var image in product.ProductImages) image.IsPrimary = false;
-            _db.ProductImages.Add(new ProductImage { ProductId = product.Id, ImageUrl = await SaveImageAsync(model.PrimaryImage), AltText = product.Name, IsPrimary = true, SortOrder = 0 });
+            // Keep existing variants whenever possible. They may already be referenced by carts or orders,
+            // so deleting and recreating them would prevent an otherwise simple product edit from saving.
+            var variantUpdate = UpdateVariants(product, variants, now);
+            var removedVariantIds = variantUpdate.RemovedVariants.Select(x => x.Id).Where(x => x > 0).ToList();
+
+            var activeOrderStatuses = new[] { OrderStatus.Pending, OrderStatus.Paid, OrderStatus.Processing, OrderStatus.Shipped };
+            if (removedVariantIds.Count > 0 && await _db.OrderItems
+                .AnyAsync(x => removedVariantIds.Contains(x.ProductVariantId) && activeOrderStatuses.Contains(x.Order.Status)))
+            {
+                return await InvalidProductForm(model, "یکی از ویژگی‌های حذف‌شده در سبد خرید یا سفارش استفاده شده است و قابل حذف نیست.");
+            }
+
+            if (variantUpdate.RemovedVariants.Count > 0)
+            {
+                var staleCartItems = await _db.CartItems
+                    .Where(x => removedVariantIds.Contains(x.ProductVariantId))
+                    .ToListAsync();
+                _db.CartItems.RemoveRange(staleCartItems);
+
+                var variantImages = await _db.ProductImages
+                    .Where(x => x.VariantId.HasValue && removedVariantIds.Contains(x.VariantId.Value))
+                    .ToListAsync();
+                _db.ProductImages.RemoveRange(variantImages);
+
+                foreach (var variant in variantUpdate.RemovedVariants)
+                    variant.ProductSaleOption.ProductVariants.Remove(variant);
+
+                _db.ProductVariants.RemoveRange(variantUpdate.RemovedVariants);
+
+                var unusedColors = product.SaleOptions
+                    .SelectMany(option => option.SaleOptionColors)
+                    .Where(color => !product.SaleOptions.Any(option => option.ProductVariants.Any(variant => variant.saleoptioncolor == color)))
+                    .ToList();
+                foreach (var color in unusedColors)
+                    color.ProductSaleOption.SaleOptionColors.Remove(color);
+                _db.ProductSaleOptionColors.RemoveRange(unusedColors);
+
+                var emptyOptions = product.SaleOptions.Where(option => option.ProductVariants.Count == 0).ToList();
+                foreach (var option in emptyOptions)
+                    product.SaleOptions.Remove(option);
+                _db.ProductSaleOptions.RemoveRange(emptyOptions);
+            }
+            await _db.SaveChangesAsync();
+
+            if (model.PrimaryImage is { Length: > 0 })
+            {
+                foreach (var image in product.ProductImages) image.IsPrimary = false;
+                _db.ProductImages.Add(new ProductImage { ProductId = product.Id, ImageUrl = await SaveImageAsync(model.PrimaryImage), AltText = product.Name, IsPrimary = true, SortOrder = 0 });
+            }
+            await AddVariantImages(product, variantUpdate.CreatedVariants);
+            await _db.SaveChangesAsync();
         }
-        await AddVariantImages(product, createdVariants);
-        await _db.SaveChangesAsync();
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "خطا در ویرایش محصول {ProductId}", id);
+            if (IsAjaxRequest())
+                return StatusCode(500, new { success = false, message = "ذخیرهٔ تغییرات محصول انجام نشد. لطفاً دوباره تلاش کنید." });
+
+            ModelState.AddModelError(string.Empty, "ذخیرهٔ تغییرات محصول انجام نشد. لطفاً دوباره تلاش کنید.");
+            return await InvalidProductForm(model, "ذخیرهٔ تغییرات محصول انجام نشد. لطفاً دوباره تلاش کنید.");
+        }
 
         if (IsAjaxRequest()) return Json(new { success = true, message = "محصول با موفقیت ویرایش شد.", redirectUrl = Url.Action(nameof(Products)) });
         return RedirectToAction(nameof(Products));
@@ -534,6 +589,12 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         return image.Length <= 5 * 1024 * 1024 && new[] { ".jpg", ".jpeg", ".png", ".webp" }.Contains(extension);
     }
 
+    private static bool IsValidImageUrl(string? imageUrl)
+    {
+        var extension = Path.GetExtension(imageUrl ?? string.Empty).ToLowerInvariant();
+        return new[] { ".jpg", ".jpeg", ".png", ".webp" }.Contains(extension);
+    }
+
     private List<(AdminVariantInputViewModel Input, ProductVariant Variant)> AddVariants(Product product, List<AdminVariantInputViewModel> variants, DateTime now)
     {
         var created = new List<(AdminVariantInputViewModel Input, ProductVariant Variant)>();
@@ -550,6 +611,94 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             product.SaleOptions.Add(option);
         }
         return created;
+    }
+
+    private VariantUpdateResult UpdateVariants(Product product, List<AdminVariantInputViewModel> variants, DateTime now)
+    {
+        var existingVariants = product.SaleOptions.SelectMany(x => x.ProductVariants).ToList();
+        var keptVariants = new HashSet<ProductVariant>();
+        var result = new VariantUpdateResult();
+
+        foreach (var group in variants.GroupBy(x => new { Title = x.SaleTitle.Trim(), x.SaleType }))
+        {
+            var option = product.SaleOptions.FirstOrDefault(x =>
+                x.Title == group.Key.Title && (int)x.SaleType == group.Key.SaleType);
+
+            if (option is null)
+            {
+                option = new ProductSaleOption
+                {
+                    Product = product,
+                    Title = group.Key.Title,
+                    SaleType = (Entities.Enums.EnumSaleType)group.Key.SaleType,
+                    UnitName = group.Key.SaleType == 2 ? "متر" : "عدد",
+                    Step = 1
+                };
+                product.SaleOptions.Add(option);
+            }
+
+            var usedVariantIds = new HashSet<int>();
+            foreach (var input in group)
+            {
+                var inputColor = input.Color?.Trim();
+                var variant = option.ProductVariants.FirstOrDefault(x =>
+                    !usedVariantIds.Contains(x.Id) &&
+                    (string.IsNullOrWhiteSpace(inputColor)
+                        ? x.ProductSaleOptionColorId is null
+                        : string.Equals(x.saleoptioncolor?.Color, inputColor, StringComparison.Ordinal)));
+
+                ProductSaleOptionColor? color = null;
+                if (!string.IsNullOrWhiteSpace(inputColor))
+                {
+                    color = option.SaleOptionColors.FirstOrDefault(x =>
+                        string.Equals(x.Color, inputColor, StringComparison.Ordinal));
+                    if (color is null)
+                    {
+                        color = new ProductSaleOptionColor
+                        {
+                            Color = inputColor,
+                            HexCode = input.HexCode,
+                            ProductSaleOption = option
+                        };
+                        option.SaleOptionColors.Add(color);
+                    }
+                    else
+                    {
+                        color.HexCode = input.HexCode;
+                    }
+                }
+
+                if (variant is null)
+                {
+                    variant = new ProductVariant
+                    {
+                        ProductSaleOption = option,
+                        Sku = $"{product.Slug}-{Guid.NewGuid():N}"[..24]
+                    };
+                    option.ProductVariants.Add(variant);
+                    result.CreatedVariants.Add((input, variant));
+                }
+
+                variant.saleoptioncolor = color;
+                variant.Price = input.Price;
+                variant.StockQuantity = Math.Max(input.StockQuantity, 0);
+                variant.DiscountValue = input.DiscountValue;
+                variant.DisconType = ToDiscountType(input.DiscountType);
+                variant.DiscountStartAt = input.DiscountValue > 0 ? now.AddDays(-1) : null;
+                variant.DiscountEndAt = input.DiscountValue > 0 ? now.AddDays(30) : null;
+                usedVariantIds.Add(variant.Id);
+                keptVariants.Add(variant);
+            }
+        }
+
+        result.RemovedVariants = existingVariants.Where(x => !keptVariants.Contains(x)).ToList();
+        return result;
+    }
+
+    private sealed class VariantUpdateResult
+    {
+        public List<(AdminVariantInputViewModel Input, ProductVariant Variant)> CreatedVariants { get; } = new();
+        public List<ProductVariant> RemovedVariants { get; set; } = new();
     }
 
     private async Task AddVariantImages(Product product, List<(AdminVariantInputViewModel Input, ProductVariant Variant)> variants)

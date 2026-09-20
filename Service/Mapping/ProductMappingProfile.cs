@@ -26,6 +26,7 @@ namespace Service.Mapping
             .ForMember(x => x.Slug, otp => otp.MapFrom(s => s.Slug.Trim().ToLowerInvariant()))
             .ForMember(x => x.ProductCategories, otp => otp.Ignore());
         CreateMap<SeoDataDto, SeoData>();
+        CreateMap<SeoData, SeoDataDto>();
                
 
 

@@ -2,7 +2,6 @@
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = Model.IsEdit ? "ویرایش محصول" : "افزودن محصول";
-    ViewData["Title"] = "افزودن محصول";
 }
 
 <style>
@@ -10,17 +9,18 @@
     .admin-field-grid textarea { width:100%; padding:.6rem .7rem; border:1px solid #d4deea; border-radius:.65rem; color:#334155; background:#f6f8fb; font:inherit; font-size:.78rem; }.dark .admin-field-grid textarea { color:#f8fafc; border-color:#475569; background:#172235; }
     .product-category-picker { display:flex; align-items:center; justify-content:space-between; gap:.75rem; width:100%; min-height:2.55rem; padding:.45rem .55rem .45rem .7rem; border:1px solid #d4deea; border-radius:.65rem; color:#334155; background:#f6f8fb; font:inherit; font-size:.78rem; text-align:right; cursor:pointer; }
     .product-category-picker span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.product-category-picker .admin-secondary-button { min-height:1.7rem; padding:.3rem .55rem; }
-    .product-category-dialog { width:min(42rem, calc(100vw - 2rem)); max-height:calc(100vh - 2rem); padding:0; border:1px solid #dbe3ee; border-radius:1.1rem; color:#1e293b; background:#fff; box-shadow:0 24px 64px rgba(15,23,42,.28); }.product-category-dialog::backdrop { background:rgba(15,23,42,.62); backdrop-filter:blur(4px); }
+    .product-category-dialog { position:fixed; inset:0; width:min(42rem, calc(100vw - 2rem)); max-height:calc(100vh - 2rem); margin:auto; padding:0; border:1px solid #dbe3ee; border-radius:1.1rem; color:#1e293b; background:#fff; box-shadow:0 24px 64px rgba(15,23,42,.28); }.product-category-dialog::backdrop { background:rgba(15,23,42,.62); backdrop-filter:blur(4px); }
     .product-category-dialog header,.product-category-dialog footer { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.25rem; border-bottom:1px solid #e2e8f0; }.product-category-dialog footer { justify-content:flex-end; border-top:1px solid #e2e8f0; border-bottom:0; background:#f8fafc; }.product-category-dialog main { max-height:min(28rem, calc(100vh - 13rem)); overflow:auto; padding:1rem 1.25rem; background:linear-gradient(160deg,#fff,#f8fafc); }
-    .product-category-search { width:100%; min-height:2.55rem; padding:.6rem .7rem; border:1px solid #d4deea; border-radius:.65rem; color:#334155; background:#fff; font:inherit; }.product-category-options { display:grid; gap:.45rem; margin-top:1rem; }.product-category-option { display:flex; align-items:center; gap:.65rem; padding:.75rem; border:1px solid #e2e8f0; border-radius:.7rem; color:#334155; background:#fff; cursor:pointer; }.product-category-option.child { margin-right:1.5rem; }.product-category-option input { accent-color:#434ece; }.product-category-option small { margin-right:auto; color:#94a3b8; }.product-dialog-close { border:0; color:#64748b; background:transparent; font-size:1.5rem; cursor:pointer; }.seo-switches { display:flex; flex-wrap:wrap; gap:1rem; grid-column:1/-1; }
+    .product-category-search { width:100%; min-height:2.55rem; padding:.6rem .7rem; border:1px solid #d4deea; border-radius:.65rem; color:#334155; background:#fff; font:inherit; }.product-category-options { display:grid; gap:.45rem; margin-top:1rem; }.product-category-option { display:flex; align-items:center; gap:.65rem; padding:.75rem; border:1px solid #e2e8f0; border-radius:.7rem; color:#334155; background:#fff; cursor:pointer; }.product-category-option.child { margin-right:1.5rem; }.product-category-option input { accent-color:#434ece; }.product-category-option small { margin-right:auto; color:#94a3b8; }.product-dialog-close { border:0; color:#64748b; background:transparent; font-size:1.5rem; cursor:pointer; }
+    .seo-accordion { padding:0; overflow:hidden; }.seo-accordion summary { display:flex; align-items:center; gap:.7rem; padding:1.1rem 1.25rem; cursor:pointer; list-style:none; }.seo-accordion summary::-webkit-details-marker { display:none; }.seo-accordion summary::after { content:'⌄'; margin-right:auto; color:#94a3b8; font-size:1.1rem; transition:transform .2s; }.seo-accordion[open] summary::after { transform:rotate(180deg); }.seo-accordion-content { padding:0 1.25rem 1.25rem; }.seo-switches { display:flex; flex-wrap:wrap; gap:.65rem; grid-column:1/-1; }.seo-switch { display:inline-flex; align-items:center; gap:.45rem; padding:.35rem .6rem; border:1px solid #dbe4ee; border-radius:999px; color:#64748b; background:#f8fafc; font-size:.7rem; font-weight:700; cursor:pointer; }.seo-switch input { position:absolute; opacity:0; pointer-events:none; }.seo-switch span { position:relative; display:inline-block; width:1.8rem; height:1rem; border-radius:999px; background:#cbd5e1; transition:.2s; }.seo-switch span::after { content:''; position:absolute; top:.15rem; right:.15rem; width:.7rem; height:.7rem; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(15,23,42,.2); transition:.2s; }.seo-switch input:checked + span { background:#434ece; }.seo-switch input:checked + span::after { right:.95rem; }.seo-switch:has(input:checked) { color:#3730a3; border-color:#c7d2fe; background:#eef0ff; }
     .dark .product-category-picker,.dark .product-category-search,.dark .product-category-option { color:#f8fafc; border-color:#475569; background:#172235; }.dark .product-category-dialog { color:#e2e8f0; border-color:#334155; background:#0f172a; }.dark .product-category-dialog main { background:#172235; }.dark .product-category-dialog footer { border-color:#334155; background:#111b2b; }
 </style>
 
 <div class="admin-page-heading">
     <div>
         <span class="admin-eyebrow">فروشگاه</span>
-        <h1>افزودن محصول جدید</h1>
-        <p>اطلاعات محصول، حالت‌های فروش، رنگ‌ها و تصاویر را وارد کنید.</p>
+        <h1>@(Model.IsEdit ? "ویرایش محصول" : "افزودن محصول جدید")</h1>
+        <p>@(Model.IsEdit ? "اطلاعات محصول، حالت‌های فروش، رنگ‌ها و تصاویر را ویرایش کنید." : "اطلاعات محصول، حالت‌های فروش، رنگ‌ها و تصاویر را وارد کنید.")</p>
     </div>
     <a class="admin-secondary-button" href="@Url.Action("Index", "Admin")">بازگشت به پیشخوان</a>
 </div>
@@ -51,16 +51,16 @@
                 </div>
             </section>
 
-            <section class="admin-card">
-                <div class="admin-card-heading"><span class="admin-card-icon green"><svg aria-hidden="true"><use href="#admin-i-info"/></svg></span><div><h2>تنظیمات SEO</h2><p>اطلاعات نمایش محصول در موتورهای جست‌وجو.</p></div></div>
-                <div class="admin-field-grid">
+            <details class="admin-card seo-accordion">
+                <summary><span class="admin-card-icon green"><svg aria-hidden="true"><use href="#admin-i-info"/></svg></span><div><h2>تنظیمات SEO</h2><p>اطلاعات نمایش محصول در موتورهای جست‌وجو.</p></div></summary>
+                <div class="seo-accordion-content"><div class="admin-field-grid">
                     <label>عنوان سئو<input asp-for="MetaTitle" maxlength="200" placeholder="عنوان نمایش در نتایج جست‌وجو" /></label>
                     <label>آدرس Canonical<input asp-for="CanonicalUrl" maxlength="500" dir="ltr" placeholder="https://example.com/product/..." /></label>
                     <label class="full">توضیحات متا<textarea asp-for="MetaDescription" maxlength="500" rows="3" placeholder="خلاصه‌ای برای نتایج موتورهای جست‌وجو"></textarea></label>
                     <label class="full">کلمات کلیدی<input asp-for="MetaKeywords" maxlength="300" placeholder="مثال: کش، خیاطی، لوازم خرازی" /></label>
-                    <div class="seo-switches"><label class="admin-switch"><input asp-for="IndexPage" /><span></span>اجازهٔ ایندکس شدن</label><label class="admin-switch"><input asp-for="FollowPage" /><span></span>اجازهٔ دنبال‌کردن لینک‌ها</label></div>
-                </div>
-            </section>
+                    <div class="seo-switches"><label class="seo-switch"><input asp-for="IndexPage" /><span></span>ایندکس</label><label class="seo-switch"><input asp-for="FollowPage" /><span></span>دنبال‌کردن لینک‌ها</label></div>
+                </div></div>
+            </details>
 
             <section class="admin-card">
                 <div class="admin-card-heading"><span class="admin-card-icon green"><svg aria-hidden="true"><use href="#admin-i-percent"/></svg></span><div><h2>تخفیف کلی محصول</h2><p>اختیاری؛ تخفیف هر Variant می‌تواند جداگانه باشد.</p></div></div>
@@ -162,7 +162,10 @@
         e.preventDefault(); message.hidden = true; submit.disabled = true;
         try {
             const r = await fetch(form.action, { method: "POST", body: new FormData(form), headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" } });
-            const text = await r.text(); const result = text ? JSON.parse(text) : null;
+            const text = await r.text();
+            let result = null;
+            try { result = text ? JSON.parse(text) : null; }
+            catch { throw new Error("ذخیرهٔ تغییرات انجام نشد. لطفاً دوباره تلاش کنید."); }
             if (result?.redirectUrl) { window.location.href = result.redirectUrl; return; }
             if (!r.ok || !result?.success) throw new Error(result?.message || "ثبت محصول انجام نشد.");
             message.className = "admin-alert success"; message.textContent = result.message; message.hidden = false; form.reset(); syncCategories();
