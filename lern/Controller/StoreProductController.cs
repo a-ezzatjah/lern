@@ -39,6 +39,11 @@ public class StoreProductController : Microsoft.AspNetCore.Mvc.Controller
         }
 
         var relatedProducts = await _products.GetRelatedProductCardsAsync(id, take: 10);
+        ViewData["Title"] = product.SeoData?.MetaTitle ?? product.Name;
+        ViewData["MetaDescription"] = product.SeoData?.MetaDescription ?? product.ShortDescription;
+        ViewData["MetaKeywords"] = product.SeoData?.MetaKeywords;
+        ViewData["Robots"] = $"{(product.SeoData?.IndexPage ?? true ? "index" : "noindex")}, {(product.SeoData?.FollowPage ?? true ? "follow" : "nofollow")}";
+        ViewData["CanonicalUrl"] = product.SeoData?.CanonicalUrl ?? Url.Action(nameof(Details), "StoreProduct", new { id }, Request.Scheme);
         return View(StoreProductDetailsViewModel.FromProduct(product, relatedProducts));
     }
 }

@@ -15,12 +15,32 @@ public class AdminProductCreateViewModel
     public string Slug { get; set; } = string.Empty;
 
     public string? ShortDescription { get; set; }
+    public string? Description { get; set; }
+
+    // SEO fields are kept on the product's owned SeoData entity.
+    public string? MetaTitle { get; set; }
+    public string? MetaDescription { get; set; }
+    public string? MetaKeywords { get; set; }
+    public string? CanonicalUrl { get; set; }
+    public bool IndexPage { get; set; } = true;
+    public bool FollowPage { get; set; } = true;
+
+    public List<int> CategoryIds { get; set; } = new();
+    public List<AdminProductCategoryOptionViewModel> CategoryOptions { get; set; } = new();
     public bool IsActive { get; set; } = true;
 
     public decimal? ProductDiscountValue { get; set; }
     public int? ProductDiscountType { get; set; }
 
     public List<AdminVariantInputViewModel> Variants { get; set; } = new();
+}
+
+public class AdminProductCategoryOptionViewModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int? ParentId { get; set; }
+    public int SortOrder { get; set; }
 }
 
 public class AdminVariantInputViewModel

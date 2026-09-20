@@ -66,7 +66,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
     }
 
     [HttpGet("Products/Create")]
-    public IActionResult CreateProductPage()
+    public async Task<IActionResult> CreateProductPage()
     {
         var model = new AdminProductCreateViewModel
         {
@@ -74,7 +74,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
                 .Select(_ => new AdminVariantInputViewModel())
                 .ToList()
         };
-
+        await PopulateProductCategoryOptionsAsync(model);
         return View("Products/Create", model);
     }
 
@@ -201,6 +201,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
     {
         var product = await _db.Products
             .Include(x => x.ProductImages)
+            .Include(x => x.ProductCategories)
             .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants).ThenInclude(x => x.saleoptioncolor)
             .FirstOrDefaultAsync(x => x.Id == id);
         if (product is null) return NotFound();
@@ -211,6 +212,14 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             Name = product.Name,
             Slug = product.Slug,
             ShortDescription = product.ShortDescription,
+            Description = product.Description,
+            MetaTitle = product.Seo?.MetaTitle,
+            MetaDescription = product.Seo?.MetaDescription,
+            MetaKeywords = product.Seo?.MetaKeywords,
+            CanonicalUrl = product.Seo?.CanonicalUrl,
+            IndexPage = product.Seo?.IndexPage ?? true,
+            FollowPage = product.Seo?.FollowPage ?? true,
+            CategoryIds = product.ProductCategories.Select(x => x.CategoryId).ToList(),
             IsActive = product.IsActive,
             ProductDiscountValue = product.DiscountValue,
             ProductDiscountType = product.DiscountType is null ? null : (int)product.DiscountType.Value,
@@ -228,6 +237,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             })).ToList()
         };
         if (model.Variants.Count == 0) model.Variants.Add(new AdminVariantInputViewModel());
+        await PopulateProductCategoryOptionsAsync(model);
         return View("Products/Create", model);
     }
 
@@ -240,20 +250,25 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         var variants = model.Variants.Where(x => !string.IsNullOrWhiteSpace(x.SaleTitle) && x.Price > 0).ToList();
         var product = await _db.Products
             .Include(x => x.ProductImages)
+            .Include(x => x.ProductCategories)
             .Include(x => x.SaleOptions).ThenInclude(x => x.ProductVariants)
             .FirstOrDefaultAsync(x => x.Id == id);
         if (product is null) return NotFound();
 
-        if (!ModelState.IsValid || variants.Count == 0 || await _db.Products.AnyAsync(x => x.Id != id && (x.Name == model.Name || x.Slug == model.Slug)))
+        if (!ModelState.IsValid || variants.Count == 0 || !await HasValidCategoriesAsync(model.CategoryIds) || await _db.Products.AnyAsync(x => x.Id != id && (x.Name == model.Name || x.Slug == model.Slug)))
             return await InvalidProductForm(model, "اطلاعات محصول معتبر نیست یا نام/slug تکراری است.");
 
         if (!IsValidImage(model.PrimaryImage) || model.Variants.Any(x => !IsValidImage(x.Image)))
             return await InvalidProductForm(model, "فرمت تصویر باید JPG، PNG یا WEBP و حداکثر ۵ مگابایت باشد.");
 
         var now = DateTime.UtcNow;
-        product.Name = model.Name.Trim(); product.Slug = model.Slug.Trim(); product.ShortDescription = model.ShortDescription;
+        product.Name = model.Name.Trim(); product.Slug = model.Slug.Trim(); product.ShortDescription = model.ShortDescription; product.Description = model.Description;
         product.IsActive = model.IsActive; product.DiscountValue = model.ProductDiscountValue; product.DiscountType = ToDiscountType(model.ProductDiscountType);
         product.DiscountStartAt = model.ProductDiscountValue > 0 ? now.AddDays(-1) : null; product.DiscountEndAt = model.ProductDiscountValue > 0 ? now.AddDays(30) : null; product.UpdatedAt = now;
+        product.Seo ??= new SeoData();
+        ApplySeo(model, product.Seo, now);
+        _db.ProductCategories.RemoveRange(product.ProductCategories);
+        product.ProductCategories = model.CategoryIds.Distinct().Select(categoryId => new ProductCategory { Product = product, CategoryId = categoryId }).ToList();
 
         var oldVariantIds = product.SaleOptions.SelectMany(x => x.ProductVariants).Select(x => x.Id).ToList();
         if (oldVariantIds.Count > 0) await _db.ProductImages.Where(x => x.VariantId.HasValue && oldVariantIds.Contains(x.VariantId.Value)).ExecuteDeleteAsync();
@@ -282,7 +297,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             .Where(x => !string.IsNullOrWhiteSpace(x.SaleTitle) && x.Price > 0)
             .ToList();
 
-        if (!ModelState.IsValid || variants.Count == 0)
+        if (!ModelState.IsValid || variants.Count == 0 || !await HasValidCategoriesAsync(model.CategoryIds))
         {
             if (variants.Count == 0)
                 ModelState.AddModelError(string.Empty, "حداقل یک تنوع با عنوان فروش و قیمت بیشتر از صفر وارد کنید.");
@@ -302,6 +317,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
                         .ToList()
                 });
 
+            await PopulateProductCategoryOptionsAsync(model);
             return View("Products/Create", model);
         }
 
@@ -316,6 +332,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
                     message = "نام یا Slug این محصول قبلاً ثبت شده است."
                 });
 
+            await PopulateProductCategoryOptionsAsync(model);
             return View("Products/Create", model);
         }
 
@@ -352,13 +369,19 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             Name = model.Name.Trim(),
             Slug = model.Slug.Trim(),
             ShortDescription = model.ShortDescription,
+            Description = model.Description,
             IsActive = model.IsActive,
             DiscountValue = model.ProductDiscountValue,
             DiscountType = ToDiscountType(model.ProductDiscountType),
             DiscountStartAt = model.ProductDiscountValue > 0 ? now.AddDays(-1) : null,
             DiscountEndAt = model.ProductDiscountValue > 0 ? now.AddDays(30) : null,
-            CreatedAt = now
+            CreatedAt = now,
+            Seo = new SeoData()
         };
+        ApplySeo(model, product.Seo, now);
+        product.ProductCategories = model.CategoryIds.Distinct()
+            .Select(categoryId => new ProductCategory { Product = product, CategoryId = categoryId })
+            .ToList();
         var createdVariants = new List<(AdminVariantInputViewModel Input, ProductVariant Variant)>();
 
         foreach (var group in variants.GroupBy(x => new { x.SaleTitle, x.SaleType }))
@@ -539,8 +562,39 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
     {
         ModelState.AddModelError(string.Empty, message);
         if (IsAjaxRequest()) return BadRequest(new { success = false, message });
-        await Task.CompletedTask;
+        await PopulateProductCategoryOptionsAsync(model);
         return View("Products/Create", model);
+    }
+
+    private async Task PopulateProductCategoryOptionsAsync(AdminProductCreateViewModel model)
+    {
+        model.CategoryOptions = await _db.Categories.AsNoTracking()
+            .OrderBy(x => x.ParentId).ThenBy(x => x.SortOrder).ThenBy(x => x.Name)
+            .Select(x => new AdminProductCategoryOptionViewModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ParentId = x.ParentId,
+                SortOrder = x.SortOrder ?? 0
+            })
+            .ToListAsync();
+    }
+
+    private async Task<bool> HasValidCategoriesAsync(IEnumerable<int>? categoryIds)
+    {
+        var ids = categoryIds?.Where(x => x > 0).Distinct().ToList() ?? new List<int>();
+        return ids.Count > 0 && await _db.Categories.CountAsync(x => ids.Contains(x.Id)) == ids.Count;
+    }
+
+    private static void ApplySeo(AdminProductCreateViewModel model, SeoData seo, DateTime now)
+    {
+        seo.MetaTitle = model.MetaTitle?.Trim();
+        seo.MetaDescription = model.MetaDescription?.Trim();
+        seo.MetaKeywords = model.MetaKeywords?.Trim();
+        seo.CanonicalUrl = model.CanonicalUrl?.Trim();
+        seo.IndexPage = model.IndexPage;
+        seo.FollowPage = model.FollowPage;
+        seo.UpdatedAt = now;
     }
 
     private async Task<string> SaveImageAsync(IFormFile image)

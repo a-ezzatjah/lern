@@ -7,4 +7,5 @@ public sealed class ProductCommentDto
     public string? Title { get; init; }
     public string Body { get; init; } = string.Empty;
     public DateTime CreatedAt { get; init; }
+    public bool IsCurrentUser { get; init; }
 }

@@ -111,15 +111,19 @@ public sealed class ProductRatingController : ControllerBase
             .OrderByDescending(x => x.CreatedAt);
 
         var totalCount = await query.CountAsync();
-        var comments = await query.Skip((page - 1) * pageSize).Take(pageSize)
-            .Select(x => new ProductCommentDto
-            {
-                Id = x.Id,
-                AuthorName = x.AuthorName,
-                Title = x.Title,
-                Body = x.Body,
-                CreatedAt = x.CreatedAt
-            }).ToListAsync();
+        var customerKey = GetCustomerKey();
+        var commentRows = await query.Skip((page - 1) * pageSize).Take(pageSize)
+            .Select(x => new { x.Id, x.AuthorName, x.Title, x.Body, x.CreatedAt, x.CustomerKey })
+            .ToListAsync();
+        var comments = commentRows.Select(x => new ProductCommentDto
+        {
+            Id = x.Id,
+            AuthorName = x.AuthorName,
+            Title = x.Title,
+            Body = x.Body,
+            CreatedAt = x.CreatedAt,
+            IsCurrentUser = customerKey == x.CustomerKey
+        }).ToList();
         var ratingSummary = await _db.ProductRatings.AsNoTracking().Where(x => x.ProductId == productId)
             .GroupBy(x => x.ProductId)
             .Select(x => new { AverageScore = x.Average(r => (decimal)r.Score), RatingCount = x.Count() })
@@ -132,6 +136,64 @@ public sealed class ProductRatingController : ControllerBase
             pageSize,
             ratingSummary?.AverageScore ?? 0,
             ratingSummary?.RatingCount ?? 0));
+    }
+
+    [Authorize]
+    [HttpPut("/api/product-comments/{id:int}")]
+    public async Task<IActionResult> UpdateComment(int id, [FromBody] UpdateProductCommentRequest request)
+    {
+        var customerKey = GetCustomerKey();
+        if (customerKey is null)
+            return Unauthorized();
+
+        var body = request.Body?.Trim();
+        var title = request.Title?.Trim();
+        if (string.IsNullOrWhiteSpace(body) || body.Length > 2000)
+            return BadRequest(new { message = "متن دیدگاه باید بین ۱ تا ۲۰۰۰ کاراکتر باشد." });
+        if (title?.Length > 150)
+            return BadRequest(new { message = "عنوان دیدگاه حداکثر ۱۵۰ کاراکتر است." });
+        if (request.Score is < 1 or > 5)
+            return BadRequest(new { message = "امتیاز باید بین ۱ تا ۵ باشد." });
+
+        var comment = await _db.ProductComments.SingleOrDefaultAsync(x => x.Id == id && x.CustomerKey == customerKey);
+        if (comment is null)
+            return NotFound();
+
+        comment.Title = string.IsNullOrWhiteSpace(title) ? null : title;
+        comment.Body = body;
+        comment.UpdatedAt = DateTime.UtcNow;
+
+        if (request.Score.HasValue)
+        {
+            var rating = await _db.ProductRatings.SingleOrDefaultAsync(x => x.ProductId == comment.ProductId && x.CustomerKey == customerKey);
+            if (rating is null)
+                _db.ProductRatings.Add(new ProductRating { ProductId = comment.ProductId, CustomerKey = customerKey, Score = request.Score.Value });
+            else
+            {
+                rating.Score = request.Score.Value;
+                rating.UpdatedAt = DateTime.UtcNow;
+            }
+        }
+
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "دیدگاه شما ویرایش شد." });
+    }
+
+    [Authorize]
+    [HttpDelete("/api/product-comments/{id:int}")]
+    public async Task<IActionResult> DeleteComment(int id)
+    {
+        var customerKey = GetCustomerKey();
+        if (customerKey is null)
+            return Unauthorized();
+
+        var comment = await _db.ProductComments.SingleOrDefaultAsync(x => x.Id == id && x.CustomerKey == customerKey);
+        if (comment is null)
+            return NotFound();
+
+        _db.ProductComments.Remove(comment);
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "دیدگاه حذف شد." });
     }
 
     [Authorize(Roles = "Admin")]
@@ -157,6 +219,7 @@ public sealed class ProductRatingController : ControllerBase
 
 public record SaveProductRatingRequest(int Score);
 public record SaveProductCommentRequest(string? Title, string? Body, int Score);
+public record UpdateProductCommentRequest(string? Title, string? Body, int? Score);
 public record ModerateProductCommentRequest(bool IsApproved);
 public record ProductCommentListResponse(
     IReadOnlyList<ProductCommentDto> Comments,

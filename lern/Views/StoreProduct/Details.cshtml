@@ -273,7 +273,48 @@
         #product-comments-column.is-wide { grid-column: 1 / -1; }
     }
     #submit-product-comment { border-radius: .8rem !important; background: linear-gradient(135deg, #4f46e5, #7c3aed) !important; box-shadow: 0 10px 20px rgba(79, 70, 229, .28); }
+    #close-product-comment-form {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        min-height: 2.75rem;
+        padding: .3rem .45rem .3rem .85rem;
+        border: 1px solid #fecdd3;
+        border-radius: 999px;
+        color: #be123c;
+        background: #fff1f2;
+        font-size: .75rem;
+        font-weight: 700;
+        transition: .18s ease;
+    }
+    #close-product-comment-form::after {
+        content: "×";
+        display: grid;
+        width: 2rem;
+        height: 2rem;
+        place-items: center;
+        border-radius: 50%;
+        color: #fff;
+        background: #e11d48;
+        font-size: 1.5rem;
+        font-weight: 400;
+        line-height: 1;
+    }
+    #close-product-comment-form:hover { color: #fff; border-color: #be123c; background: #be123c; transform: translateY(-1px); }
+    #close-product-comment-form:hover::after { color: #be123c; background: #fff; }
     #product-comments-list .review-card { border-radius: 1.15rem; box-shadow: 0 8px 18px rgba(30, 41, 59, .05); }
+    .review-action {
+        border: 1px solid #cbd5e1;
+        border-radius: .65rem;
+        padding: .45rem .7rem;
+        font-size: .75rem;
+        font-weight: 700;
+        transition: .18s ease;
+    }
+    .review-action-edit { color: #4338ca; background: #eef2ff; }
+    .review-action-edit:hover { color: #fff; border-color: #4f46e5; background: #4f46e5; }
+    .review-action-delete { color: #be123c; background: #fff1f2; }
+    .review-action-delete:hover { color: #fff; border-color: #e11d48; background: #e11d48; }
     @@keyframes review-form-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
     .dark #Comments.product-review-panel { border-color: #334155; background: linear-gradient(145deg, #0f172a, #111827); box-shadow: 0 18px 50px rgba(0, 0, 0, .30); }
@@ -283,6 +324,11 @@
     .dark #product-comment-form { border-color: #334155 !important; background: #111827 !important; box-shadow: 0 14px 30px rgba(0, 0, 0, .25) !important; }
     .dark #product-comment-form input, .dark #product-comment-form textarea { border-color: #475569 !important; color: #f8fafc !important; background: #1e293b !important; }
     .dark #product-comment-form input:focus, .dark #product-comment-form textarea:focus { border-color: #818cf8 !important; background: #0f172a !important; }
+    .dark #close-product-comment-form { border-color: #9f1239; color: #fecdd3; background: #4c0519; }
+    .dark #close-product-comment-form::after { background: #fb7185; }
+    .dark .review-action { border-color: #475569; }
+    .dark .review-action-edit { color: #c7d2fe; background: #312e81; }
+    .dark .review-action-delete { color: #fecdd3; background: #4c0519; }
 
     #product-share-dialog { z-index: 2147483647; }
 
@@ -1190,7 +1236,7 @@
                     <form id="product-comment-form" data-product-id="@Model.Id" class="hidden p-6 lg:col-span-2">
                         <div class="flex items-center justify-between gap-3">
                             <h3 class="font-bold text-slate-800 dark:text-white">دیدگاه خود را بنویسید</h3>
-                            <button id="close-product-comment-form" type="button" class="grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="بستن فرم دیدگاه">×</button>
+                            <button id="close-product-comment-form" type="button" aria-label="بستن فرم ثبت دیدگاه">بستن ثبت دیدگاه</button>
                         </div>
                         <p class="mt-1 text-xs leading-6 text-slate-500 dark:text-slate-400">پس از بررسی، دیدگاه شما نمایش داده می‌شود.</p>
                         <label class="mt-5 block text-sm font-medium">امتیاز شما</label>
@@ -2923,6 +2969,25 @@
             const commentStatus = document.getElementById('product-comment-status');
             const reviewNotice = document.getElementById('product-review-notice');
             let selectedReviewScore = 0;
+            let loadedComments = [];
+            let editingCommentId = null;
+
+            const setSelectedScore = score => {
+                selectedReviewScore = Number(score) || 0;
+                scorePicker?.querySelectorAll('[data-score]').forEach(item => {
+                    const active = Number(item.dataset.score) <= selectedReviewScore;
+                    item.classList.toggle('is-selected', active);
+                    item.setAttribute('aria-pressed', String(Number(item.dataset.score) === selectedReviewScore));
+                });
+            };
+
+            const resetCommentEditor = () => {
+                editingCommentId = null;
+                commentForm?.reset();
+                setSelectedScore(0);
+                document.getElementById('submit-product-comment').textContent = 'ثبت دیدگاه';
+                commentStatus.textContent = '';
+            };
 
             const setCommentFormVisibility = visible => {
                 if (!commentForm) return;
@@ -2935,8 +3000,14 @@
                 }
             };
 
-            openCommentFormButton?.addEventListener('click', () => setCommentFormVisibility(true));
-            closeCommentFormButton?.addEventListener('click', () => setCommentFormVisibility(false));
+            openCommentFormButton?.addEventListener('click', () => {
+                resetCommentEditor();
+                setCommentFormVisibility(true);
+            });
+            closeCommentFormButton?.addEventListener('click', () => {
+                setCommentFormVisibility(false);
+                resetCommentEditor();
+            });
 
             const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -2947,6 +3018,7 @@
             }).format(new Date(value));
 
             const renderComments = data => {
+                loadedComments = data.comments || [];
                 const total = Number(data.totalCount) || 0;
                 const ratingTotal = Number(data.ratingCount) || 0;
                 const average = Number(data.averageScore) || 0;
@@ -2960,7 +3032,7 @@
                     return;
                 }
 
-                commentList.innerHTML = data.comments.map(comment => `
+                commentList.innerHTML = loadedComments.map(comment => `
                     <article class="review-card rounded-2xl p-5">
                         <div class="flex items-start justify-between gap-4">
                             <div class="min-w-0">
@@ -2973,7 +3045,38 @@
                         </div>
                         ${comment.title ? `<h5 class="mt-4 font-bold text-slate-700 dark:text-slate-100">${escapeHtml(comment.title)}</h5>` : ''}
                         <p class="mt-2 whitespace-pre-line text-sm leading-8 text-slate-600 dark:text-slate-300">${escapeHtml(comment.body)}</p>
+                        ${comment.isCurrentUser ? `<div class="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4 dark:border-slate-700">
+                            <button type="button" class="review-action review-action-edit" data-edit-comment="${comment.id}">ویرایش</button>
+                            <button type="button" class="review-action review-action-delete" data-delete-comment="${comment.id}">حذف</button>
+                        </div>` : ''}
                     </article>`).join('');
+
+                commentList.querySelectorAll('[data-edit-comment]').forEach(button => button.addEventListener('click', () => {
+                    const comment = loadedComments.find(item => item.id === Number(button.dataset.editComment));
+                    if (!comment) return;
+                    editingCommentId = comment.id;
+                    document.getElementById('review-title').value = comment.title || '';
+                    document.getElementById('review-body').value = comment.body || '';
+                    setSelectedScore(0);
+                    document.getElementById('submit-product-comment').textContent = 'ذخیرهٔ تغییرات';
+                    setCommentFormVisibility(true);
+                }));
+
+                commentList.querySelectorAll('[data-delete-comment]').forEach(button => button.addEventListener('click', async () => {
+                    if (!confirm('از حذف این دیدگاه مطمئن هستید؟')) return;
+                    try {
+                        const response = await fetch(`/api/product-comments/${button.dataset.deleteComment}`, { method: 'DELETE', credentials: 'same-origin' });
+                        if (response.status === 401) { location.assign(`/login?returnUrl=${encodeURIComponent(location.pathname)}`); return; }
+                        const result = await response.json().catch(() => ({}));
+                        if (!response.ok) throw new Error(result.message || 'حذف دیدگاه انجام نشد.');
+                        reviewNotice.textContent = result.message || 'دیدگاه حذف شد.';
+                        reviewNotice.classList.remove('hidden');
+                        await loadComments();
+                    } catch (error) {
+                        reviewNotice.textContent = error.message || 'حذف دیدگاه انجام نشد.';
+                        reviewNotice.className = 'mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-300';
+                    }
+                }));
             };
 
             const loadComments = async () => {
@@ -2989,12 +3092,7 @@
 
             scorePicker?.querySelectorAll('[data-score]').forEach(button => {
                 button.addEventListener('click', () => {
-                    selectedReviewScore = Number(button.dataset.score);
-                    scorePicker.querySelectorAll('[data-score]').forEach(item => {
-                        const active = Number(item.dataset.score) <= selectedReviewScore;
-                        item.classList.toggle('is-selected', active);
-                        item.setAttribute('aria-pressed', String(Number(item.dataset.score) === selectedReviewScore));
-                    });
+                    setSelectedScore(button.dataset.score);
                 });
             });
 
@@ -3004,7 +3102,7 @@
                 const body = document.getElementById('review-body').value.trim();
                 const submitButton = document.getElementById('submit-product-comment');
 
-                if (!selectedReviewScore) {
+                if (!editingCommentId && !selectedReviewScore) {
                     commentStatus.textContent = 'لطفاً امتیاز خود را انتخاب کنید.';
                     commentStatus.className = 'mt-3 text-sm text-rose-600 dark:text-rose-300';
                     return;
@@ -3015,11 +3113,13 @@
                 commentStatus.textContent = 'در حال ثبت دیدگاه…';
                 commentStatus.className = 'mt-3 text-sm text-slate-500 dark:text-slate-400';
                 try {
-                    const response = await fetch(`/api/products/${commentForm.dataset.productId}/comments`, {
-                        method: 'POST',
+                    const response = await fetch(editingCommentId
+                        ? `/api/product-comments/${editingCommentId}`
+                        : `/api/products/${commentForm.dataset.productId}/comments`, {
+                        method: editingCommentId ? 'PUT' : 'POST',
                         credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ title: title || null, body, score: selectedReviewScore })
+                        body: JSON.stringify({ title: title || null, body, score: selectedReviewScore || null })
                     });
                     if (response.status === 401) {
                         location.assign(`/login?returnUrl=${encodeURIComponent(location.pathname)}`);
@@ -3028,12 +3128,7 @@
                     const result = await response.json().catch(() => ({}));
                     if (!response.ok) throw new Error(result.message || 'ثبت دیدگاه انجام نشد.');
 
-                    commentForm.reset();
-                    selectedReviewScore = 0;
-                    scorePicker.querySelectorAll('[data-score]').forEach(item => {
-                        item.classList.remove('is-selected');
-                        item.setAttribute('aria-pressed', 'false');
-                    });
+                    resetCommentEditor();
                     commentStatus.textContent = result.message || 'دیدگاه شما برای بررسی ارسال شد.';
                     commentStatus.className = 'mt-3 text-sm text-emerald-600 dark:text-emerald-300';
                     await loadComments();
