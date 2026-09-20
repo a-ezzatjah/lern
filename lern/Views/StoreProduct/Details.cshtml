@@ -344,6 +344,12 @@
         align-items: center;
         justify-content: center;
     }
+    /* Keep the service cards close to the purchase area while letting normal
+       document flow push them down when options/descriptions grow. */
+    #shop-features {
+        margin-top: 1rem;
+        clear: both;
+    }
 
     @@media (min-width: 1024px) {
         #product-gallery-column {
@@ -359,7 +365,7 @@
         }
 
         #shop-features {
-            margin-top: 7rem;
+            margin-top: 1.25rem;
         }
 
 
