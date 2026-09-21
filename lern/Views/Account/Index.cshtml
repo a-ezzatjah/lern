@@ -4,6 +4,7 @@
 <html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <base href="/">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -56,7 +57,7 @@
                     </a>
 
                     <!-- Profile -->
-                    <a href="user-panel-profile.html"
+                    <a href="/account/profile"
                        class="block px-4 py-3 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline me-2" fill="none"
                              viewBox="0 0 24 24" stroke="currentColor">
@@ -386,7 +387,7 @@
                     <div id="user-dropdown-menu"
                          class="absolute end-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg z-10 shadow-lg hidden">
                         <!-- Profile Link -->
-                        <a href="/account"
+                        <a href="/account/profile"
                            class="flex items-center px-4 py-2 text-sm text-gray-700 space-x-1 rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24"
                                  stroke-width="1.5" stroke="currentColor">
@@ -427,6 +428,12 @@
 
         <!-- page content -->
         <main class="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-background-dark">
+            @if (ViewData["ProfileOnly"] is true)
+            {
+                <h1 class="text-2xl font-bold text-dark dark:text-light">پروفایل</h1>
+            }
+            else
+            {
             <!-- header page -->
             <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
@@ -1017,6 +1024,7 @@
                     </article>
                 </div>
             </div>
+            }
         </main>
     </div>
 </div>
@@ -1291,7 +1299,8 @@
 <!-- chart -->
 <script>
     // Display the current date in Persian format
-    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fa-IR');
+    const currentDate = document.getElementById('currentDate');
+    if (currentDate) currentDate.textContent = new Date().toLocaleDateString('fa-IR');
 
     // General settings for Chart.js to support RTL
     Chart.defaults.font.family = 'payda, sans-serif';
@@ -1300,8 +1309,8 @@
     };
 
     // Create the chart
-    const ctx = document.getElementById('userActivityChart').getContext('2d');
-    const userActivityChart = new Chart(ctx, {
+    const chartCanvas = document.getElementById('userActivityChart');
+    const userActivityChart = chartCanvas ? new Chart(chartCanvas.getContext('2d'), {
         type: 'bar', // Chart type (bar, line, pie, etc.)
         data: {
             labels: ['دیدن محصول', 'اضافه کردن به سبد خرید', 'خرید', 'افزودن به علاقه مندی', 'نظر'],
@@ -1363,10 +1372,11 @@
                 }
             }
         }
-    });
+    }) : null;
 
     // Function to change the chart type dynamically
     function changeChartType(type) {
+        if (!userActivityChart) return;
         userActivityChart.config.type = type;
         userActivityChart.update();
     }
@@ -1394,10 +1404,14 @@
             const dashboard = await dashboardResponse.json();
             const purchaseTotal = Number(dashboard.purchaseTotal || 0);
             const rating = Math.max(0, Math.min(100, Number(dashboard.ratingOutOf100 || 0)));
-            document.getElementById('purchase-total').innerHTML = `${purchaseTotal.toLocaleString('fa-IR')} <span class="text-sm">تومان</span>`;
-            document.getElementById('rating-out-of-100').innerHTML = `${rating.toLocaleString('fa-IR')} <span class="text-sm">از 100</span>`;
-            document.getElementById('rating-progress').style.width = `${rating}%`;
-            document.getElementById('rating-percentage').textContent = `${rating.toLocaleString('fa-IR')}%`;
+            const purchaseTotalElement = document.getElementById('purchase-total');
+            const ratingElement = document.getElementById('rating-out-of-100');
+            const ratingProgress = document.getElementById('rating-progress');
+            const ratingPercentage = document.getElementById('rating-percentage');
+            if (purchaseTotalElement) purchaseTotalElement.innerHTML = `${purchaseTotal.toLocaleString('fa-IR')} <span class="text-sm">تومان</span>`;
+            if (ratingElement) ratingElement.innerHTML = `${rating.toLocaleString('fa-IR')} <span class="text-sm">از 100</span>`;
+            if (ratingProgress) ratingProgress.style.width = `${rating}%`;
+            if (ratingPercentage) ratingPercentage.textContent = `${rating.toLocaleString('fa-IR')}%`;
         }
     }
 

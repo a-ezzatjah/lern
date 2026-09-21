@@ -46,4 +46,8 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
 
         return View(new AccountIndexViewModel { RecentlyViewedProducts = recentlyViewedProducts });
     }
+
+    [Authorize]
+    [HttpGet("/account/profile")]
+    public IActionResult Profile() => View();
 }
