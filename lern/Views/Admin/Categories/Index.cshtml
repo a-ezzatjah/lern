@@ -5,140 +5,60 @@
 }
 
 <style>
-    .category-search-input { color: #1e293b !important; background: #fff !important; border: 1px solid #cbd5e1 !important; }
-    .category-search-input::placeholder { color: #64748b !important; opacity: 1; }
-    .category-search-input:focus { color: #0f172a !important; background: #fff !important; }
-    .category-dialog { position: fixed; inset: 0; width: min(34rem, calc(100vw - 2rem)); margin: auto; padding: 0; overflow: visible; border: 1px solid #dbe3ee; border-radius: 1.25rem; color: #1e293b; background: #fff; box-shadow: 0 24px 64px rgba(15, 23, 42, .28); }
-    .category-dialog::backdrop { background: rgba(15, 23, 42, .62); backdrop-filter: blur(4px); }
-    .category-dialog-body { padding: 1.5rem; background: linear-gradient(160deg, #fff 0%, #f8fafc 100%); }
-    .category-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0; background: linear-gradient(135deg, rgba(67, 78, 206, .13), rgba(38, 146, 61, .08)); }
-    .category-dialog-field { display: block; margin-bottom: 1rem; color: #334155; font-size: .85rem; font-weight: 700; }
-    .category-dialog-field input, .category-dialog-field select { display: block; box-sizing: border-box; width: 100%; min-height: 3rem; margin-top: .5rem; padding: .7rem .85rem; border: 1px solid #cbd5e1; border-radius: .75rem; color: #1e293b; background: #fff; font: inherit; transition: border-color .18s, box-shadow .18s, background .18s; }
-    .category-dialog-field input:focus, .category-dialog-field select:focus { border-color: #434ece; box-shadow: 0 0 0 3px rgba(67, 78, 206, .14); }
-    .category-dialog-footer { display: flex; justify-content: flex-end; gap: .75rem; padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0; background: #f8fafc; }
-    .category-dialog-close { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border: 0; border-radius: 50%; color: #64748b; background: rgba(255, 255, 255, .8); font-size: 1.55rem; cursor: pointer; transition: .18s; }
-    .category-dialog-close:hover { color: #1e293b; background: #e2e8f0; transform: rotate(90deg); }
-    .dark .category-search-input { color: #f8fafc !important; background: #0f172a !important; border-color: #475569 !important; }
-    .dark .category-search-input::placeholder { color: #94a3b8 !important; }
-    .dark .category-search-input:focus { color: #fff !important; background: #0f172a !important; }
-    .dark .category-dialog { border-color: #334155; color: #e2e8f0; background: #0f172a; box-shadow: 0 24px 64px rgba(0, 0, 0, .55); }
-    .dark .category-dialog-body { background: linear-gradient(160deg, #0f172a 0%, #172235 100%); }
-    .dark .category-dialog-header { border-color: #334155; background: linear-gradient(135deg, rgba(96, 111, 216, .25), rgba(38, 146, 61, .15)); }
-    .dark .category-dialog-field { color: #e2e8f0; }
-    .dark .category-dialog-field input, .dark .category-dialog-field select { border-color: #475569; color: #f8fafc; background: #172235; }
-    .dark .category-dialog-footer { border-color: #334155; background: #111b2b; }
-    .dark .category-dialog-close { color: #cbd5e1; background: #1e293b; }
-    .dark .category-dialog-close:hover { color: #fff; background: #334155; }
-    .dark .category-dialog-footer .category-cancel-button { color: #e2e8f0 !important; border-color: #475569 !important; background: #1e293b !important; }
-    .dark .category-dialog-footer .category-cancel-button:hover { color: #fff !important; background: #334155 !important; }
-    .category-parent-picker { margin-top: .5rem; }
-    #category-parent { display: none !important; }
-    .category-parent-trigger { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 3rem; padding: .7rem .85rem; border: 1px solid #cbd5e1; border-radius: .75rem; color: #1e293b; background: #fff; font: inherit; text-align: right; cursor: pointer; }
-    .category-parent-trigger svg { width: 1rem; height: 1rem; flex: 0 0 auto; transition: transform .18s; }
-    .category-parent-picker.is-open .category-parent-trigger { border-color: #434ece; box-shadow: 0 0 0 3px rgba(67, 78, 206, .14); }
-    .category-parent-picker.is-open .category-parent-trigger svg { transform: rotate(180deg); }
-    .category-parent-menu { position: fixed; z-index: 1000; display: none; max-height: min(19rem, calc(100vh - 1rem)); overflow-y: auto; padding: .5rem; border: 1px solid #cbd5e1; border-radius: .85rem; background: #fff; box-shadow: 0 12px 28px rgba(15, 23, 42, .16); }
-    .category-parent-picker.is-open .category-parent-menu { display: block; }
-    .category-parent-group { padding: .7rem .7rem .3rem; color: #64748b; font-size: .72rem; font-weight: 800; }
-    .category-parent-option { display: block; width: 100%; padding: .6rem .7rem; border: 0; border-radius: .55rem; color: #334155; background: transparent; font: inherit; font-size: .82rem; text-align: right; cursor: pointer; }
-    .category-parent-option:hover, .category-parent-option.is-selected { color: #3730a3; background: #eef0ff; }
-    .category-parent-branch + .category-parent-branch { margin-top: .35rem; border-top: 1px solid #e2e8f0; }
-    .category-parent-branch-title { display: block; width: 100%; padding: .65rem .7rem .4rem; border: 0; color: #1e293b; background: transparent; font: inherit; font-size: .84rem; font-weight: 800; text-align: right; cursor: pointer; }
-    .category-parent-branch-title:hover { color: #3730a3; }
-    .category-parent-option.child-option { padding-right: 1.65rem; }
-    .dark .category-parent-trigger { border-color: #475569; color: #f8fafc; background: #172235; }
-    .dark .category-parent-menu { border-color: #475569; background: #172235; box-shadow: 0 12px 28px rgba(0, 0, 0, .45); }
-    .dark .category-parent-group { color: #94a3b8; }
-    .dark .category-parent-option { color: #e2e8f0; }
-    .dark .category-parent-option:hover, .dark .category-parent-option.is-selected { color: #fff; background: #303b72; }
-    .dark .category-parent-branch + .category-parent-branch { border-color: #334155; }
-    .dark .category-parent-branch-title { color: #f8fafc; }
-    .dark .category-parent-branch-title:hover { color: #c7d2fe; }
-    @@media (max-width: 480px) { .category-dialog { width: calc(100vw - 1rem); border-radius: 1rem; } .category-dialog-header, .category-dialog-footer { padding-inline: 1rem; } .category-dialog-body { padding: 1rem; } }
+    .category-page{color:#0f172a}.category-hero{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.25rem;padding:1.35rem 1.5rem;border:1px solid #e0e7ff;border-radius:1.35rem;background:linear-gradient(135deg,#fff 15%,#eef2ff 100%);box-shadow:0 12px 35px rgba(67,78,206,.08)}
+    .category-hero h1{margin:0;font-size:1.55rem;font-weight:900}.category-hero p{margin:.35rem 0 0;color:#64748b;font-size:.86rem}.category-primary{display:inline-flex;align-items:center;gap:.5rem;min-height:2.8rem;padding:.7rem 1rem;border:0;border-radius:.85rem;color:#fff;background:linear-gradient(135deg,#434ece,#6366f1);font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(67,78,206,.25)}
+    .category-toolbar{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;padding:.8rem;border:1px solid #e2e8f0;border-radius:1rem;background:#fff}.category-search{flex:1;min-width:13rem;height:2.75rem;padding:0 1rem;border:1px solid #cbd5e1;border-radius:.75rem;color:#0f172a;background:#f8fafc;outline:none}.category-search:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12);background:#fff}.category-toolbar button{height:2.6rem;padding:0 .85rem;border:1px solid #e2e8f0;border-radius:.7rem;color:#475569;background:#fff;font-weight:700;cursor:pointer}
+    .category-tree{overflow:hidden;border:1px solid #e2e8f0;border-radius:1.1rem;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.05)}.category-tree-head{display:grid;grid-template-columns:minmax(18rem,1fr) 16rem 13rem;gap:1rem;padding:.8rem 1rem;color:#64748b;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:.74rem;font-weight:800}.category-row{display:grid;grid-template-columns:auto auto minmax(12rem,1fr) 16rem 13rem;align-items:center;gap:.7rem;min-height:4.5rem;padding:.55rem 1rem .55rem calc(1rem + var(--tree-depth) * 1.55rem);border-bottom:1px solid #eef2f7;transition:.18s}.category-row:hover{background:#f8faff}.category-node:last-child>.category-row{border-bottom:0}
+    .category-toggle{display:grid;width:1.8rem;height:1.8rem;place-items:center;border:0;border-radius:.5rem;color:#64748b;background:#f1f5f9;cursor:pointer;transition:.18s}.category-toggle svg{width:.95rem;transition:transform .18s}.category-toggle[aria-expanded=true] svg{transform:rotate(90deg)}.category-toggle.is-leaf{background:transparent;cursor:default}.category-icon{display:grid;width:2.45rem;height:2.45rem;place-items:center;border-radius:.75rem;color:#64748b;background:#f1f5f9}.category-icon.is-root{color:#4f46e5;background:#eef2ff}.category-icon svg{width:1.3rem}.category-main{min-width:0}.category-main strong,.category-main span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.category-main strong{font-size:.9rem}.category-main span{margin-top:.25rem;color:#94a3b8;direction:ltr;text-align:right;font-size:.74rem}
+    .category-meta{display:flex;align-items:center;gap:.5rem;color:#64748b;font-size:.74rem}.category-count{padding:.3rem .55rem;border-radius:999px;color:#4338ca;background:#eef2ff}.category-actions{display:flex;justify-content:flex-end;gap:.4rem}.category-action{min-height:2.1rem;padding:.35rem .65rem;border:1px solid #e2e8f0;border-radius:.6rem;color:#475569;background:#fff;font-size:.72rem;font-weight:700;cursor:pointer}.category-action:hover{color:#4338ca;border-color:#c7d2fe;background:#eef2ff}.category-action.danger:hover{color:#dc2626;border-color:#fecaca;background:#fef2f2}.category-children{background:#f8fafc;border-right:4px solid #c7d2fe}.category-children>.category-node>.category-row{background:#f8fafc}.category-children>.category-node>.category-row:hover{background:#eef2ff}.category-children .category-children{background:#f1f5f9;border-right-color:#a5b4fc}.category-children .category-children>.category-node>.category-row{background:#f1f5f9}.category-node.is-open>.category-row{background:#eef2ff;box-shadow:inset -4px 0 #6366f1}.category-children.is-collapsed{display:none}.category-empty{padding:4rem 1rem;text-align:center;color:#64748b}[data-category-node].is-search-hidden{display:none}
+    .category-dialog{position:fixed;inset:0;width:min(38rem,calc(100vw - 2rem));max-height:calc(100vh - 2rem);margin:auto;padding:0;overflow:auto;border:0;border-radius:1.35rem;color:#0f172a;background:#fff;box-shadow:0 30px 80px rgba(15,23,42,.35)}.category-dialog::backdrop{background:rgba(15,23,42,.65);backdrop-filter:blur(5px)}.dialog-head{display:flex;justify-content:space-between;gap:1rem;padding:1.35rem 1.5rem;color:#fff;background:linear-gradient(135deg,#312e81,#6366f1)}.dialog-head h2{margin:0;font-size:1.2rem}.dialog-head p{margin:.35rem 0 0;color:#c7d2fe;font-size:.8rem}.dialog-close{width:2.3rem;height:2.3rem;border:0;border-radius:50%;color:#fff;background:rgba(255,255,255,.15);font-size:1.4rem;cursor:pointer}
+    .dialog-body{padding:1.4rem 1.5rem}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.field{display:block;color:#334155;font-size:.78rem;font-weight:800}.field.full{grid-column:1/-1}.field input{display:block;box-sizing:border-box;width:100%;height:3rem;margin-top:.45rem;padding:0 .85rem;border:1px solid #cbd5e1;border-radius:.75rem;color:#0f172a;background:#f8fafc;font:inherit;outline:none}.field input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12);background:#fff}.category-parent-summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:.45rem;padding:.85rem 1rem;border:1px solid #c7d2fe;border-radius:.8rem;color:#4338ca;background:#eef2ff}.category-parent-summary strong,.category-parent-summary span{display:block}.category-parent-summary span{color:#64748b;font-size:.72rem;font-weight:500}.form-hint{display:block;margin-top:.35rem;color:#94a3b8;font-size:.7rem;font-weight:500}.dialog-footer{display:flex;justify-content:flex-end;gap:.7rem;padding:1rem 1.5rem;border-top:1px solid #e2e8f0;background:#f8fafc}.dialog-footer button{min-height:2.7rem;padding:.65rem 1.1rem;border-radius:.75rem;font-weight:800;cursor:pointer}.dialog-cancel{border:1px solid #cbd5e1;color:#475569;background:#fff}.dialog-save{border:0;color:#fff;background:#4f46e5}.category-message{margin:0 0 1rem;padding:.75rem;border-radius:.7rem;color:#b91c1c;background:#fef2f2;font-size:.8rem}
+    .dark .category-page{color:#f8fafc}.dark .category-hero,.dark .category-toolbar,.dark .category-tree{border-color:#334155;background:#0f172a}.dark .category-hero{background:linear-gradient(135deg,#0f172a,#1e1b4b)}.dark .category-tree-head,.dark .dialog-footer{border-color:#334155;background:#111827}.dark .category-row{border-color:#1e293b}.dark .category-row:hover{background:#172033}.dark .category-children,.dark .category-children>.category-node>.category-row{background:#111c2e}.dark .category-children .category-children,.dark .category-children .category-children>.category-node>.category-row{background:#172033}.dark .category-node.is-open>.category-row{background:#1e1b4b}.dark .category-search,.dark .field input{border-color:#475569;color:#f8fafc;background:#172033}.dark .category-dialog{color:#f8fafc;background:#0f172a}.dark .field{color:#e2e8f0}.dark .category-action,.dark .category-toolbar button{border-color:#475569;color:#cbd5e1;background:#172033}
+    @@media(max-width:850px){.category-tree-head{display:none}.category-row{grid-template-columns:auto auto minmax(0,1fr);padding-right:calc(.7rem + var(--tree-depth) * .75rem)}.category-meta,.category-actions{grid-column:3}.category-actions{justify-content:flex-start;flex-wrap:wrap}.category-hero{align-items:flex-start;flex-direction:column}}@@media(max-width:560px){.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.category-toolbar{align-items:stretch;flex-wrap:wrap}.category-search{width:100%;flex-basis:100%}}
 </style>
 
-<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-    <div><h1 class="text-2xl font-black dark:text-white">دسته‌بندی‌ها</h1><p class="mt-1 text-sm text-gray-500">مدیریت ساختار مگامنو و دسته‌بندی محصولات</p></div>
-    <button type="button" id="new-category" class="btn bg-primary text-white">افزودن دسته‌بندی</button>
-</div>
-<div class="hidden">@Html.AntiForgeryToken()</div>
-
-<section class="admin-card p-5">
-    <form method="get" class="mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60">
-        <div class="flex flex-col gap-3 sm:flex-row">
-            <label class="relative flex-1">
-                <span class="sr-only">جست‌وجوی دسته‌بندی</span>
-                <svg class="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" style="right: .75rem; z-index: 1;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-                <input class="category-search-input w-full rounded-xl py-3 pl-4 pr-12 text-right" style="padding-right: 3rem;" name="search" value="@Model.Search" placeholder="جست‌وجو در همه دسته‌بندی‌ها، slug یا والد..." />
-            </label>
-            <button class="btn rounded-xl bg-secondary px-6 text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" type="submit">جست‌وجو</button>
-            @if (!string.IsNullOrWhiteSpace(Model.Search)) { <a class="btn rounded-xl border border-slate-200 bg-white px-5 dark:border-slate-600 dark:bg-slate-900" href="@Url.Action("Categories")">پاک کردن</a> }
+<div class="category-page">
+    <header class="category-hero"><div><h1>مدیریت دسته‌بندی‌ها</h1><p>ساختار درختی فروشگاه را بسازید و زیرمجموعه‌ها را در هر سطح مدیریت کنید.</p></div><button id="new-category" class="category-primary" type="button"><span>＋</span> افزودن دسته جدید</button></header>
+    <div class="hidden">@Html.AntiForgeryToken()</div>
+    <div class="category-toolbar"><input id="category-search" class="category-search" type="search" placeholder="جست‌وجو در نام یا آدرس دسته..." autocomplete="off"/><button id="expand-all" type="button">باز کردن همه</button><button id="collapse-all" type="button">بستن همه</button><span class="text-xs text-slate-500">@Model.TotalCount دسته</span></div>
+    <section class="category-tree">
+        <div class="category-tree-head"><span>نام و مسیر دسته</span><span>اطلاعات</span><span class="text-left">عملیات</span></div>
+        <div id="category-tree-body">
+            @if (Model.Categories.Count == 0) { <div class="category-empty">هنوز دسته‌بندی‌ای ثبت نشده است.</div> }
+            @foreach (var category in Model.Categories) { @await Html.PartialAsync("Categories/_CategoryTreeNode", category, new ViewDataDictionary(ViewData) { ["Depth"] = 0 }) }
         </div>
-    </form>
-    <div class="mb-4 flex items-center justify-between text-sm text-slate-500"><span>نمایش @Model.Categories.Count مورد از @Model.TotalCount دسته‌بندی</span>@if (!string.IsNullOrWhiteSpace(Model.Search)){<span>نتیجه جست‌وجو برای «@Model.Search»</span>}</div>
-    <div id="category-message" class="admin-alert mb-4" hidden></div>
-    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="border-b border-slate-200 dark:border-slate-700"><tr><th class="p-3">نام</th><th class="p-3">والد</th><th class="p-3">Slug</th><th class="p-3">ترتیب</th><th class="p-3">عملیات</th></tr></thead><tbody>
-    @foreach (var item in Model.Categories)
-    {
-        <tr class="border-b border-gray-100 transition hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-slate-800/50"><td class="p-3 font-medium dark:text-white">@item.Name</td><td class="p-3 text-sm text-gray-500">@(item.Parent?.Name ?? "دستهٔ اصلی")</td><td class="p-3 text-xs text-gray-500" dir="ltr">@item.Slug</td><td class="p-3">@(item.SortOrder ?? 0)</td><td class="p-3 whitespace-nowrap"><div class="flex items-center gap-2"><button type="button" class="edit-category inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white" data-id="@item.Id" data-name="@item.Name" data-slug="@item.Slug" data-parent="@item.ParentId" data-sort="@(item.SortOrder ?? 0)" title="ویرایش دسته‌بندی"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 20 4.2-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Z"/><path d="m13.8 7.2 3 3"/></svg>ویرایش</button><button type="button" class="delete-category inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-600 hover:text-white dark:border-red-900/50 dark:bg-red-950/30" data-id="@item.Id" data-name="@item.Name" title="حذف دسته‌بندی"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>حذف</button></div></td></tr>
-    }
-    </tbody></table></div>
-    @if (Model.TotalPages > 1)
-    {
-        <nav class="mt-6 flex flex-wrap items-center justify-center gap-2" aria-label="صفحه‌بندی دسته‌بندی‌ها">
-            @if (Model.Page > 1) { <a class="rounded-lg border px-3 py-2 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800" href="@Url.Action("Categories", new { search = Model.Search, page = Model.Page - 1 })">قبلی</a> }
-            @{ var firstPage = Math.Max(1, Math.Min(Model.Page - 4, Model.TotalPages - 9));
-               var lastPage = Math.Min(Model.TotalPages, firstPage + 9); }
-            @for (var number = firstPage; number <= lastPage; number++) { <a class="rounded-lg px-3 py-2 text-sm transition @(number == Model.Page ? "bg-primary text-white shadow-sm" : "border border-slate-200 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800")" href="@Url.Action("Categories", new { search = Model.Search, page = number })">@number</a> }
-            @if (Model.Page < Model.TotalPages) { <a class="rounded-lg border px-3 py-2 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800" href="@Url.Action("Categories", new { search = Model.Search, page = Model.Page + 1 })">بعدی</a> }
-        </nav>
-    }
-</section>
+        <div id="search-empty" class="category-empty" hidden>دسته‌ای با این عبارت پیدا نشد.</div>
+    </section>
+</div>
 
 <dialog id="category-dialog" class="category-dialog">
     <form id="category-form" method="dialog">
-        <div class="category-dialog-header">
-            <div><p class="text-xs font-semibold text-primary">مدیریت فروشگاه</p><h2 id="dialog-title" class="mt-1 text-xl font-black">افزودن دسته‌بندی</h2></div>
-            <button type="button" aria-label="بستن" class="category-dialog-close" onclick="categoryDialog.close()">×</button>
-        </div>
-        <div class="category-dialog-body">
-            <input id="category-id" type="hidden" />
-            <label class="category-dialog-field">نام دسته‌بندی<input id="category-name" required maxlength="100" /></label>
-            <label class="category-dialog-field">Slug<input id="category-slug" required maxlength="100" dir="ltr" placeholder="sewing-thread" /></label>
-            <label class="category-dialog-field">دستهٔ والد
-                <select id="category-parent" class="hidden" aria-hidden="true" tabindex="-1"><option value="">دستهٔ اصلی</option>@foreach(var parent in Model.ParentOptions){<option value="@parent.Id">@parent.Name</option>}</select>
-                <div id="category-parent-picker" class="category-parent-picker">
-                    <button id="category-parent-trigger" class="category-parent-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span id="category-parent-label">دستهٔ اصلی</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
-                    <div id="category-parent-menu" class="category-parent-menu" role="listbox">
-                        <button type="button" class="category-parent-option" data-value="">دستهٔ اصلی</button>
-                        @{ var mainCategories = Model.ParentOptions.Where(x => x.ParentId is null).OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToList(); }
-                        @if (mainCategories.Count > 0) { <div class="category-parent-group">دسته‌ها و زیرشاخه‌ها</div> @foreach (var parent in mainCategories) { var children = Model.ParentOptions.Where(x => x.ParentId == parent.Id).OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToList(); <div class="category-parent-branch"><button type="button" class="category-parent-branch-title category-parent-option" data-value="@parent.Id" data-category-id="@parent.Id">@parent.Name</button>@foreach (var child in children) { <button type="button" class="category-parent-option child-option" data-value="@child.Id" data-category-id="@child.Id">↳ @child.Name</button> }</div> } }
-                    </div>
-                </div>
-            </label>
-            <label class="category-dialog-field">ترتیب نمایش<input id="category-sort" type="number" value="0" /></label>
-        </div>
-        <div class="category-dialog-footer"><button type="button" class="category-cancel-button btn rounded-xl border border-slate-200 bg-white px-5" onclick="categoryDialog.close()">انصراف</button><button class="btn rounded-xl bg-primary px-6 text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" type="submit">ذخیره دسته‌بندی</button></div>
+        <div class="dialog-head"><div><h2 id="dialog-title">افزودن دسته جدید</h2><p id="dialog-subtitle">اطلاعات دسته را وارد کنید.</p></div><button class="dialog-close" type="button" data-close>×</button></div>
+        <div class="dialog-body"><p id="category-message" class="category-message" hidden></p><input id="category-id" type="hidden"/><div class="form-grid">
+            <label class="field full">نام دسته‌بندی<input id="category-name" maxlength="100" required placeholder="مثلاً لپ‌تاپ و کامپیوتر"/><span class="form-hint">نامی واضح و کوتاه برای نمایش در فروشگاه</span></label>
+            <label class="field">آدرس انگلیسی (Slug)<input id="category-slug" maxlength="100" required dir="ltr" placeholder="laptop-computer"/><span class="form-hint">حروف انگلیسی، عدد و خط تیره</span></label>
+            <label class="field">ترتیب نمایش<input id="category-sort" type="number" value="0" min="0"/><span class="form-hint">عدد کمتر، نمایش بالاتر</span></label>
+            <input id="category-parent" type="hidden"/>
+            <div id="category-parent-summary" class="field full" hidden>جایگاه دسته<div class="category-parent-summary"><strong id="category-parent-name"></strong><span>این دسته در همین جایگاه ذخیره می‌شود.</span></div></div>
+        </div></div>
+        <footer class="dialog-footer"><button class="dialog-cancel" type="button" data-close>انصراف</button><button id="category-submit" class="dialog-save" type="submit">ذخیره دسته‌بندی</button></footer>
     </form>
 </dialog>
 
 @section Scripts {
 <script>
-const categoryDialog = document.getElementById('category-dialog'), form = document.getElementById('category-form'), message = document.getElementById('category-message');
-const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-const parentSelect = document.getElementById('category-parent'), parentPicker = document.getElementById('category-parent-picker'), parentTrigger = document.getElementById('category-parent-trigger'), parentLabel = document.getElementById('category-parent-label'), parentMenu = document.getElementById('category-parent-menu');
-function notice(text, error=false){ message.textContent=text; message.hidden=false; message.classList.toggle('text-red-600',error); }
-function setParent(value){ parentSelect.value=value||''; const selected=parentMenu.querySelector(`.category-parent-option[data-value="${CSS.escape(value||'')}"]`); parentLabel.textContent=selected?.textContent?.trim()||'دستهٔ اصلی'; parentMenu.querySelectorAll('.category-parent-option').forEach(option=>option.classList.toggle('is-selected', option===selected)); }
-function positionParentMenu(){ const rect=parentTrigger.getBoundingClientRect(), top=rect.bottom+7, bottomGap=16; parentMenu.style.width=`${rect.width}px`; parentMenu.style.right='auto'; parentMenu.style.left=`${Math.max(8, rect.left)}px`; parentMenu.style.top=`${top}px`; parentMenu.style.maxHeight=`${Math.max(9 * 16, window.innerHeight-top-bottomGap)}px`; }
-function toggleParentPicker(open){ if(open) positionParentMenu(); parentPicker.classList.toggle('is-open', open); parentTrigger.setAttribute('aria-expanded', String(open)); }
-parentTrigger.onclick=()=>toggleParentPicker(!parentPicker.classList.contains('is-open'));
-parentMenu.querySelectorAll('.category-parent-option').forEach(option=>option.onclick=()=>{ setParent(option.dataset.value); toggleParentPicker(false); });
-document.addEventListener('click', event=>{ if (!parentPicker.contains(event.target)) toggleParentPicker(false); });
-window.addEventListener('resize', ()=>{ if(parentPicker.classList.contains('is-open')) positionParentMenu(); });
-categoryDialog.addEventListener('scroll', ()=>{ if(parentPicker.classList.contains('is-open')) positionParentMenu(); });
-function openForm(data){ document.getElementById('dialog-title').textContent=data?'ویرایش دسته‌بندی':'افزودن دسته‌بندی'; document.getElementById('category-id').value=data?.id||''; document.getElementById('category-name').value=data?.name||''; document.getElementById('category-slug').value=data?.slug||''; setParent(data?.parent||''); document.getElementById('category-sort').value=data?.sort||0; categoryDialog.showModal(); }
-document.getElementById('new-category').onclick=()=>openForm(); document.querySelectorAll('.edit-category').forEach(x=>x.onclick=()=>openForm(x.dataset));
-form.onsubmit=async e=>{ e.preventDefault(); const id=document.getElementById('category-id').value, body=new URLSearchParams({name:document.getElementById('category-name').value,slug:document.getElementById('category-slug').value,parentId:document.getElementById('category-parent').value,sortOrder:document.getElementById('category-sort').value,__RequestVerificationToken:token}); const r=await fetch(id?`/Admin/Categories/${id}/Edit`:'/Admin/Categories',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}); const result=await r.json(); if(!r.ok){notice(result.message,true);return;} location.reload(); };
-document.querySelectorAll('.delete-category').forEach(x=>x.onclick=async()=>{if(!confirm(`دسته «${x.dataset.name}» حذف شود؟`))return; const body=new URLSearchParams({__RequestVerificationToken:token}); const r=await fetch(`/Admin/Categories/${x.dataset.id}/Delete`,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}); const result=await r.json(); if(!r.ok){notice(result.message,true);return;} location.reload();});
+(()=>{
+const dialog=document.getElementById('category-dialog'),form=document.getElementById('category-form'),message=document.getElementById('category-message'),token=document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+const fields={id:document.getElementById('category-id'),name:document.getElementById('category-name'),slug:document.getElementById('category-slug'),parent:document.getElementById('category-parent'),sort:document.getElementById('category-sort')};
+const setBranch=(toggle,open)=>{const node=toggle.closest('.category-node'),children=node.querySelector(':scope > .category-children');if(!children)return;children.classList.toggle('is-collapsed',!open);node.classList.toggle('is-open',open);toggle.setAttribute('aria-expanded',String(open));};
+document.querySelectorAll('.category-toggle:not(.is-leaf)').forEach(toggle=>toggle.addEventListener('click',()=>setBranch(toggle,toggle.getAttribute('aria-expanded')!=='true')));
+document.getElementById('expand-all').onclick=()=>document.querySelectorAll('.category-toggle:not(.is-leaf)').forEach(x=>setBranch(x,true));document.getElementById('collapse-all').onclick=()=>document.querySelectorAll('.category-toggle:not(.is-leaf)').forEach(x=>setBranch(x,false));
+const openForm=(data={})=>{form.reset();delete fields.slug.dataset.edited;message.hidden=true;fields.id.value=data.id||'';fields.name.value=data.name||'';fields.slug.value=data.slug||'';fields.parent.value=data.parent||'';fields.sort.value=data.sort||0;const isChild=Boolean(data.parent),parentSummary=document.getElementById('category-parent-summary');document.getElementById('dialog-title').textContent=data.id?'ویرایش دسته‌بندی':isChild?'افزودن زیرمجموعه':'افزودن سر‌دسته جدید';document.getElementById('dialog-subtitle').textContent=isChild?`زیرمجموعه‌ای برای «${data.parentName||'دسته انتخاب‌شده'}» بسازید.`:'این دسته در سطح اصلی فروشگاه ساخته می‌شود.';parentSummary.hidden=!isChild;document.getElementById('category-parent-name').textContent=data.parentName||'دسته والد';dialog.showModal();setTimeout(()=>fields.name.focus(),50);};
+document.getElementById('new-category').onclick=()=>openForm();document.querySelectorAll('[data-close]').forEach(x=>x.onclick=()=>dialog.close());document.querySelectorAll('.add-child-category').forEach(x=>x.onclick=()=>openForm({parent:x.dataset.parent,parentName:x.dataset.parentName}));document.querySelectorAll('.edit-category').forEach(x=>x.onclick=()=>openForm(x.dataset));
+fields.name.addEventListener('input',()=>{if(fields.id.value||fields.slug.dataset.edited)return;fields.slug.value=fields.name.value.trim().toLowerCase().replace(/\s+/g,'-');});fields.slug.addEventListener('input',()=>fields.slug.dataset.edited='true');
+form.onsubmit=async event=>{event.preventDefault();const id=fields.id.value,submit=document.getElementById('category-submit');submit.disabled=true;submit.textContent='در حال ذخیره...';const body=new URLSearchParams({name:fields.name.value,slug:fields.slug.value,parentId:fields.parent.value,sortOrder:fields.sort.value,__RequestVerificationToken:token});try{const response=await fetch(id?`/Admin/Categories/${id}/Edit`:'/Admin/Categories',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});const result=await response.json();if(!response.ok)throw new Error(result.message);location.reload();}catch(error){message.textContent=error.message||'ذخیره دسته‌بندی انجام نشد.';message.hidden=false;}finally{submit.disabled=false;submit.textContent='ذخیره دسته‌بندی';}};
+document.querySelectorAll('.delete-category').forEach(button=>button.onclick=async()=>{if(!confirm(`دسته «${button.dataset.name}» حذف شود؟`))return;const response=await fetch(`/Admin/Categories/${button.dataset.id}/Delete`,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({__RequestVerificationToken:token})});const result=await response.json();if(!response.ok){alert(result.message);return;}location.reload();});
+document.getElementById('category-search').addEventListener('input',event=>{const term=event.target.value.trim().toLocaleLowerCase('fa-IR'),nodes=[...document.querySelectorAll('[data-category-node]')];nodes.forEach(node=>node.classList.remove('is-search-hidden'));if(term){nodes.slice().reverse().forEach(node=>{const own=`${node.dataset.name} ${node.dataset.slug}`.toLocaleLowerCase('fa-IR').includes(term),childMatch=Boolean(node.querySelector(':scope > .category-children [data-category-node]:not(.is-search-hidden)'));node.classList.toggle('is-search-hidden',!own&&!childMatch);if(own||childMatch){const toggle=node.querySelector(':scope > .category-row .category-toggle:not(.is-leaf)');if(toggle)setBranch(toggle,true);}});}document.getElementById('search-empty').hidden=nodes.some(x=>!x.classList.contains('is-search-hidden'));});
+})();
 </script>
 }

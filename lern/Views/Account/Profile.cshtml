@@ -1,7 +1,366 @@
 @{
-    Layout = null;
+    Layout = "_AccountLayout";
     ViewData["Title"] = "پروفایل";
-    ViewData["ProfileOnly"] = true;
 }
 
-@await Html.PartialAsync("Index", new lern.Models.AccountIndexViewModel())
+<style>
+    .jalali-field { position: relative; }
+    .jalali-field button { text-align: right; }
+    .jalali-field svg { position: absolute; left: 14px; top: 50%; width: 20px; height: 20px; transform: translateY(-50%); pointer-events: none; color: #6b7280; }
+    .jalali-modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15, 23, 42, .55); backdrop-filter: blur(3px); }
+    .jalali-modal[hidden] { display: none; }
+    .jalali-calendar { width: 100%; max-width: 360px; overflow: hidden; border: 1px solid #e5e7eb; border-radius: 18px; background: #fff; box-shadow: 0 24px 70px rgba(15, 23, 42, .25); }
+    .jalali-calendar-header { padding: 18px; color: #fff; background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .jalali-calendar-title { display: flex; align-items: center; justify-content: space-between; }
+    .jalali-calendar-title button { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: rgba(255,255,255,.15); font-size: 20px; }
+    .jalali-calendar-selects { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .jalali-calendar-selects select { width: 100%; border: 1px solid rgba(255,255,255,.35); border-radius: 10px; padding: 8px 10px; color: #fff; background: rgba(255,255,255,.14); outline: none; }
+    .jalali-calendar-selects option { color: #111827; background: #fff; }
+    .jalali-calendar-body { padding: 16px; }
+    .jalali-weekdays, .jalali-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; text-align: center; }
+    .jalali-weekdays { margin-bottom: 8px; color: #6b7280; font-size: 12px; }
+    .jalali-day { aspect-ratio: 1; border-radius: 10px; font-size: 13px; transition: .15s ease; }
+    .jalali-day:hover { color: #4f46e5; background: #eef2ff; }
+    .jalali-day.is-selected { color: #fff; background: #4f46e5; box-shadow: 0 5px 12px rgba(79,70,229,.3); }
+    .jalali-day.is-today { border: 1px solid #8b5cf6; }
+    .jalali-day:disabled { color: #cbd5e1; cursor: not-allowed; background: transparent; }
+    .jalali-calendar-footer { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #e5e7eb; padding: 12px 16px; }
+    .jalali-calendar-footer button { border-radius: 10px; padding: 8px 14px; font-size: 13px; }
+    .jalali-cancel { color: #4b5563; background: #f3f4f6; }
+    .jalali-clear { color: #dc2626; background: #fef2f2; }
+    .dark .jalali-calendar { border-color: #374151; background: #1f2937; color: #f9fafb; }
+    .dark .jalali-weekdays { color: #9ca3af; }
+    .dark .jalali-calendar-footer { border-color: #374151; }
+    .dark .jalali-cancel { color: #e5e7eb; background: #374151; }
+</style>
+
+<section class="w-full px-4 py-3 md:px-6 md:py-5">
+    <div class="mb-6 px-1 md:px-2">
+        <h1 class="text-2xl font-bold text-dark dark:text-light">پروفایل</h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">اطلاعات شخصی حساب خود را مدیریت کنید.</p>
+    </div>
+
+    <form id="profile-form" class="w-full rounded-xl border bg-white shadow-soft dark:border-gray-700 dark:bg-card-dark dark:shadow-soft-dark">
+        <div class="border-b border-gray-200 p-5 dark:border-gray-700">
+            <h2 class="text-lg font-bold text-dark dark:text-light">اطلاعات شخصی</h2>
+        </div>
+
+        <div class="p-5 md:p-8">
+            <div class="flex flex-col gap-8 lg:flex-row">
+                <div class="flex shrink-0 flex-col items-center lg:w-40">
+                    <div class="relative">
+                        <img data-profile-image class="h-28 w-28 rounded-full border-4 border-white object-cover shadow-lg dark:border-gray-800" src="/assets/images/user/user.jpg" alt="تصویر پروفایل کاربر" />
+                        <span class="absolute bottom-1 start-1 h-4 w-4 rounded-full border-2 border-white bg-green-500 dark:border-gray-800"></span>
+                    </div>
+                    <span class="mt-3 text-sm text-gray-500 dark:text-gray-400">تصویر پروفایل</span>
+                    <input id="profile-image-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" />
+                    <label for="profile-image-input" class="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20 dark:bg-primary/20 dark:text-primary-300 dark:hover:bg-primary/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 16.5V19a2 2 0 002 2h14a2 2 0 002-2v-2.5M16 8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        تغییر تصویر
+                    </label>
+                    <p id="profile-image-message" class="mt-2 text-center text-xs text-gray-500 dark:text-gray-400">JPG، PNG، WEBP یا GIF تا ۵ مگابایت</p>
+                </div>
+
+                <div class="min-w-0 flex-1">
+                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                        <div>
+                            <label for="firstName" class="mb-1 block text-sm font-medium">نام</label>
+                            <input id="firstName" required maxlength="100" class="w-full rounded-lg border px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
+                        </div>
+                        <div>
+                            <label for="lastName" class="mb-1 block text-sm font-medium">نام خانوادگی</label>
+                            <input id="lastName" required maxlength="100" class="w-full rounded-lg border px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
+                        </div>
+                        <div>
+                            <label for="email" class="mb-1 block text-sm font-medium">ایمیل</label>
+                            <input id="email" type="email" maxlength="256" class="w-full rounded-lg border px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
+                        </div>
+                        <div>
+                            <label for="phone" class="mb-1 block text-sm font-medium">شماره موبایل</label>
+                            <input id="phone" readonly class="w-full cursor-not-allowed rounded-lg border bg-gray-100 px-4 py-2 text-gray-500 dark:border-gray-600 dark:bg-gray-800" />
+                            <p class="mt-1 text-xs text-gray-500">شماره موبایل، شناسهٔ ورود شماست و از این بخش تغییر نمی‌کند.</p>
+                        </div>
+                        <div>
+                            <label for="birthDateDisplay" class="mb-1 block text-sm font-medium">تاریخ تولد</label>
+                            <input id="birthDate" type="hidden" />
+                            <div class="jalali-field">
+                                <button id="birthDateDisplay" type="button" class="w-full rounded-lg border px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" aria-haspopup="dialog">انتخاب تاریخ تولد</button>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M6.75 3v2.25M17.25 3v2.25M3.75 9h16.5M5.25 5.25h13.5a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-12a1.5 1.5 0 011.5-1.5z" /></svg>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">تاریخ را به تقویم شمسی انتخاب کنید.</p>
+                        </div>
+                        <div>
+                            <label for="nationalCode" class="mb-1 block text-sm font-medium">کد ملی</label>
+                            <input id="nationalCode" inputmode="numeric" minlength="10" maxlength="10" pattern="[0-9]{10}" autocomplete="off" placeholder="مثال: ۰۰۱۲۳۴۵۶۷۸" class="w-full rounded-lg border px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
+                            <p id="national-code-hint" class="mt-1 text-xs text-gray-500 dark:text-gray-400">کد ملی باید دقیقاً ۱۰ رقم باشد.</p>
+                        </div>
+                    </div>
+
+                    <p id="profile-message" role="alert" class="mt-5 hidden rounded-lg px-4 py-3 text-sm"></p>
+
+                    <div class="mt-6 flex justify-end">
+                        <button id="save-profile" type="submit" class="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90">ذخیره تغییرات</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+<div id="jalali-date-modal" class="jalali-modal" hidden role="dialog" aria-modal="true" aria-labelledby="jalali-calendar-heading">
+    <div class="jalali-calendar">
+        <div class="jalali-calendar-header">
+            <div class="jalali-calendar-title">
+                <button id="jalali-next" type="button" aria-label="ماه بعد">›</button>
+                <strong id="jalali-calendar-heading">انتخاب تاریخ تولد</strong>
+                <button id="jalali-prev" type="button" aria-label="ماه قبل">‹</button>
+            </div>
+            <div class="jalali-calendar-selects">
+                <select id="jalali-month" aria-label="ماه"></select>
+                <select id="jalali-year" aria-label="سال"></select>
+            </div>
+        </div>
+        <div class="jalali-calendar-body">
+            <div class="jalali-weekdays"><span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span></div>
+            <div id="jalali-days" class="jalali-days"></div>
+        </div>
+        <div class="jalali-calendar-footer">
+            <button id="jalali-clear" type="button" class="jalali-clear">پاک کردن تاریخ</button>
+            <button id="jalali-cancel" type="button" class="jalali-cancel">انصراف</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(() => {
+    const form = document.getElementById('profile-form');
+    const message = document.getElementById('profile-message');
+    const save = document.getElementById('save-profile');
+    const imageInput = document.getElementById('profile-image-input');
+    const imageMessage = document.getElementById('profile-image-message');
+    const birthDateDisplay = document.getElementById('birthDateDisplay');
+    const dateModal = document.getElementById('jalali-date-modal');
+    const dateDays = document.getElementById('jalali-days');
+    const monthSelect = document.getElementById('jalali-month');
+    const yearSelect = document.getElementById('jalali-year');
+    const nationalCodeHint = document.getElementById('national-code-hint');
+    const defaultProfileImage = '/assets/images/user/user.jpg';
+    const fields = {
+        firstName: document.getElementById('firstName'),
+        lastName: document.getElementById('lastName'),
+        email: document.getElementById('email'),
+        phone: document.getElementById('phone'),
+        birthDate: document.getElementById('birthDate'),
+        nationalCode: document.getElementById('nationalCode')
+    };
+
+    const showMessage = (text, isError = false) => {
+        message.textContent = text;
+        message.className = `mt-5 rounded-lg px-4 py-3 text-sm ${isError ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`;
+    };
+
+    const persianMonths = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+    const persianFormatter = new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    const faNumber = value => Number(value).toLocaleString('fa-IR', { useGrouping: false });
+    const toPersianParts = date => {
+        const parts = Object.fromEntries(persianFormatter.formatToParts(date).filter(x => x.type !== 'literal').map(x => [x.type, Number(x.value)]));
+        return { year: parts.year, month: parts.month, day: parts.day };
+    };
+    const toIsoDate = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const fromIsoDate = value => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
+        const [year, month, day] = value.split('-').map(Number);
+        return new Date(year, month - 1, day, 12);
+    };
+    const findGregorianDate = (year, month, day) => {
+        const cursor = new Date(year + 621, 1, 15, 12);
+        for (let index = 0; index < 430; index += 1) {
+            const parts = toPersianParts(cursor);
+            if (parts.year === year && parts.month === month && parts.day === day) return new Date(cursor);
+            cursor.setDate(cursor.getDate() + 1);
+        }
+        return null;
+    };
+    const today = new Date();
+    const todayPersian = toPersianParts(today);
+    let calendarYear = todayPersian.year - 25;
+    let calendarMonth = todayPersian.month;
+
+    persianMonths.forEach((month, index) => monthSelect.add(new Option(month, String(index + 1))));
+    for (let year = todayPersian.year; year >= todayPersian.year - 120; year -= 1) yearSelect.add(new Option(faNumber(year), String(year)));
+
+    const updateBirthDateDisplay = () => {
+        const date = fromIsoDate(fields.birthDate.value);
+        if (!date) {
+            birthDateDisplay.textContent = 'انتخاب تاریخ تولد';
+            birthDateDisplay.classList.add('text-gray-500');
+            return;
+        }
+        const parts = toPersianParts(date);
+        birthDateDisplay.textContent = `${faNumber(parts.day)} ${persianMonths[parts.month - 1]} ${faNumber(parts.year)}`;
+        birthDateDisplay.classList.remove('text-gray-500');
+    };
+
+    const renderCalendar = () => {
+        monthSelect.value = String(calendarMonth);
+        yearSelect.value = String(calendarYear);
+        dateDays.replaceChildren();
+        const firstDay = findGregorianDate(calendarYear, calendarMonth, 1);
+        if (!firstDay) return;
+        const nextYear = calendarMonth === 12 ? calendarYear + 1 : calendarYear;
+        const nextMonth = calendarMonth === 12 ? 1 : calendarMonth + 1;
+        const nextFirstDay = findGregorianDate(nextYear, nextMonth, 1);
+        const daysInMonth = Math.round((nextFirstDay - firstDay) / 86400000);
+        const startOffset = (firstDay.getDay() + 1) % 7;
+        for (let blank = 0; blank < startOffset; blank += 1) dateDays.append(document.createElement('span'));
+        const selectedDate = fromIsoDate(fields.birthDate.value);
+        const selected = selectedDate ? toPersianParts(selectedDate) : null;
+        for (let day = 1; day <= daysInMonth; day += 1) {
+            const date = new Date(firstDay);
+            date.setDate(firstDay.getDate() + day - 1);
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'jalali-day';
+            button.textContent = faNumber(day);
+            button.disabled = date > today;
+            if (selected && selected.year === calendarYear && selected.month === calendarMonth && selected.day === day) button.classList.add('is-selected');
+            if (todayPersian.year === calendarYear && todayPersian.month === calendarMonth && todayPersian.day === day) button.classList.add('is-today');
+            button.addEventListener('click', () => {
+                fields.birthDate.value = toIsoDate(date);
+                updateBirthDateDisplay();
+                dateModal.hidden = true;
+            });
+            dateDays.append(button);
+        }
+    };
+
+    const openCalendar = () => {
+        const selectedDate = fromIsoDate(fields.birthDate.value);
+        if (selectedDate) {
+            const selected = toPersianParts(selectedDate);
+            calendarYear = selected.year;
+            calendarMonth = selected.month;
+        }
+        renderCalendar();
+        dateModal.hidden = false;
+    };
+
+    birthDateDisplay.addEventListener('click', openCalendar);
+    document.getElementById('jalali-cancel').addEventListener('click', () => dateModal.hidden = true);
+    document.getElementById('jalali-clear').addEventListener('click', () => { fields.birthDate.value = ''; updateBirthDateDisplay(); dateModal.hidden = true; });
+    document.getElementById('jalali-prev').addEventListener('click', () => { calendarMonth -= 1; if (calendarMonth < 1) { calendarMonth = 12; calendarYear -= 1; } renderCalendar(); });
+    document.getElementById('jalali-next').addEventListener('click', () => { calendarMonth += 1; if (calendarMonth > 12) { calendarMonth = 1; calendarYear += 1; } if (calendarYear > todayPersian.year) { calendarYear = todayPersian.year; calendarMonth = todayPersian.month; } renderCalendar(); });
+    monthSelect.addEventListener('change', () => { calendarMonth = Number(monthSelect.value); renderCalendar(); });
+    yearSelect.addEventListener('change', () => { calendarYear = Number(yearSelect.value); renderCalendar(); });
+    dateModal.addEventListener('click', event => { if (event.target === dateModal) dateModal.hidden = true; });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') dateModal.hidden = true; });
+
+    const normalizeDigits = value => value
+        .replace(/[۰-۹]/g, digit => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
+        .replace(/[٠-٩]/g, digit => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)))
+        .replace(/\D/g, '')
+        .slice(0, 10);
+    const validateNationalCode = () => {
+        fields.nationalCode.value = normalizeDigits(fields.nationalCode.value);
+        const valid = !fields.nationalCode.value || /^\d{10}$/.test(fields.nationalCode.value);
+        fields.nationalCode.setCustomValidity(valid ? '' : 'کد ملی باید دقیقاً ۱۰ رقم باشد.');
+        nationalCodeHint.className = `mt-1 text-xs ${valid ? 'text-gray-500 dark:text-gray-400' : 'text-red-600 dark:text-red-400'}`;
+        return valid;
+    };
+    fields.nationalCode.addEventListener('input', validateNationalCode);
+
+    const setProfileImages = (imageUrl) => {
+        const source = imageUrl || defaultProfileImage;
+        document.querySelectorAll('[data-profile-image]').forEach(image => {
+            image.src = `${source}${source.includes('?') ? '&' : '?'}v=${Date.now()}`;
+        });
+    };
+
+    fetch('/api/account/me', { credentials: 'same-origin' })
+        .then(response => response.ok ? response.json() : Promise.reject())
+        .then(user => {
+            fields.firstName.value = user.firstName || '';
+            fields.lastName.value = user.lastName || '';
+            fields.email.value = user.email || '';
+            fields.phone.value = user.phoneNumber || '';
+            fields.birthDate.value = user.birthDate || '';
+            fields.nationalCode.value = user.nationalCode || '';
+            updateBirthDateDisplay();
+            validateNationalCode();
+            setProfileImages(user.profileImageUrl);
+        })
+        .catch(() => location.assign('/login'));
+
+    imageInput.addEventListener('change', async () => {
+        const file = imageInput.files?.[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            imageMessage.textContent = 'حجم تصویر نباید بیشتر از ۵ مگابایت باشد.';
+            imageMessage.className = 'mt-2 text-center text-xs text-red-600 dark:text-red-400';
+            imageInput.value = '';
+            return;
+        }
+
+        imageMessage.textContent = 'در حال آپلود تصویر...';
+        imageMessage.className = 'mt-2 text-center text-xs text-gray-500 dark:text-gray-400';
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/api/account/profile-image', {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: formData
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.message || 'تغییر تصویر انجام نشد.');
+            setProfileImages(data.profileImageUrl);
+            imageMessage.textContent = 'تصویر پروفایل با موفقیت تغییر کرد.';
+            imageMessage.className = 'mt-2 text-center text-xs text-green-600 dark:text-green-400';
+        } catch (error) {
+            imageMessage.textContent = error.message;
+            imageMessage.className = 'mt-2 text-center text-xs text-red-600 dark:text-red-400';
+        } finally {
+            imageInput.value = '';
+        }
+    });
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!validateNationalCode()) {
+            fields.nationalCode.reportValidity();
+            return;
+        }
+        save.disabled = true;
+        save.textContent = 'در حال ذخیره...';
+
+        try {
+            const response = await fetch('/api/account/me', {
+                method: 'PUT',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    firstName: fields.firstName.value,
+                    lastName: fields.lastName.value,
+                    email: fields.email.value || null,
+                    birthDate: fields.birthDate.value || null,
+                    nationalCode: fields.nationalCode.value || null
+                })
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.message || 'ذخیره‌سازی انجام نشد.');
+
+            const fullName = `${data.user.firstName} ${data.user.lastName}`.trim();
+            document.querySelectorAll('[data-user-name]').forEach(element => element.textContent = fullName);
+            showMessage('تغییرات با موفقیت ذخیره شد.');
+        } catch (error) {
+            showMessage(error.message, true);
+        } finally {
+            save.disabled = false;
+            save.textContent = 'ذخیره تغییرات';
+        }
+    });
+})();
+</script>

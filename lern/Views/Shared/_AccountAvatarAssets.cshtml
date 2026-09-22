@@ -1,0 +1,21 @@
+<style>
+    img[data-profile-image] { width: 48px; height: 48px; max-width: 100%; object-fit: cover; border-radius: 50%; flex-shrink: 0; }
+    #user-dropdown img[data-profile-image] { width: 32px; height: 32px; }
+    #profile-form img[data-profile-image] { width: 112px; height: 112px; }
+    .account-content-column { min-width: 0; min-height: 0; }
+    .account-content-column > header { flex-shrink: 0; }
+    .account-scroll-content { flex: 1 1 0%; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+</style>
+<script>
+    window.setAccountAvatar = function (url) {
+        document.querySelectorAll('[data-profile-image]').forEach(image => {
+            image.src = url || '/assets/images/user/user.jpg';
+        });
+    };
+    window.addEventListener('pageshow', async () => {
+        try {
+            const response = await fetch('/api/account/me', { credentials: 'same-origin', cache: 'no-store' });
+            if (response.ok) window.setAccountAvatar((await response.json()).profileImageUrl);
+        } catch { /* Keep the last displayed image when offline. */ }
+    });
+</script>

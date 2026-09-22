@@ -57,6 +57,8 @@ namespace Entities
             modelBuilder.Entity<CustomerUser>().Property(x => x.Email).HasMaxLength(256);
             modelBuilder.Entity<CustomerUser>().Property(x => x.FirstName).IsRequired().HasMaxLength(100);
             modelBuilder.Entity<CustomerUser>().Property(x => x.LastName).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<CustomerUser>().Property(x => x.NationalCode).HasMaxLength(10);
+            modelBuilder.Entity<CustomerUser>().Property(x => x.ProfileImageUrl).HasMaxLength(500);
             modelBuilder.Entity<CustomerUser>().Property(x => x.PasswordHash).IsRequired().HasMaxLength(256);
             modelBuilder.Entity<CustomerUser>().Property(x => x.PasswordSalt).IsRequired().HasMaxLength(128);
             modelBuilder.Entity<CustomerUser>().Property(x => x.Role).IsRequired().HasMaxLength(32);

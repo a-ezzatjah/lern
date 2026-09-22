@@ -60,7 +60,7 @@ public sealed class UserAuthService : IUserAuthService
     public async Task<UserProfileDto?> GetProfileAsync(int userId)
     {
         return await _db.Users.AsNoTracking().Where(x => x.Id == userId && x.IsActive)
-            .Select(x => new UserProfileDto { Id = x.Id, PhoneNumber = x.PhoneNumber, Email = x.Email, FirstName = x.FirstName, LastName = x.LastName, Role = x.Role, CreatedAt = x.CreatedAt })
+            .Select(x => new UserProfileDto { Id = x.Id, PhoneNumber = x.PhoneNumber, Email = x.Email, FirstName = x.FirstName, LastName = x.LastName, BirthDate = x.BirthDate, NationalCode = x.NationalCode, ProfileImageUrl = x.ProfileImageUrl, Role = x.Role, CreatedAt = x.CreatedAt })
             .SingleOrDefaultAsync();
     }
 
@@ -82,5 +82,5 @@ public sealed class UserAuthService : IUserAuthService
         catch (FormatException) { return false; }
     }
 
-    private static UserProfileDto ToProfile(CustomerUser user) => new() { Id = user.Id, PhoneNumber = user.PhoneNumber, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, Role = user.Role, CreatedAt = user.CreatedAt };
+    private static UserProfileDto ToProfile(CustomerUser user) => new() { Id = user.Id, PhoneNumber = user.PhoneNumber, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, BirthDate = user.BirthDate, NationalCode = user.NationalCode, ProfileImageUrl = user.ProfileImageUrl, Role = user.Role, CreatedAt = user.CreatedAt };
 }

@@ -1,0 +1,31 @@
+@model Entities.Category
+@{
+    var depth = ViewData["Depth"] as int? ?? 0;
+    var children = Model.Children.OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToList();
+    var hasChildren = children.Count > 0;
+}
+
+<article class="category-node depth-@depth @(hasChildren && depth == 0 ? "is-open" : "")" data-category-node data-name="@Model.Name" data-slug="@Model.Slug">
+    <div class="category-row" style="--tree-depth: @depth">
+        <button class="category-toggle @(hasChildren ? "" : "is-leaf")" type="button" aria-label="نمایش زیرمجموعه‌ها" aria-expanded="@(depth == 0 ? "true" : "false")" @(hasChildren ? null : "disabled")>
+            @if (hasChildren) { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6" /></svg> }
+        </button>
+        <span class="category-icon @(depth == 0 ? "is-root" : "")"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7.5h6l2 2h10v9.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5Z"/><path d="M3 7.5V5a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v2.5"/></svg></span>
+        <div class="category-main"><strong>@Model.Name</strong><span>@Model.Slug</span></div>
+        <div class="category-meta">@if (hasChildren) { <span class="category-count">@children.Count زیرمجموعه</span> }<span>ترتیب: @(Model.SortOrder ?? 0)</span></div>
+        <div class="category-actions">
+            <button type="button" class="category-action add-child-category" data-parent="@Model.Id" data-parent-name="@Model.Name">＋ زیرمجموعه</button>
+            <button type="button" class="category-action edit-category" data-id="@Model.Id" data-name="@Model.Name" data-slug="@Model.Slug" data-parent="@Model.ParentId" data-parent-name="@Model.Parent?.Name" data-sort="@Model.SortOrder">ویرایش</button>
+            <button type="button" class="category-action danger delete-category" data-id="@Model.Id" data-name="@Model.Name">حذف</button>
+        </div>
+    </div>
+    @if (hasChildren)
+    {
+        <div class="category-children @(depth > 0 ? "is-collapsed" : "")">
+            @foreach (var child in children)
+            {
+                @await Html.PartialAsync("Categories/_CategoryTreeNode", child, new ViewDataDictionary(ViewData) { ["Depth"] = depth + 1 })
+            }
+        </div>
+    }
+</article>

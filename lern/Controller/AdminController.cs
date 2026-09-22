@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Entities;
 using lern.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -99,26 +100,160 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
     }
 
     [HttpGet("Categories")]
-    public async Task<IActionResult> Categories(string? search, int page = 1)
+    public async Task<IActionResult> Categories()
     {
-        var query = _db.Categories.AsNoTracking().Include(x => x.Parent).AsQueryable();
-        if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(x => x.Name.Contains(search) || x.Slug.Contains(search) || (x.Parent != null && x.Parent.Name.Contains(search)));
+        var categories = await _db.Categories.AsNoTracking()
+            .OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToListAsync();
+        var categoryIds = categories.Select(x => x.Id).ToHashSet();
+        var categoryById = categories.ToDictionary(x => x.Id);
+        var childrenByParent = categories
+            .Where(x => x.ParentId.HasValue && categoryIds.Contains(x.ParentId.Value))
+            .GroupBy(x => x.ParentId!.Value)
+            .ToDictionary(x => x.Key, x => x.ToList());
 
-        const int pageSize = 10;
-        var totalCount = await query.CountAsync();
-        var totalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize));
-        page = Math.Clamp(page, 1, totalPages);
-        var categories = await query.OrderBy(x => x.ParentId).ThenBy(x => x.SortOrder).ThenBy(x => x.Name)
-            .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-        var parents = await _db.Categories.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
-        return View("Categories/Index", new AdminCategoryListViewModel { Search = search, Categories = categories, ParentOptions = parents, Page = page, PageSize = pageSize, TotalCount = totalCount });
+        foreach (var category in categories)
+        {
+            category.Children = childrenByParent.GetValueOrDefault(category.Id) ?? new List<Category>();
+            if (category.ParentId.HasValue)
+                category.Parent = categoryById.GetValueOrDefault(category.ParentId.Value);
+        }
+
+        var roots = categories.Where(x => !x.ParentId.HasValue || !categoryIds.Contains(x.ParentId.Value)).ToList();
+        return View("Categories/Index", new AdminCategoryListViewModel
+        {
+            Categories = roots,
+            TotalCount = categories.Count
+        });
     }
 
     [HttpGet("Users")]
-    public IActionResult Users()
+    public async Task<IActionResult> Users(string? search, int page = 1)
     {
-        return View("Users/Index");
+        var query = _db.Users.AsNoTracking().AsQueryable();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.Trim();
+            query = query.Where(x => x.FirstName.Contains(search) || x.LastName.Contains(search) ||
+                x.PhoneNumber.Contains(search) || (x.Email != null && x.Email.Contains(search)));
+        }
+
+        const int pageSize = 10;
+        var totalCount = await query.CountAsync();
+        page = Math.Clamp(page, 1, Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize)));
+        var users = await query.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
+            .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        return View("Users/Index", new AdminUserListViewModel
+        {
+            Search = search, Users = users, Page = page, PageSize = pageSize, TotalCount = totalCount
+        });
+    }
+
+    [HttpGet("Users/Create")]
+    public IActionResult CreateUserPage()
+    {
+        return View("Users/Create", new AdminUserCreateViewModel());
+    }
+
+    [HttpPost("Users/Create")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateUser(AdminUserCreateViewModel model)
+    {
+        model.PhoneNumber = NormalizePhone(model.PhoneNumber) ?? model.PhoneNumber;
+        model.Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim().ToLowerInvariant();
+
+        if (model.Role is not ("Admin" or "Author" or "Customer"))
+            ModelState.AddModelError(nameof(model.Role), "نقش انتخاب‌شده معتبر نیست.");
+
+        if (await _db.Users.AnyAsync(x => x.PhoneNumber == model.PhoneNumber))
+            ModelState.AddModelError(nameof(model.PhoneNumber), "کاربری با این شماره موبایل وجود دارد.");
+
+        if (model.Email is not null && await _db.Users.AnyAsync(x => x.Email == model.Email))
+            ModelState.AddModelError(nameof(model.Email), "کاربری با این ایمیل وجود دارد.");
+
+        if (model.Avatar is { Length: > 0 } && !IsValidAvatar(model.Avatar))
+            ModelState.AddModelError(nameof(model.Avatar), "تصویر باید JPG، PNG یا WEBP و حداکثر ۵ مگابایت باشد.");
+
+        if (!ModelState.IsValid)
+            return View("Users/Create", model);
+
+        var salt = RandomNumberGenerator.GetBytes(16);
+        var user = new CustomerUser
+        {
+            FirstName = model.FirstName.Trim(),
+            LastName = model.LastName.Trim(),
+            PhoneNumber = model.PhoneNumber,
+            Email = model.Email,
+            Role = model.Role,
+            IsActive = model.IsActive,
+            PasswordSalt = Convert.ToBase64String(salt),
+            PasswordHash = Convert.ToBase64String(Rfc2898DeriveBytes.Pbkdf2(
+                model.Password, salt, 100_000, HashAlgorithmName.SHA256, 32))
+        };
+
+        if (model.Avatar is { Length: > 0 })
+            user.ProfileImageUrl = await SaveAvatarAsync(model.Avatar);
+
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
+        TempData["UserCreated"] = "کاربر جدید با موفقیت ذخیره شد.";
+        return RedirectToAction(nameof(Users));
+    }
+
+    [HttpGet("Users/{id:int}/Edit")]
+    public async Task<IActionResult> EditUserPage(int id)
+    {
+        var user = await _db.Users.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id);
+        if (user is null) return NotFound();
+        return View("Users/Edit", new AdminUserEditViewModel
+        {
+            Id = user.Id, FirstName = user.FirstName, LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber, Email = user.Email, Role = user.Role,
+            IsActive = user.IsActive, ExistingAvatarUrl = user.ProfileImageUrl
+        });
+    }
+
+    [HttpPost("Users/{id:int}/Edit")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditUser(int id, AdminUserEditViewModel model)
+    {
+        if (id != model.Id) return BadRequest();
+        var user = await _db.Users.SingleOrDefaultAsync(x => x.Id == id);
+        if (user is null) return NotFound();
+
+        model.PhoneNumber = NormalizePhone(model.PhoneNumber) ?? model.PhoneNumber;
+        model.Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim().ToLowerInvariant();
+        model.ExistingAvatarUrl = user.ProfileImageUrl;
+        if (model.Role is not ("Admin" or "Author" or "Customer")) ModelState.AddModelError(nameof(model.Role), "نقش انتخاب‌شده معتبر نیست.");
+        if (await _db.Users.AnyAsync(x => x.Id != id && x.PhoneNumber == model.PhoneNumber)) ModelState.AddModelError(nameof(model.PhoneNumber), "کاربری با این شماره موبایل وجود دارد.");
+        if (model.Email is not null && await _db.Users.AnyAsync(x => x.Id != id && x.Email == model.Email)) ModelState.AddModelError(nameof(model.Email), "کاربری با این ایمیل وجود دارد.");
+        if (model.Avatar is { Length: > 0 } && !IsValidAvatar(model.Avatar)) ModelState.AddModelError(nameof(model.Avatar), "تصویر باید JPG، PNG یا WEBP و حداکثر ۵ مگابایت باشد.");
+        if (!ModelState.IsValid) return View("Users/Edit", model);
+
+        user.FirstName = model.FirstName.Trim(); user.LastName = model.LastName.Trim();
+        user.PhoneNumber = model.PhoneNumber; user.Email = model.Email;
+        user.Role = model.Role; user.IsActive = model.IsActive;
+        if (!string.IsNullOrWhiteSpace(model.Password))
+        {
+            var salt = RandomNumberGenerator.GetBytes(16);
+            user.PasswordSalt = Convert.ToBase64String(salt);
+            user.PasswordHash = Convert.ToBase64String(Rfc2898DeriveBytes.Pbkdf2(model.Password, salt, 100_000, HashAlgorithmName.SHA256, 32));
+        }
+        if (model.Avatar is { Length: > 0 }) user.ProfileImageUrl = await SaveAvatarAsync(model.Avatar);
+        await _db.SaveChangesAsync();
+        TempData["UserCreated"] = "اطلاعات کاربر با موفقیت ویرایش شد.";
+        return RedirectToAction(nameof(Users));
+    }
+
+    [HttpPost("Users/{id:int}/Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        var user = await _db.Users.SingleOrDefaultAsync(x => x.Id == id);
+        if (user is null) return NotFound(new { success = false, message = "کاربر پیدا نشد." });
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+        return Json(new { success = true, message = "کاربر با موفقیت حذف شد." });
     }
 
     [HttpPost("Categories")]
@@ -769,6 +904,34 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         await using var stream = new FileStream(filePath, FileMode.CreateNew);
         await image.CopyToAsync(stream);
         return $"/uploads/products/{fileName}";
+    }
+
+    private static string? NormalizePhone(string? phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone)) return null;
+        var value = new string(phone.Where(char.IsDigit).ToArray());
+        if (value.StartsWith("0098")) value = "0" + value[4..];
+        else if (value.StartsWith("98") && value.Length == 12) value = "0" + value[2..];
+        else if (value.Length == 10 && value.StartsWith('9')) value = "0" + value;
+        return value.Length == 11 && value.StartsWith("09") ? value : null;
+    }
+
+    private static bool IsValidAvatar(IFormFile image)
+    {
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+        return image.Length <= 5 * 1024 * 1024 &&
+               allowedExtensions.Contains(Path.GetExtension(image.FileName).ToLowerInvariant());
+    }
+
+    private async Task<string> SaveAvatarAsync(IFormFile image)
+    {
+        var uploadDirectory = Path.Combine(_environment.WebRootPath, "uploads", "profiles");
+        Directory.CreateDirectory(uploadDirectory);
+        var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
+        var fileName = $"{Guid.NewGuid():N}{extension}";
+        await using var stream = new FileStream(Path.Combine(uploadDirectory, fileName), FileMode.CreateNew);
+        await image.CopyToAsync(stream);
+        return $"/uploads/profiles/{fileName}";
     }
 
     private bool IsAjaxRequest()
