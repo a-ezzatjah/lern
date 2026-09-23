@@ -3,6 +3,7 @@ using Entities;
 using lern.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using DTO;
 
 namespace lern.Controller;
@@ -13,15 +14,18 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
     private readonly ShopDbContext _db;
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<AdminController> _logger;
+    private readonly IMemoryCache _cache;
 
     public AdminController(
         ShopDbContext db,
         IWebHostEnvironment environment,
-        ILogger<AdminController> logger)
+        ILogger<AdminController> logger,
+        IMemoryCache cache)
     {
         _db = db;
         _environment = environment;
         _logger = logger;
+        _cache = cache;
     }
 
     [HttpGet("")]
@@ -263,8 +267,15 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         var error = await ValidateCategoryAsync(name, slug, parentId);
         if (error is not null) return BadRequest(new { success = false, message = error });
 
-        _db.Categories.Add(new Category { Name = name.Trim(), Slug = slug.Trim(), ParentId = parentId, SortOrder = sortOrder ?? 0 });
+        var siblings = await _db.Categories.Where(x => x.ParentId == parentId)
+            .OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ThenBy(x => x.Id).ToListAsync();
+        var category = new Category { Name = name.Trim(), Slug = slug.Trim(), ParentId = parentId };
+        siblings.Insert(Math.Clamp(sortOrder ?? siblings.Count + 1, 1, siblings.Count + 1) - 1, category);
+        for (var index = 0; index < siblings.Count; index++)
+            siblings[index].SortOrder = index + 1;
+        _db.Categories.Add(category);
         await _db.SaveChangesAsync();
+        _cache.Remove("categories_tree");
         return Json(new { success = true, message = "دسته‌بندی افزوده شد." });
     }
 
@@ -281,8 +292,13 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         category.Name = name.Trim();
         category.Slug = slug.Trim();
         category.ParentId = parentId;
-        category.SortOrder = sortOrder ?? 0;
+        var siblings = await _db.Categories.Where(x => x.ParentId == parentId && x.Id != id)
+            .OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ThenBy(x => x.Id).ToListAsync();
+        siblings.Insert(Math.Clamp(sortOrder ?? category.SortOrder ?? siblings.Count + 1, 1, siblings.Count + 1) - 1, category);
+        for (var index = 0; index < siblings.Count; index++)
+            siblings[index].SortOrder = index + 1;
         await _db.SaveChangesAsync();
+        _cache.Remove("categories_tree");
         return Json(new { success = true, message = "دسته‌بندی ویرایش شد." });
     }
 
@@ -297,8 +313,14 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         if (await _db.ProductCategories.AnyAsync(x => x.CategoryId == id))
             return Conflict(new { success = false, message = "این دسته به محصول متصل است و قابل حذف نیست." });
 
+        var siblings = await _db.Categories.Where(x => x.ParentId == category.ParentId && x.Id != id)
+            .OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ThenBy(x => x.Id).ToListAsync();
+        for (var index = 0; index < siblings.Count; index++)
+            siblings[index].SortOrder = index + 1;
+
         _db.Categories.Remove(category);
         await _db.SaveChangesAsync();
+        _cache.Remove("categories_tree");
         return Json(new { success = true, message = "دسته‌بندی حذف شد." });
     }
 
