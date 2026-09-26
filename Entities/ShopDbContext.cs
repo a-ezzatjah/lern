@@ -33,9 +33,14 @@ namespace Entities
         public DbSet<ProductComment> ProductComments { get; set; }
         public DbSet<ProductViewHistory> ProductViewHistories { get; set; }
 
+        public DbSet<ProductFavorite> ProductFavorites { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ProductFavorite>().HasKey(x => new { x.UserId, x.ProductId });
+            modelBuilder.Entity<ProductFavorite>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProductFavorite>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Product>().ToTable("products");
             modelBuilder.Entity<Category>().ToTable("categories");
             modelBuilder.Entity<ProductCategory>().ToTable("ProductCategories");

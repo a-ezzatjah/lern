@@ -1,0 +1,11 @@
+<div id="favorite-security" hidden>@Html.AntiForgeryToken()</div>
+<style>
+[data-favorite-id] { cursor: pointer; }
+[data-favorite-id] svg { width: 24px; height: 24px; }
+[data-favorite-id].is-favorite, [data-favorite-id].is-favorite svg { color: #e11d48 !important; }
+[data-favorite-id]:disabled { opacity: .5; cursor: wait; }
+.store-product-card { position: relative; }
+.store-favorite-button { position: absolute; z-index: 2; top: 12px; left: 12px; padding: 8px; background: white; border-radius: 50%; color: #6b7280; }
+#favorites-page [hidden] { display: none !important; }
+</style>
+<script src="/assets/js/favorites.js" defer asp-append-version="true"></script>

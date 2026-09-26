@@ -23,6 +23,8 @@ namespace ServiceContract.Interfaces
 
         public Task<List<ProductCardDto>> GetProductCardsAsync();
 
+        public Task<PageResult<ProductCardDto>> GetCategoryProductCardsAsync(int categoryId, int page = 1);
+
         public Task<ProductListItemDto?> GetListItemByIdAsync(int productId);
 
         public Task<ProductUpdateDto?> GetForUpdateAsync(int productId);

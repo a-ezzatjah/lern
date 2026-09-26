@@ -7993,7 +7993,40 @@ html:not(.dark) .bg-card-light.rounded-3xl {
   display: flex;
   min-height: 3rem;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.6rem;
   margin-top: 0.7rem;
+}
+
+.store-price-option-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-inline-start: auto;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(67, 78, 206, 0.16);
+  border-radius: 999px;
+  color: #434ece;
+  background: linear-gradient(135deg, #f0f1ff, #f8f5ff);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.store-price-option-badge::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(67, 78, 206, 0.12);
+}
+
+.dark .store-price-option-badge {
+  border-color: rgba(165, 180, 252, 0.2);
+  color: #c7d2fe;
+  background: linear-gradient(135deg, rgba(67, 78, 206, 0.25), rgba(124, 58, 237, 0.18));
 }
 
 .store-product-price > div {

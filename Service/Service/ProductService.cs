@@ -563,6 +563,41 @@ public async Task<List<ProductCardDto>> GetRelatedProductCardsAsync(int productI
 
 
 
+public async Task<PageResult<ProductCardDto>> GetCategoryProductCardsAsync(int categoryId, int page = 1)
+{
+    const int pageSize = 24;
+    var hierarchy = await _shopDbContext.Categories.AsNoTracking()
+        .Select(c => new { c.Id, c.ParentId }).ToListAsync();
+    var children = hierarchy.Where(c => c.ParentId.HasValue).ToLookup(c => c.ParentId!.Value, c => c.Id);
+    var categoryIds = new HashSet<int>();
+    var pending = new Queue<int>();
+    pending.Enqueue(categoryId);
+    while (pending.TryDequeue(out var id))
+    {
+        if (!categoryIds.Add(id)) continue;
+        foreach (var childId in children[id]) pending.Enqueue(childId);
+    }
+
+    var ids = categoryIds.ToArray();
+    var query = _shopDbContext.Products.AsNoTracking()
+        .Where(p => p.IsActive && p.ProductCategories.Any(c => ids.Contains(c.CategoryId)));
+    var totalCount = await query.CountAsync();
+    page = Math.Clamp(page, 1, Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize)));
+    var products = await query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id)
+        .Skip((page - 1) * pageSize).Take(pageSize)
+        .Include(p => p.SaleOptions).ThenInclude(o => o.ProductVariants)
+        .Include(p => p.SaleOptions).ThenInclude(o => o.SaleOptionColors).ThenInclude(c => c.ProductVariants)
+        .Include(p => p.ProductImages)
+        .AsSplitQuery().ToListAsync();
+    return new PageResult<ProductCardDto>
+    {
+        Items = products.Select(CreateProductCard).ToList(),
+        TotalCount = totalCount,
+        Page = page,
+        PageSize = pageSize
+    };
+}
+
 public async Task<List<ProductCardDto>> GetDiscountedProductCardsAsync(int take = 8)
 {
     take = Math.Clamp(take, 1, 50);

@@ -1,0 +1,55 @@
+@model lern.Models.StoreCategoryViewModel
+@{
+    var totalPages = Math.Max(1, (int)Math.Ceiling(Model.Products.TotalCount / (double)Model.Products.PageSize));
+}
+<section class="container category-results">
+    <nav class="category-breadcrumbs" aria-label="مسیر دسته‌بندی">
+        <a href="/">صفحه اصلی</a>
+        @foreach (var parent in Model.Breadcrumbs)
+        {
+            <span aria-hidden="true">/</span>
+            <a asp-controller="StoreCategory" asp-action="Index" asp-route-id="@parent.Id">@parent.Name</a>
+        }
+        <span aria-hidden="true">/</span><span aria-current="page">@Model.Category.Name</span>
+    </nav>
+    <header class="category-results-heading">
+        <h1>@Model.Category.Name</h1>
+        <span>@Model.Products.TotalCount.ToString("N0") محصول</span>
+    </header>
+    @if (Model.Children.Count > 0)
+    {
+        <nav class="category-subcategories" aria-label="زیرمجموعه‌های این دسته">
+            @foreach (var child in Model.Children)
+            {
+                <a asp-controller="StoreCategory" asp-action="Index" asp-route-id="@child.Id">@child.Name <span aria-hidden="true">←</span></a>
+            }
+        </nav>
+    }
+    @if (Model.Products.Items.Count == 0)
+    {
+        <p class="category-results-empty">هنوز محصولی در این دسته و زیرمجموعه‌های آن ثبت نشده است.</p>
+    }
+    else
+    {
+        <div class="category-product-grid">
+            @foreach (var product in Model.Products.Items)
+            {
+                <partial name="_ProductCard" model="product" />
+            }
+        </div>
+    }
+    @if (totalPages > 1)
+    {
+        <nav class="category-pagination" aria-label="صفحه‌بندی محصولات">
+            @if (Model.Products.Page > 1)
+            {
+                <a asp-controller="StoreCategory" asp-action="Index" asp-route-id="@Model.Category.Id" asp-route-page="@(Model.Products.Page - 1)">صفحه قبل</a>
+            }
+            <span>صفحه @Model.Products.Page از @totalPages</span>
+            @if (Model.Products.Page < totalPages)
+            {
+                <a asp-controller="StoreCategory" asp-action="Index" asp-route-id="@Model.Category.Id" asp-route-page="@(Model.Products.Page + 1)">صفحه بعد</a>
+            }
+        </nav>
+    }
+</section>

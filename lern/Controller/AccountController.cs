@@ -44,7 +44,7 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
             .Select(id => cardsById[id])
             .ToList();
 
-        return View(new AccountIndexViewModel { RecentlyViewedProducts = recentlyViewedProducts });
+        return View(new AccountIndexViewModel { RecentlyViewedProducts = recentlyViewedProducts, FavoriteCount = await _db.ProductFavorites.CountAsync(x => x.UserId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!) && x.Product.IsActive) });
     }
 
     [Authorize]

@@ -1,0 +1,13 @@
+@model lern.ViewComponents.MegaMenuViewModel
+<ul>
+    @foreach (var category in Model.Roots)
+    {
+        <li>
+            <a asp-controller="StoreCategory" asp-action="Index" asp-route-id="@category.Id">@category.Name</a>
+            @if (Model.ChildrenByParent.TryGetValue(category.Id, out var children) && children.Count > 0)
+            {
+                <partial name="_CategoryMenuDescendants" model="@(new lern.ViewComponents.MegaMenuViewModel(children, Model.ChildrenByParent))" />
+            }
+        </li>
+    }
+</ul>
