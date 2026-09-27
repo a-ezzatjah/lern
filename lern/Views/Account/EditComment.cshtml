@@ -1,0 +1,43 @@
+@model lern.Models.AccountCommentEditViewModel
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "ویرایش نظر";
+}
+<section class="w-full p-4 md:p-6">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div><h1 class="text-2xl font-bold text-dark dark:text-light">ویرایش نظر</h1><p class="mt-1 text-sm text-gray-600 dark:text-gray-400">شما در حال ویرایش نظر خود برای محصول زیر هستید.</p></div>
+        <a asp-action="Comments" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-dark hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-light">بازگشت به نظرات</a>
+    </div>
+
+    <div class="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-soft dark:border-gray-700 dark:bg-card-dark dark:shadow-soft-dark">
+        <a asp-controller="StoreProduct" asp-action="Details" asp-route-id="@Model.ProductId" class="text-lg font-medium text-primary hover:underline dark:text-primary-dark">@Model.ProductName</a>
+        <div class="mt-4 flex flex-wrap items-center gap-4 text-sm dark:text-white">
+            <span>امتیاز فعلی: @(Model.Score.HasValue ? $"{Model.Score} از ۵" : "ثبت نشده")</span>
+            <span>وضعیت نظر: <span class="rounded-full px-2 py-1 @(Model.IsApproved ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200")">@(Model.IsApproved ? "تأیید شده" : "در انتظار تأیید")</span></span>
+        </div>
+    </div>
+
+    <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-soft dark:border-gray-700 dark:bg-card-dark dark:shadow-soft-dark">
+        <h2 class="mb-5 text-lg font-bold text-dark dark:text-light">ویرایش نظر</h2>
+        @if (!string.IsNullOrWhiteSpace(Model.Error)) { <p role="alert" class="mb-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">@Model.Error</p> }
+        <form asp-action="EditComment" asp-route-id="@Model.Id" method="post" class="space-y-6">
+            @Html.AntiForgeryToken()
+            <fieldset>
+                <legend class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">امتیاز شما به این محصول</legend>
+                <div class="flex flex-wrap gap-2">
+                    @for (var score = 1; score <= 5; score++)
+                    {
+                        <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 dark:border-gray-600 dark:text-gray-300">
+                            <input type="radio" name="score" value="@score" checked="@(Model.Score == score)" class="h-4 w-4 accent-indigo-600" />
+                            <span>★ @score</span>
+                        </label>
+                    }
+                </div>
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">امتیاز برای این محصول در حساب شما ثبت می‌شود.</p>
+            </fieldset>
+            <div><label for="review-title" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">عنوان نظر (اختیاری)</label><input id="review-title" name="title" value="@Model.Title" maxlength="150" class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" placeholder="عنوان کوتاه برای نظر خود بنویسید" /></div>
+            <div><label for="review-text" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">متن نظر</label><textarea id="review-text" name="body" rows="6" required maxlength="2000" class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" placeholder="تجربه خود از استفاده این محصول را شرح دهید">@Model.Body</textarea><p class="mt-2 text-xs text-gray-500 dark:text-gray-400">حداکثر ۲۰۰۰ کاراکتر</p></div>
+            <div class="flex flex-wrap justify-end gap-3"><a asp-action="Comments" class="rounded-lg border border-gray-300 px-6 py-3 text-sm text-dark dark:border-gray-600 dark:text-light">انصراف</a><button type="submit" class="rounded-lg bg-primary px-6 py-3 text-sm text-white hover:bg-primary/90">ذخیره تغییرات</button></div>
+        </form>
+    </div>
+</section>

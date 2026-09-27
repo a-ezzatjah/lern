@@ -9,7 +9,7 @@
                 <p class="text-gray-600 dark:text-gray-400">اطلاعات آدرس خود را به روزرسانی کنید</p>
             </div>
             <div class="mt-4 md:mt-0 flex gap-2">
-                <a href="/checkout" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                <a href="@(Context.Request.Query["from"] == "account" ? "/account/addresses" : "/checkout")" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 me-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
                     بازگشت
                 </a>
@@ -70,7 +70,7 @@
     const isNew = new URLSearchParams(location.search).get('new') === '1';
     const validationMessages = { editAddressTitle:'عنوان آدرس را وارد کنید.', editProvince:'استان را انتخاب کنید.', editCity:'شهر را انتخاب کنید.', editAddress:'آدرس دقیق را وارد کنید.', editPostalCode:'کد پستی باید ۱۰ رقم باشد.', editPhone:'شماره تلفن همراه را وارد کنید.', editReceiverName:'نام تحویل‌گیرنده را وارد کنید.' };
     Object.keys(validationMessages).forEach(id => { const input=field(id); input.addEventListener('invalid', e => { e.preventDefault(); input.setCustomValidity(validationMessages[id]); input.reportValidity(); }); input.addEventListener('input', () => input.setCustomValidity('')); input.addEventListener('change', () => input.setCustomValidity('')); });
-    if (!isNew) { const editId = new URLSearchParams(location.search).get('id'); fetch('/api/address' + (editId ? '?id=' + encodeURIComponent(editId) : '')).then(response => response.status === 204 ? null : response.ok ? response.json() : null).then(setValues).catch(() => {}); }
+    if (!isNew) { const editId = new URLSearchParams(location.search).get('id'); fetch('/api/address' + (editId ? '?id=' + encodeURIComponent(editId) : '')).then(response => response.status === 204 ? null : response.ok ? response.json() : Promise.reject(new Error('آدرس موردنظر پیدا نشد.'))).then(setValues).catch(error => { message.textContent = error.message; message.className = 'text-sm text-red-600'; form.querySelector('button[type="submit"]').disabled = true; }); }
     form.addEventListener('submit', async event => {
         event.preventDefault();
         for (const [id, msg] of Object.entries(validationMessages)) { const input=field(id); if (!input.value.trim()) { input.setCustomValidity(msg); input.reportValidity(); return; } }
@@ -87,7 +87,8 @@
             try { const existing = await fetch('/api/address/list').then(r => r.ok ? r.json() : []); if (existing.length >= 3) { showLimitMessage(); return; } } catch (_) { }
         }
         try {
-            const response = await fetch('/api/address', { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const editId = new URLSearchParams(location.search).get('id');
+            const response = await fetch('/api/address' + (!isNew && editId ? '?id=' + encodeURIComponent(editId) : ''), { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const result = await response.json().catch(() => null);
             if (!response.ok) {
                 const detail = typeof result === 'string'
@@ -101,7 +102,7 @@
             message.textContent = 'آدرس با موفقیت ذخیره شد؛ در حال انتقال...';
             message.className = 'text-sm text-green-600';
             // بعد از ذخیره موفق، کاربر باید به مرحله تکمیل سفارش برگردد.
-            window.setTimeout(() => window.location.assign('/checkout'), 250);
+            window.setTimeout(() => window.location.assign(new URLSearchParams(location.search).get('from') === 'account' ? '/account/addresses' : '/checkout'), 250);
         } catch (error) {
             if ((error.message || '').includes('سه آدرس') || (error.message || '').includes('نمی‌توانید')) { showLimitMessage(); return; }
             message.textContent = error.message || 'ذخیره آدرس انجام نشد.';

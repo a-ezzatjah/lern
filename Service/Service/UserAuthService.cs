@@ -64,6 +64,25 @@ public sealed class UserAuthService : IUserAuthService
             .SingleOrDefaultAsync();
     }
 
+    public async Task<ServiceResponseDto<bool>> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+    {
+        var user = await _db.Users.SingleOrDefaultAsync(x => x.Id == userId && x.IsActive);
+        if (user is null || string.IsNullOrEmpty(currentPassword) ||
+            !VerifyPassword(currentPassword, user.PasswordSalt, user.PasswordHash))
+            return ServiceResponseDto<bool>.Fail("رمز عبور فعلی نادرست است.");
+
+        if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 8)
+            return ServiceResponseDto<bool>.Fail("رمز عبور جدید باید حداقل ۸ کاراکتر باشد.");
+        if (VerifyPassword(newPassword, user.PasswordSalt, user.PasswordHash))
+            return ServiceResponseDto<bool>.Fail("رمز عبور جدید باید با رمز عبور فعلی متفاوت باشد.");
+
+        var salt = RandomNumberGenerator.GetBytes(SaltSize);
+        user.PasswordSalt = Convert.ToBase64String(salt);
+        user.PasswordHash = HashPassword(newPassword, salt);
+        await _db.SaveChangesAsync();
+        return ServiceResponseDto<bool>.Success(true);
+    }
+
     private static string? NormalizePhone(string? phone)
     {
         if (string.IsNullOrWhiteSpace(phone)) return null;

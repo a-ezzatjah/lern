@@ -199,47 +199,29 @@
   }
 }
 
-/* Storefront light-mode surfaces: white page with warm cream cards. */
-html:not(.dark) body:not(.admin-shell) { background-color: #ffffff !important; }
+/* Shared light palette: cool blue gray page and softly tinted surfaces. */
+html:not(.dark) body { background-color: #F3F5FA; }
 html:not(.dark) body:not(.admin-shell) #topHeader,
 html:not(.dark) body:not(.admin-shell) > section[itemtype*="WPFooter"],
-html:not(.dark) body:not(.admin-shell) nav.fixed { background-color: #fffaf0 !important; box-shadow: 0 4px 18px rgba(120,90,40,.10); }
+html:not(.dark) body:not(.admin-shell) nav.fixed {
+  background-color: #FAFBFE !important;
+  box-shadow: 0 4px 18px rgba(39, 44, 72, .08);
+}
 html:not(.dark) body:not(.admin-shell) .bg-white.rounded-lg,
 html:not(.dark) body:not(.admin-shell) .bg-white.rounded-xl,
-html:not(.dark) body:not(.admin-shell) .bg-white.rounded-2xl { background-color: #fffdf7 !important; border: 1px solid #eee5d5; box-shadow: 0 3px 14px rgba(120,90,40,.09); }
-
-/* Final storefront palette and address validation contrast. */
-html:not(.dark) body:not(.admin-shell) { background-color: #edf1f4 !important; }
-html:not(.dark) body:not(.admin-shell) .bg-white,
-html:not(.dark) body:not(.admin-shell) [class~="bg-white"] { background-color: #f8f5ee !important; }
-html:not(.dark) body:not(.admin-shell) .bg-white.rounded-lg,
-html:not(.dark) body:not(.admin-shell) .bg-white.rounded-xl,
-html:not(.dark) body:not(.admin-shell) .bg-white.rounded-2xl { background-color: #fff8e9 !important; border: 1px solid #e8dcc7 !important; box-shadow: 0 4px 16px rgba(100,80,40,.12) !important; }
-html:not(.dark) body:not(.admin-shell) #topHeader,
-html:not(.dark) body:not(.admin-shell) > section[itemtype*="WPFooter"] { background-color: #f5efe3 !important; }
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-2xl,
+html:not(.dark) body:not(.admin-shell) .bg-white.rounded-3xl,
+html:not(.dark) body:not(.admin-shell) .bg-card-light.rounded-lg,
+html:not(.dark) body:not(.admin-shell) .bg-card-light.rounded-xl,
+html:not(.dark) body:not(.admin-shell) .bg-card-light.rounded-2xl,
+html:not(.dark) body:not(.admin-shell) .bg-card-light.rounded-3xl {
+  background-color: #FAFBFE !important;
+  border: 1px solid #E3E8F2 !important;
+  box-shadow: 0 3px 14px rgba(39, 44, 72, .07);
+}
 html:not(.dark) .address-limit-message { border: 2px solid #fca5a5; background: #fef2f2; color: #b91c1c; }
 html.dark .address-limit-message { border: 2px solid #f87171; background: #450a0a; color: #fecaca; }
 
-/* جداسازی ظریف کارت‌ها، هدر و فوتر از پس‌زمینه‌ی سفید در حالت روز */
-html:not(.dark) body { background-color: #ffffff; }
-html:not(.dark) #topHeader,
-html:not(.dark) body > section[itemtype*="WPFooter"],
-html:not(.dark) nav.fixed {
-  background-color: #fffaf0 !important;
-  box-shadow: 0 4px 18px rgba(120, 90, 40, .10);
-}
-html:not(.dark) .bg-white.rounded-lg,
-html:not(.dark) .bg-white.rounded-xl,
-html:not(.dark) .bg-white.rounded-2xl,
-html:not(.dark) .bg-white.rounded-3xl,
-html:not(.dark) .bg-card-light.rounded-lg,
-html:not(.dark) .bg-card-light.rounded-xl,
-html:not(.dark) .bg-card-light.rounded-2xl,
-html:not(.dark) .bg-card-light.rounded-3xl {
-  background-color: #fffdf7 !important;
-  border: 1px solid #e8dcc7 !important;
-  box-shadow: 0 3px 14px rgba(120, 90, 40, .09);
-}
 @layer base {
   *, ::after, ::before, ::backdrop, ::file-selector-button {
     box-sizing: border-box;
@@ -7885,16 +7867,16 @@ html:not(.dark) .bg-card-light.rounded-3xl {
   min-width: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #e8dcc7;
+  border: 1px solid #E3E8F2;
   border-radius: 1.25rem;
-  background: #fff8e9;
-  box-shadow: 0 8px 30px rgba(100, 80, 40, 0.09);
+  background: #FAFBFE;
+  box-shadow: 0 8px 30px rgba(39, 44, 72, 0.07);
   transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
 
 .store-product-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(255, 130, 41, 0.35);
+  border-color: rgba(67, 78, 206, 0.35);
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
 }
 
@@ -7903,7 +7885,7 @@ html:not(.dark) .bg-card-light.rounded-3xl {
   aspect-ratio: 1 / 0.86;
   overflow: hidden;
   background:
-    radial-gradient(circle at center, #fffdf7, #f5ead6);
+    radial-gradient(circle at center, #FAFBFE, #E9EDF8);
 }
 
 .store-product-image {
@@ -8774,9 +8756,9 @@ html:not(.dark) .admin-shell {
 .admin-icon-sprite{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;opacity:0!important;pointer-events:none!important}
 .admin-nav-icon{flex:0 0 1.7rem!important}
 .admin-nav-icon svg{display:block!important;width:1.05rem!important;height:1.05rem!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
-.admin-shell{background:#e9eef5!important}
-.admin-sidebar,.admin-topbar{background:#f5f8fb!important;border-color:#d8e1ec!important}
-.admin-card,.admin-stat-card,.admin-welcome-card,.admin-placeholder-grid article{background:#f7f9fc!important;border-color:#dbe4ee!important}
+.admin-shell{background:#F3F5FA!important}
+.admin-sidebar,.admin-topbar{background:#FAFBFE!important;border-color:#d8e1ec!important}
+.admin-card,.admin-stat-card,.admin-welcome-card,.admin-placeholder-grid article{background:#FAFBFE!important;border-color:#dbe4ee!important}
 .admin-field-grid input,.admin-field-grid select{background:#eef3f8!important;border-color:#d0dbe8!important}
 .admin-variant-row,.admin-sidebar-footer{background:#edf2f7!important;border-color:#d5e0eb!important}
 .admin-nav-link:hover,.admin-nav-link.active{background:linear-gradient(135deg,#e4e9ff,#e5f5e8)!important}
@@ -8788,13 +8770,13 @@ html:not(.dark) .admin-shell {
 @media(max-width:560px){.admin-content{padding:1rem .75rem 5rem}.admin-topbar{padding:.75rem}.admin-page-heading{align-items:flex-start;flex-direction:column}.admin-page-heading .admin-primary-button,.admin-page-heading .admin-secondary-button{width:100%}.admin-stat-grid,.admin-placeholder-grid,.admin-field-grid{grid-template-columns:1fr}.admin-field-grid label.full{grid-column:auto}.admin-welcome-card{align-items:flex-start;flex-direction:column}.admin-welcome-art,.admin-site-link{display:none}}
 /* Final light-mode surface adjustment (kept after generated utility overrides) */
 html:not(.dark) body:not(.admin-shell) {
-  background: #f1f4f8 !important;
+  background: #F3F5FA !important;
 }
 
 /* Reduce the stark white surfaces across the storefront in light mode. */
 html:not(.dark) body:not(.admin-shell) .bg-white,
 html:not(.dark) body:not(.admin-shell) [class~="bg-white"] {
-  background-color: #f3f5f7 !important;
+  background-color: #FAFBFE !important;
 }
 
 html:not(.dark) body:not(.admin-shell) #topHeader {
@@ -8956,4 +8938,14 @@ html:not(.dark) article.bg-white,
 html:not(.dark) .bg-white[class*="rounded-"],
 html:not(.dark) .bg-card-light[class*="rounded-"] {
   border: 1px solid #434ece !important;
+}
+/* Account dashboard and subpages share the cool light surfaces. */
+html:not(.dark) body.account-shell,
+html:not(.dark) body.account-shell .account-scroll-content {
+  background-color: #F3F5FA !important;
+}
+html:not(.dark) body.account-shell .bg-card-light,
+html:not(.dark) body.account-shell header.bg-white,
+html:not(.dark) body.account-shell .bg-white {
+  background-color: #FAFBFE !important;
 }

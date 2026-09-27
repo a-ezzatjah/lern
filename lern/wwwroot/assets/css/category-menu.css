@@ -144,6 +144,8 @@
 .category-root > summary { min-height: 50px; padding: 11px 17px; font-size: 15px; }
 .category-root[open] > summary { background: linear-gradient(to left, var(--cat-soft), var(--cat-bg)); font-weight: 600; }
 .category-root > summary > a { padding: 3px 0; }
+.category-root > summary > a { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.category-root-icon { width: 19px; height: 19px; flex: 0 0 19px; color: var(--cat-accent); }
 .category-panel { inset-inline-start: 230px; inset-inline-end: 0; direction: rtl; padding: 24px 30px 30px; }
 .category-tree, .category-panel, #offcanvas-right { scrollbar-width: thin; scrollbar-color: #aab2e5 transparent; }
 .dark .category-tree, .dark .category-panel, .dark #offcanvas-right { scrollbar-color: #676d9c transparent; }

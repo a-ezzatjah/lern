@@ -1,4 +1,5 @@
 using Entities;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,13 +12,13 @@ public class AddressApiController : ControllerBase
     public AddressApiController(ShopDbContext db) => _db = db;
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get(int? id)
     {
         var key = EnsureCustomerKey();
         await EnsureAddressTableAsync();
-        var address = await _db.Addresses.AsNoTracking().Where(x => x.CustomerKey == key)
+        var address = await _db.Addresses.AsNoTracking().Where(x => x.CustomerKey == key && (!id.HasValue || x.Id == id.Value))
             .OrderByDescending(x => x.IsDefault).ThenByDescending(x => x.UpdatedAt).FirstOrDefaultAsync();
-        return address is null ? NoContent() : Ok(ToResponse(address));
+        return address is null ? (id.HasValue ? NotFound() : NoContent()) : Ok(ToResponse(address));
     }
 
     [HttpPut]
@@ -36,6 +37,7 @@ public class AddressApiController : ControllerBase
         await EnsureAddressTableAsync();
         var requestedId = int.TryParse(Request.Query["id"], out var id) ? id : 0;
         var address = await _db.Addresses.Where(x => x.CustomerKey == key && (requestedId == 0 || x.Id == requestedId)).OrderByDescending(x => x.IsDefault).ThenByDescending(x => x.UpdatedAt).FirstOrDefaultAsync();
+        if (requestedId != 0 && address is null) return NotFound();
         if (address is null) { address = new Address { CustomerKey = key }; _db.Addresses.Add(address); }
         if (request.IsDefault) await _db.Addresses.Where(x => x.CustomerKey == key && x.Id != address.Id).ExecuteUpdateAsync(s => s.SetProperty(x => x.IsDefault, false));
         address.Title = values.Title; address.Province = values.Province; address.City = values.City; address.Details = values.Details;
@@ -113,6 +115,9 @@ END");
 
     private string EnsureCustomerKey()
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (User.Identity?.IsAuthenticated == true && !string.IsNullOrWhiteSpace(userId))
+            return $"user-{userId}";
         var key = Request.Cookies["customer-key"];
         if (!string.IsNullOrWhiteSpace(key)) return key;
         key = Guid.NewGuid().ToString("N");
