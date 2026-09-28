@@ -33,6 +33,17 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
     public async Task<IActionResult> Index()
     {
         var customerKey = $"user-{User.FindFirstValue(ClaimTypes.NameIdentifier)}";
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var now = DateTime.UtcNow;
+        var yearAgo = now.AddYears(-1);
+        var activityDates = new[]
+        {
+            await _db.ProductViewHistories.AsNoTracking().Where(x => x.CustomerKey == customerKey && x.LastViewedAt >= yearAgo).Select(x => x.LastViewedAt).ToListAsync(),
+            await _db.CartItems.AsNoTracking().Where(x => x.CustomerKey == customerKey && x.UpdatedAt >= yearAgo).Select(x => x.UpdatedAt).ToListAsync(),
+            await _db.Orders.AsNoTracking().Where(x => x.CustomerKey == customerKey && x.CreatedAt >= yearAgo).Select(x => x.CreatedAt).ToListAsync(),
+            await _db.ProductFavorites.AsNoTracking().Where(x => x.UserId == userId && x.CreatedAt >= yearAgo).Select(x => x.CreatedAt).ToListAsync(),
+            await _db.ProductComments.AsNoTracking().Where(x => x.CustomerKey == customerKey && x.CreatedAt >= yearAgo).Select(x => x.CreatedAt).ToListAsync()
+        };
         var viewedProductIds = await _db.ProductViewHistories.AsNoTracking()
             .Where(x => x.CustomerKey == customerKey)
             .OrderByDescending(x => x.LastViewedAt)
@@ -49,6 +60,16 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
         return View(new AccountIndexViewModel
         {
             RecentlyViewedProducts = recentlyViewedProducts,
+            ActivityCounts = new Dictionary<string, int[]>
+            {
+                ["week"] = activityDates.Select(dates => dates.Count(date => date >= now.AddDays(-7))).ToArray(),
+                ["month"] = activityDates.Select(dates => dates.Count(date => date >= now.AddMonths(-1))).ToArray(),
+                ["year"] = activityDates.Select(dates => dates.Count).ToArray()
+            },
+            RecentTransactions = await _db.PaymentTransactions.AsNoTracking().Include(x => x.Order)
+                .Where(x => x.Order.CustomerKey == customerKey &&
+                    (x.Status == PaymentStatus.Successful || x.Status == PaymentStatus.Failed))
+                .OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id).Take(4).ToListAsync(),
             RecentOrders = await _db.Orders.AsNoTracking().Include(x => x.Items)
                 .Where(x => x.CustomerKey == customerKey).OrderByDescending(x => x.CreatedAt).Take(3).ToListAsync(),
             ActiveOrderCount = await _db.Orders.CountAsync(x => x.CustomerKey == customerKey &&
