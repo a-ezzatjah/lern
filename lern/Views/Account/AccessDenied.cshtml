@@ -1,0 +1,22 @@
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>دسترسی مجاز نیست</title>
+    <link rel="stylesheet" href="~/assets/css/arino-account.css" asp-append-version="true" />
+</head>
+<body class="bg-light text-gray-900">
+    <main class="flex min-h-screen items-center justify-center p-6">
+        <section class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+            <h1 class="mb-4 text-2xl font-bold">دسترسی مجاز نیست</h1>
+            <p class="mb-6 text-gray-600">حساب فعلی اجازهٔ مشاهدهٔ این صفحه را ندارد. برای مشاهدهٔ سفارش‌های فروشگاه، با حساب مدیر وارد شوید.</p>
+            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="mb-4 block rounded-xl bg-primary px-4 py-3 text-white">ورود با حساب مدیر</a>
+            <a href="/account" class="text-sm text-primary">بازگشت به حساب کاربری</a>
+        </section>
+    </main>
+</body>
+</html>

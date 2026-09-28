@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using Entities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +24,22 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
     }
     [AllowAnonymous]
     [HttpGet("/login")]
-    public IActionResult Login() => View();
+    public IActionResult Login(string? returnUrl)
+    {
+        ViewData["ReturnUrl"] = Url.IsLocalUrl(returnUrl) ? returnUrl : "/account";
+        return View();
+    }
+
+    [AllowAnonymous]
+    [HttpGet("/account/access-denied")]
+    [HttpGet("/Account/AccessDenied")]
+    [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult AccessDenied(string? returnUrl)
+    {
+        ViewData["ReturnUrl"] = Url.IsLocalUrl(returnUrl) ? returnUrl : "/Admin/Orders";
+        Response.StatusCode = StatusCodes.Status403Forbidden;
+        return View();
+    }
 
     [AllowAnonymous]
     [HttpGet("/register")]
@@ -111,12 +128,27 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
     public IActionResult Profile() => View();
 
     [Authorize]
+    [HttpPost("/account/logout")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return Redirect("/");
+    }
+
+    [Authorize]
     [HttpGet("/account/orders")]
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
-    public async Task<IActionResult> Orders(OrderStatus? status, string? period, string? amount, int page = 1)
+    public async Task<IActionResult> Orders(OrderStatus? status, string? period, string? amount, string? search, int page = 1)
     {
         var customerKey = $"user-{User.FindFirstValue(ClaimTypes.NameIdentifier)}";
         var orders = _db.Orders.AsNoTracking().Where(x => x.CustomerKey == customerKey);
+        search = search?.Trim().TrimStart('#');
+        if (!string.IsNullOrEmpty(search))
+        {
+            if (int.TryParse(search, out var orderId)) orders = orders.Where(x => x.Id == orderId);
+            else orders = orders.Where(x => false);
+        }
         if (status.HasValue && Enum.IsDefined(status.Value)) orders = orders.Where(x => x.Status == status.Value);
         else status = null;
 
@@ -146,9 +178,9 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
         page = Math.Clamp(page, 1, Math.Max(1, (totalCount + pageSize - 1) / pageSize));
         return View(new AccountOrdersViewModel
         {
-            Orders = await orders.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
+            Orders = await orders.Include(x => x.Transactions).OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
                 .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(),
-            Status = status, Period = period, Amount = amount, Page = page, TotalCount = totalCount
+            Status = status, Period = period, Amount = amount, Search = search, Page = page, TotalCount = totalCount
         });
     }
 

@@ -27,6 +27,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/login";
+        options.AccessDeniedPath = "/account/access-denied";
         options.Cookie.Name = "lern.auth";
         options.Cookie.HttpOnly = true;
         options.Cookie.Path = "/";

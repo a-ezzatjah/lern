@@ -1,0 +1,93 @@
+@model AdminOrderDetailsViewModel
+@{
+    Layout = "_AdminLayout";
+    var order = Model.Order;
+    var payment = order.Transactions.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id).FirstOrDefault();
+    ViewData["Title"] = $"جزئیات سفارش #{order.Id}";
+}
+<style>
+    @@media print {
+        .admin-sidebar, .admin-topbar, .admin-sidebar-overlay, .order-actions { display: none !important; }
+        .admin-frame, .admin-main, .admin-content { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; height: auto !important; }
+        .order-card { box-shadow: none !important; break-inside: avoid; background: white !important; color: black !important; }
+    }
+</style>
+<nav class="order-actions mb-5 text-sm text-gray-500 dark:text-gray-400" aria-label="مسیر صفحه">
+    <a asp-controller="Admin" asp-action="Index" class="hover:text-primary">پیشخوان</a><span class="mx-2">›</span>
+    <a asp-controller="AdminOrders" asp-action="Index" class="hover:text-primary">سفارش‌ها</a><span class="mx-2">›</span><span class="text-primary">سفارش #@order.Id</span>
+</nav>
+<div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div><h1 class="text-2xl font-bold text-gray-900 dark:text-white">جزئیات سفارش</h1><p class="text-gray-600 dark:text-gray-400">شماره سفارش: #@order.Id · @AdminOrderDisplay.Date(order.CreatedAt) - @AdminOrderDisplay.LocalTime(order.CreatedAt).ToString("HH:mm")</p></div>
+    <button type="button" onclick="window.print()" class="order-actions self-start rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white">چاپ فاکتور</button>
+</div>
+<div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+    <section id="order-status" class="order-card rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800">
+        <h2 class="mb-4 text-lg font-semibold dark:text-white">وضعیت سفارش</h2><span class="inline-flex rounded-full px-3 py-1 text-sm font-semibold @AdminOrderDisplay.StatusClass(order.Status)">@AdminOrderDisplay.Status(order.Status)</span>
+    </section>
+    <section class="order-card rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800">
+        <h2 class="mb-4 text-lg font-semibold dark:text-white">اطلاعات پرداخت</h2>
+        <dl class="space-y-3 text-sm">
+            <div class="flex justify-between gap-2"><dt class="text-gray-600 dark:text-gray-400">روش پرداخت:</dt><dd class="dark:text-white">@AdminOrderDisplay.Gateway(payment?.Gateway)</dd></div>
+            <div class="flex justify-between gap-2"><dt class="text-gray-600 dark:text-gray-400">وضعیت پرداخت:</dt><dd class="dark:text-white">@(payment is null ? "تراکنشی ثبت نشده" : AdminOrderDisplay.Payment(payment.Status))</dd></div>
+            @if (payment is not null && !string.IsNullOrWhiteSpace(payment.Reference)) { <div class="flex justify-between gap-2"><dt class="text-gray-600 dark:text-gray-400">کد پیگیری:</dt><dd class="dark:text-white"><bdi>@payment.Reference</bdi></dd></div> }
+        </dl>
+    </section>
+    <section class="order-card rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800">
+        <h2 class="mb-4 text-lg font-semibold dark:text-white">مشتری</h2>
+        <dl class="space-y-3 text-sm">
+            <div class="flex justify-between gap-2"><dt class="text-gray-600 dark:text-gray-400">نام:</dt><dd class="dark:text-white">@order.CustomerFirstName @order.CustomerLastName</dd></div>
+            <div class="flex justify-between gap-2"><dt class="text-gray-600 dark:text-gray-400">تلفن:</dt><dd class="dark:text-white"><bdi>@order.CustomerPhone</bdi></dd></div>
+            <div class="flex justify-between gap-2"><dt class="text-gray-600 dark:text-gray-400">ایمیل فعلی حساب:</dt><dd class="dark:text-white">@(Model.CustomerEmail ?? "ثبت نشده")</dd></div>
+        </dl>
+    </section>
+</div>
+<div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+    <section class="order-card rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800">
+        <h2 class="mb-4 text-lg font-semibold dark:text-white">آدرس صورتحساب</h2><p class="text-sm text-gray-600 dark:text-gray-400">آدرس صورتحساب برای این سفارش ثبت نشده است.</p>
+    </section>
+    <section class="order-card rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800">
+        <h2 class="mb-4 text-lg font-semibold dark:text-white">آدرس فعلی مشتری</h2>
+        @if (Model.CurrentAddress is { } address)
+        {
+            <address class="space-y-2 text-sm not-italic text-gray-600 dark:text-gray-300"><p>@address.Province، @address.City، @address.Details</p><p>گیرنده: @address.ReceiverName</p><p>کد پستی: <bdi>@address.PostalCode</bdi></p></address>
+            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">این آدرس از پروفایل فعلی مشتری خوانده شده و آدرس زمان ثبت سفارش نیست.</p>
+        }
+        else { <p class="text-sm text-gray-600 dark:text-gray-400">آدرسی برای این مشتری ثبت نشده است.</p> }
+    </section>
+</div>
+<section class="order-card mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800">
+    <h2 class="border-b border-gray-200 p-6 text-lg font-semibold dark:border-gray-700 dark:text-white">محصولات سفارش</h2>
+    <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
+        <thead class="bg-gray-50 text-gray-500 dark:bg-gray-700 dark:text-gray-300"><tr><th scope="col" class="px-6 py-3 text-start">محصول</th><th scope="col" class="px-6 py-3 text-start">قیمت واحد</th><th scope="col" class="px-6 py-3 text-start">تعداد</th><th scope="col" class="px-6 py-3 text-start">جمع</th></tr></thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            @foreach (var item in order.Items.OrderBy(x => x.Id))
+            {
+                var image = item.Product?.ProductImages.OrderByDescending(x => x.IsPrimary).ThenBy(x => x.SortOrder).FirstOrDefault()?.ImageUrl;
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td class="px-6 py-4"><div class="flex min-w-48 items-center gap-3"><img class="h-12 w-12 rounded-lg object-cover" src="@(string.IsNullOrWhiteSpace(image) ? "/assets/images/logo.png" : image)" alt="" /><div><p class="font-medium text-gray-900 dark:text-white">@item.ProductName</p><p class="text-xs text-gray-500 dark:text-gray-400">کد: @(item.ProductVariant?.Sku ?? "—")</p></div></div></td>
+                    <td class="whitespace-nowrap px-6 py-4 text-gray-600 dark:text-gray-300">@item.UnitPrice.ToString("N0") تومان</td><td class="px-6 py-4 text-gray-600 dark:text-gray-300">@item.Quantity</td><td class="whitespace-nowrap px-6 py-4 font-medium dark:text-white">@item.LineTotal.ToString("N0") تومان</td>
+                </tr>
+            }
+        </tbody>
+    </table></div>
+</section>
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <section class="order-card rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800">
+        <h2 class="mb-4 text-lg font-semibold dark:text-white">تاریخچه وضعیت</h2>
+        <div class="space-y-4 text-sm">
+            <div class="flex items-start gap-3"><span class="mt-2 h-2.5 w-2.5 rounded-full bg-primary"></span><div><p class="font-medium dark:text-white">سفارش ثبت شد</p><p class="text-gray-500">@AdminOrderDisplay.Date(order.CreatedAt) - @AdminOrderDisplay.LocalTime(order.CreatedAt).ToString("HH:mm")</p></div></div>
+            <div class="flex items-start gap-3"><span class="mt-2 h-2.5 w-2.5 rounded-full bg-green-500"></span><div><p class="font-medium dark:text-white">وضعیت فعلی: @AdminOrderDisplay.Status(order.Status)</p><p class="text-gray-500">زمان تغییر وضعیت ثبت نشده است.</p></div></div>
+        </div>
+    </section>
+    <section class="order-card rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800">
+        <h2 class="mb-4 text-lg font-semibold dark:text-white">جمع کل</h2>
+        <dl class="space-y-4 text-sm">
+            <div class="flex justify-between gap-3"><dt class="text-gray-600 dark:text-gray-400">جمع اقلام:</dt><dd class="dark:text-white">@order.Subtotal.ToString("N0") تومان</dd></div>
+            <div class="flex justify-between gap-3"><dt class="text-gray-600 dark:text-gray-400">هزینه ارسال و سایر هزینه‌ها:</dt><dd class="dark:text-white">@((order.Total - order.Subtotal).ToString("N0")) تومان</dd></div>
+            <div class="flex justify-between gap-3 border-t pt-4 text-lg font-bold dark:border-gray-700"><dt class="dark:text-white">مجموع کل:</dt><dd class="text-primary">@order.Total.ToString("N0") تومان</dd></div>
+        </dl>
+    </section>
+</div>
+@section Scripts {
+    @if (Context.Request.Query["print"] == "true") { <script>window.addEventListener('load', () => window.print());</script> }
+}

@@ -166,7 +166,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         model.PhoneNumber = NormalizePhone(model.PhoneNumber) ?? model.PhoneNumber;
         model.Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim().ToLowerInvariant();
 
-        if (model.Role is not ("Admin" or "Author" or "Customer"))
+        if (model.Role is not ("Admin" or "Customer"))
             ModelState.AddModelError(nameof(model.Role), "نقش انتخاب‌شده معتبر نیست.");
 
         if (await _db.Users.AnyAsync(x => x.PhoneNumber == model.PhoneNumber))
@@ -228,7 +228,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         model.PhoneNumber = NormalizePhone(model.PhoneNumber) ?? model.PhoneNumber;
         model.Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim().ToLowerInvariant();
         model.ExistingAvatarUrl = user.ProfileImageUrl;
-        if (model.Role is not ("Admin" or "Author" or "Customer")) ModelState.AddModelError(nameof(model.Role), "نقش انتخاب‌شده معتبر نیست.");
+        if (model.Role is not ("Admin" or "Customer")) ModelState.AddModelError(nameof(model.Role), "نقش انتخاب‌شده معتبر نیست.");
         if (await _db.Users.AnyAsync(x => x.Id != id && x.PhoneNumber == model.PhoneNumber)) ModelState.AddModelError(nameof(model.PhoneNumber), "کاربری با این شماره موبایل وجود دارد.");
         if (model.Email is not null && await _db.Users.AnyAsync(x => x.Id != id && x.Email == model.Email)) ModelState.AddModelError(nameof(model.Email), "کاربری با این ایمیل وجود دارد.");
         if (model.Avatar is { Length: > 0 } && !IsValidAvatar(model.Avatar)) ModelState.AddModelError(nameof(model.Avatar), "تصویر باید JPG، PNG یا WEBP و حداکثر ۵ مگابایت باشد.");

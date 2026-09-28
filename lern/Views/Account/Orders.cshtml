@@ -20,9 +20,17 @@
         _ => "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-dark"
     };
 }
-<section class="w-full p-4 md:p-6">
-    <h1 class="mb-6 text-2xl font-bold text-dark dark:text-light">سفارش‌های من</h1>
-    <form method="get" action="/account/orders" class="mb-6 rounded-xl border border-gray-100 bg-white p-5 shadow-soft dark:border-gray-700 dark:bg-card-dark dark:shadow-soft-dark">
+<section class="w-full bg-gray-50 p-4 dark:bg-gray-900 md:p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">سفارش‌های من</h1>
+        <p class="text-gray-600 dark:text-gray-400">فهرست سفارش‌های ثبت‌شده در حساب شما</p>
+    </div>
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800">
+    <form method="get" action="/account/orders" class="border-b border-gray-200 p-4 dark:border-gray-700">
+        <label class="mb-4 block text-sm font-medium text-gray-700 dark:text-gray-300">جستجوی شماره سفارش
+            <input type="search" name="search" value="@Model.Search" placeholder="شماره سفارش..." class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white md:w-64" />
+        </label>
+        <div class="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">فیلتر سفارش‌ها</div>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">وضعیت سفارش
                 <select name="status" class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
@@ -51,51 +59,50 @@
                     <option value="more5000" selected="@(Model.Amount == "more5000")">۵ میلیون و بیشتر</option>
                 </select>
             </label>
-            <div class="flex items-end"><button type="submit" class="w-full rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">اعمال فیلتر</button></div>
+            <div class="flex items-end gap-2"><button type="submit" class="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">اعمال فیلتر</button><a asp-action="Orders" class="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 dark:border-gray-600 dark:text-gray-300">پاک کردن</a></div>
         </div>
     </form>
 
-    <div class="mb-6 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-soft dark:border-gray-700 dark:bg-card-dark dark:shadow-soft-dark">
+    <div>
         <div class="flex items-center justify-between border-b border-gray-200 p-5 dark:border-gray-700">
             <h2 class="text-lg font-bold text-dark dark:text-light">فهرست سفارش‌ها</h2>
             <span class="text-sm text-gray-500 dark:text-gray-400">@Model.TotalCount سفارش</span>
         </div>
-        @if (Model.Orders.Count == 0)
-        {
-            <p class="p-8 text-center text-gray-500 dark:text-gray-400">سفارشی با این شرایط پیدا نشد.</p>
-        }
-        else
-        {
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
-                    <thead class="bg-gray-50 text-gray-500 dark:bg-gray-800 dark:text-gray-400"><tr>
-                        <th class="px-6 py-3 text-start">شماره سفارش</th><th class="px-6 py-3 text-start">تاریخ</th><th class="px-6 py-3 text-start">مبلغ</th><th class="px-6 py-3 text-start">وضعیت</th><th class="px-6 py-3 text-start">عملیات</th>
+                    <thead class="bg-gray-50 text-xs font-medium text-gray-500 dark:bg-gray-700 dark:text-gray-300"><tr>
+                        <th scope="col" class="px-6 py-3 text-start">شماره سفارش</th><th scope="col" class="px-6 py-3 text-start">تاریخ</th><th scope="col" class="px-6 py-3 text-start">مبلغ</th><th scope="col" class="px-6 py-3 text-start">وضعیت</th><th scope="col" class="px-6 py-3 text-start">روش پرداخت</th><th scope="col" class="px-6 py-3 text-start">اقدامات</th>
                     </tr></thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @if (Model.Orders.Count == 0)
+                        {
+                            <tr><td colspan="6" class="p-8 text-center text-gray-500 dark:text-gray-400">سفارشی با این شرایط پیدا نشد.</td></tr>
+                        }
                         @foreach (var order in Model.Orders)
                         {
+                            var payment = order.Transactions.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id).FirstOrDefault();
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                 <td class="whitespace-nowrap px-6 py-4 font-medium dark:text-white">#@order.Id</td>
-                                <td class="whitespace-nowrap px-6 py-4 text-gray-600 dark:text-gray-300">@DateLabel(order.CreatedAt)</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-gray-600 dark:text-gray-300"><div>@DateLabel(order.CreatedAt)</div><small>@order.CreatedAt.ToLocalTime().ToString("HH:mm")</small></td>
                                 <td class="whitespace-nowrap px-6 py-4 text-gray-600 dark:text-gray-300">@order.Total.ToString("N0") تومان</td>
                                 <td class="whitespace-nowrap px-6 py-4"><span class="inline-flex rounded-full px-3 py-1 text-xs @StatusClass(order.Status)">@StatusLabel(order.Status)</span></td>
-                                <td class="whitespace-nowrap px-6 py-4"><a asp-action="OrderDetails" asp-route-id="@order.Id" class="text-primary hover:underline">جزئیات ←</a></td>
+                                <td class="whitespace-nowrap px-6 py-4 text-gray-600 dark:text-gray-300"><div>@(string.IsNullOrWhiteSpace(payment?.Gateway) ? "ثبت نشده" : payment.Gateway)</div>@if (payment is not null) { <small>@(payment.Status switch { PaymentStatus.Successful => "موفق", PaymentStatus.Failed => "ناموفق", PaymentStatus.Refunded => "بازگشت وجه", _ => "در انتظار" })</small> }</td>
+                                <td class="whitespace-nowrap px-6 py-4"><a asp-action="OrderDetails" asp-route-id="@order.Id" class="font-medium text-primary hover:underline">مشاهده جزئیات</a></td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-        }
         @if (Model.TotalPages > 1)
         {
             <nav aria-label="صفحات سفارش‌ها" class="flex items-center justify-between gap-3 border-t border-gray-200 bg-gray-50 p-4 text-sm dark:border-gray-700 dark:bg-gray-800">
-                <span class="text-gray-500 dark:text-gray-400">صفحه @Model.Page از @Model.TotalPages</span>
+                <span class="text-gray-500 dark:text-gray-400">نمایش @((Model.Page - 1) * Model.PageSize + 1) تا @Math.Min(Model.Page * Model.PageSize, Model.TotalCount) از @Model.TotalCount سفارش</span>
                 <div class="flex gap-2">
-                    @if (Model.Page > 1) { <a asp-action="Orders" asp-route-page="@(Model.Page - 1)" asp-route-status="@Model.Status" asp-route-period="@Model.Period" asp-route-amount="@Model.Amount" class="rounded-lg border px-3 py-1 dark:border-gray-600 dark:text-white">قبلی</a> }
-                    @if (Model.Page < Model.TotalPages) { <a asp-action="Orders" asp-route-page="@(Model.Page + 1)" asp-route-status="@Model.Status" asp-route-period="@Model.Period" asp-route-amount="@Model.Amount" class="rounded-lg border px-3 py-1 dark:border-gray-600 dark:text-white">بعدی</a> }
+                    @if (Model.Page > 1) { <a asp-action="Orders" asp-route-page="@(Model.Page - 1)" asp-route-status="@Model.Status" asp-route-period="@Model.Period" asp-route-amount="@Model.Amount" asp-route-search="@Model.Search" class="rounded-lg border px-3 py-1 dark:border-gray-600 dark:text-white">قبلی</a> }
+                    @if (Model.Page < Model.TotalPages) { <a asp-action="Orders" asp-route-page="@(Model.Page + 1)" asp-route-status="@Model.Status" asp-route-period="@Model.Period" asp-route-amount="@Model.Amount" asp-route-search="@Model.Search" class="rounded-lg border px-3 py-1 dark:border-gray-600 dark:text-white">بعدی</a> }
                 </div>
             </nav>
         }
     </div>
-
+    </div>
 </section>

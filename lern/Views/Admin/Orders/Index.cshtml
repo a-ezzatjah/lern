@@ -1,0 +1,92 @@
+@model AdminOrderListViewModel
+@using Entities
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "مدیریت سفارشات";
+    string PageUrl(int page) => Url.Action("Index", "AdminOrders", new { page, search = Model.Search, status = Model.Status, period = Model.Period, from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") })!;
+}
+<style>
+    .order-filter-select { appearance: none; min-width: 11.5rem; padding: .5rem .75rem .5rem 2.75rem; }
+    .order-filter-arrow { position: absolute; left: .75rem; top: 50%; width: 1rem; height: 1rem; transform: translateY(-50%); pointer-events: none; }
+</style>
+<form method="get" asp-controller="AdminOrders" asp-action="Index">
+    <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div><h1 class="text-2xl font-bold text-gray-900 dark:text-white">مدیریت سفارشات</h1><p class="text-gray-600 dark:text-gray-400">لیست تمام سفارشات ثبت شده در سیستم</p></div>
+        <div class="flex gap-2">
+            <label class="relative"><span class="sr-only">جستجوی شماره سفارش، نام یا موبایل مشتری</span><input name="search" value="@Model.Search" placeholder="شماره سفارش، نام یا موبایل..." class="w-full rounded-lg border px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white md:w-64" /></label>
+            <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm text-white">جستجو</button>
+        </div>
+    </div>
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800">
+        <div class="flex flex-wrap items-end gap-4 border-b border-gray-200 p-4 dark:border-gray-700">
+            <div><label for="status-filter" class="mb-1 block text-sm font-medium dark:text-gray-300">وضعیت سفارش</label>
+                <div class="relative inline-block"><select id="status-filter" name="status" class="order-filter-select rounded-lg border text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    <option value="">همه وضعیت‌ها</option>
+                    @foreach (var status in Enum.GetValues<OrderStatus>()) { <option value="@status" selected="@(Model.Status == status)">@AdminOrderDisplay.Status(status)</option> }
+                </select><svg aria-hidden="true" class="order-filter-arrow text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" /></svg></div>
+            </div>
+            <div><label for="date-filter" class="mb-1 block text-sm font-medium dark:text-gray-300">بازه زمانی</label>
+                <div class="relative inline-block"><select id="date-filter" name="period" class="order-filter-select rounded-lg border text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    <option value="">همه زمان‌ها</option>
+                    <option value="today" selected="@(Model.Period == "today")">امروز</option>
+                    <option value="week" selected="@(Model.Period == "week")">هفته جاری</option>
+                    <option value="month" selected="@(Model.Period == "month")">ماه جاری</option>
+                    <option value="year" selected="@(Model.Period == "year")">سال جاری</option>
+                    <option value="custom" selected="@(Model.Period == "custom")">سفارشی</option>
+                </select><svg aria-hidden="true" class="order-filter-arrow text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" /></svg></div>
+            </div>
+            <div id="custom-order-dates" class="@(Model.Period == "custom" ? "flex" : "hidden") flex-wrap gap-3">
+                <label class="text-sm dark:text-gray-300">از تاریخ (میلادی)<input type="date" name="from" value="@Model.From?.ToString("yyyy-MM-dd")" class="mt-1 block rounded-lg border px-3 py-2 dark:border-gray-600 dark:bg-gray-700" /></label>
+                <label class="text-sm dark:text-gray-300">تا تاریخ (میلادی)<input type="date" name="to" value="@Model.To?.ToString("yyyy-MM-dd")" class="mt-1 block rounded-lg border px-3 py-2 dark:border-gray-600 dark:bg-gray-700" /></label>
+            </div>
+            <button type="submit" class="rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:text-gray-300">اعمال فیلترها</button>
+            <a asp-controller="AdminOrders" asp-action="Index" class="px-3 py-2 text-sm text-primary">پاک کردن</a>
+            <div asp-validation-summary="All" class="text-sm text-red-600"></div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
+                <thead class="bg-gray-50 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-300"><tr>
+                    @foreach (var title in new[] { "شماره سفارش", "مشتری", "تاریخ", "مبلغ", "وضعیت", "روش پرداخت", "اقدامات" }) { <th scope="col" class="whitespace-nowrap px-6 py-3 text-start font-medium">@title</th> }
+                </tr></thead>
+                <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                    @if (Model.Orders.Count == 0) { <tr><td colspan="7" class="p-8 text-center text-gray-500 dark:text-gray-400">سفارشی با این شرایط پیدا نشد.</td></tr> }
+                    @foreach (var order in Model.Orders)
+                    {
+                        var payment = order.Transactions.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id).FirstOrDefault();
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="whitespace-nowrap px-6 py-4 font-medium dark:text-white">#@order.Id</td>
+                            <td class="whitespace-nowrap px-6 py-4"><div class="font-medium dark:text-white">@order.CustomerFirstName @order.CustomerLastName</div><div class="text-gray-500 dark:text-gray-400" dir="ltr">@order.CustomerPhone</div></td>
+                            <td class="whitespace-nowrap px-6 py-4"><div class="dark:text-white">@AdminOrderDisplay.Date(order.CreatedAt)</div><div class="text-gray-500 dark:text-gray-400">@AdminOrderDisplay.LocalTime(order.CreatedAt).ToString("HH:mm")</div></td>
+                            <td class="whitespace-nowrap px-6 py-4 font-medium dark:text-white">@order.Total.ToString("N0") تومان</td>
+                            <td class="whitespace-nowrap px-6 py-4"><span class="inline-flex rounded-full px-2 py-1 text-xs font-semibold @AdminOrderDisplay.StatusClass(order.Status)">@AdminOrderDisplay.Status(order.Status)</span></td>
+                            <td class="whitespace-nowrap px-6 py-4"><div class="dark:text-white">@AdminOrderDisplay.Gateway(payment?.Gateway)</div><div class="text-gray-500 dark:text-gray-400">@(payment is null ? "بدون تراکنش" : AdminOrderDisplay.Payment(payment.Status))</div></td>
+                            <td class="whitespace-nowrap px-6 py-4"><div class="flex gap-3">
+                                <a asp-controller="AdminOrders" asp-action="Details" asp-route-id="@order.Id" class="text-primary">مشاهده</a>
+                                <a asp-controller="AdminOrders" asp-action="Details" asp-route-id="@order.Id" asp-route-print="true" class="text-blue-600">چاپ</a>
+                                <a asp-controller="AdminOrders" asp-action="Details" asp-route-id="@order.Id" asp-fragment="order-status" class="text-gray-600 dark:text-gray-300">پیگیری</a>
+                            </div></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <nav aria-label="صفحات سفارش‌ها" class="flex flex-wrap items-center justify-between gap-4 border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+            <p class="text-sm text-gray-700 dark:text-gray-300">نمایش @(Model.TotalCount == 0 ? 0 : (Model.Page - 1) * Model.PageSize + 1) تا @Math.Min(Model.Page * Model.PageSize, Model.TotalCount) از @Model.TotalCount سفارش</p>
+            <div class="flex flex-wrap gap-2 text-sm dark:text-gray-300">
+                @if (Model.Page > 1) { <a href="@PageUrl(Model.Page - 1)" class="rounded-lg border px-3 py-1">قبلی</a> }
+                @for (var page = Math.Max(1, Model.Page - 2); page <= Math.Min(Model.TotalPages, Model.Page + 2); page++)
+                { <a href="@PageUrl(page)" aria-current="@(page == Model.Page ? "page" : null)" class="rounded-lg border px-3 py-1 @(page == Model.Page ? "bg-primary text-white" : "")">@(page)</a> }
+                @if (Model.Page < Model.TotalPages) { <a href="@PageUrl(Model.Page + 1)" class="rounded-lg border px-3 py-1">بعدی</a> }
+            </div>
+        </nav>
+    </div>
+</form>
+@section Scripts {
+<script>
+document.getElementById('date-filter').addEventListener('change', function () {
+    const dates = document.getElementById('custom-order-dates');
+    dates.classList.toggle('hidden', this.value !== 'custom');
+    dates.classList.toggle('flex', this.value === 'custom');
+});
+</script>
+}

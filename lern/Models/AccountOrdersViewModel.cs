@@ -8,6 +8,7 @@ public sealed class AccountOrdersViewModel
     public OrderStatus? Status { get; init; }
     public string? Period { get; init; }
     public string? Amount { get; init; }
+    public string? Search { get; init; }
     public int Page { get; init; }
     public int TotalCount { get; init; }
     public int PageSize { get; init; } = 10;

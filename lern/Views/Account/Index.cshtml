@@ -226,29 +226,19 @@
                             <span>پروفایل</span>
                         </a>
 
-                        <!-- Settings Link -->
-                        <a href="/account"
-                           class="flex items-center px-4 py-2 text-sm text-gray-700 space-x-1 rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24"
-                                 stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281a1.125 1.125 0 0 0 .865.997l1.437.553a1.125 1.125 0 0 1 .51 1.685l-1.004.827a1.125 1.125 0 0 0 0 1.742l1.004.827a1.125 1.125 0 0 1-.51 1.685l-1.437.553a1.125 1.125 0 0 0-.865.997l-.213 1.281a1.125 1.125 0 0 1-1.11.94h-2.593a1.125 1.125 0 0 1-1.11-.94l-.213-1.281a1.125 1.125 0 0 0-.865-.997l-1.437-.553a1.125 1.125 0 0 1-.51-1.685l1.004-.827a1.125 1.125 0 0 0 0-1.742l-1.004-.827a1.125 1.125 0 0 1 .51-1.685l1.437-.553a1.125 1.125 0 0 0 .865-.997l.213-1.281Z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                            </svg>
-                            <span>تنظیمات</span>
-                        </a>
-
                         <!-- Logout Link -->
-                        <a href="/" data-logout
-                           class="flex items-center px-4 py-2 text-sm text-gray-700 space-x-1 rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <form action="/account/logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit"
+                                    class="flex w-full items-center px-4 py-2 text-start text-sm text-gray-700 space-x-1 rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24"
                                  stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                       d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"/>
                             </svg>
                             <span>خروج</span>
-                        </a>
+                            </button>
+                        </form>
                     </div>
                 </div>
 
