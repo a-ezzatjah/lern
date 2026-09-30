@@ -98,7 +98,18 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
 
     [Authorize]
     [HttpGet("/account/discounts")]
-    public IActionResult Discounts() => View();
+    public async Task<IActionResult> Discounts()
+    {
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) return Forbid();
+        return View(new AccountDiscountsViewModel
+        {
+            Coupons = await _db.DiscountCoupons.AsNoTracking()
+                .Where(x => x.RecipientUserId == null || x.RecipientUserId == userId)
+                .OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id).ToListAsync(),
+            UsedCouponIds = (await _db.CouponRedemptions.AsNoTracking().Where(x => x.UserId == userId)
+                .Select(x => x.CouponId).ToListAsync()).ToHashSet()
+        });
+    }
 
     [Authorize]
     [HttpGet("/account/change-password")]

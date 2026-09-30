@@ -1,0 +1,100 @@
+@model AdminCouponPageModel
+@using Entities
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "تخفیف‌ها و کوپن‌ها";
+    var now = DateTime.UtcNow;
+    string PageUrl(int number) => Url.Action("Index", "AdminCoupons", new { page = number, pageSize = Model.PageSize })!;
+}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div><h1 class="text-2xl font-bold dark:text-white">مدیریت تخفیف‌ها و کوپن‌ها</h1><p class="text-gray-600 dark:text-gray-400">صدور کارت تخفیف برای یک مشتری یا تمام مشتریان</p></div>
+    <a asp-controller="AdminCoupons" asp-action="Create" class="coupon-primary-action">＋ ایجاد کوپن جدید</a>
+</div>
+@if (TempData["CouponMessage"] is string message) { <div class="mb-5 rounded-lg bg-green-50 p-4 text-green-800" role="status">@message</div> }
+@if (TempData["CouponError"] is string error) { <div class="mb-5 rounded-lg bg-red-50 p-4 text-red-800" role="alert">@error</div> }
+<div class="coupon-stats mb-7">
+    <div class="coupon-stat"><span class="coupon-stat-icon">٪</span><div><p>کل کوپن‌ها</p><strong>@Model.TotalCount.ToString("N0")</strong><small>کارت ثبت‌شده</small></div></div>
+    <div class="coupon-stat"><span class="coupon-stat-icon green">✓</span><div><p>کوپن‌های فعال</p><strong>@Model.ActiveCount.ToString("N0")</strong><small>در دسترس مشتریان</small></div></div>
+    <div class="coupon-stat"><span class="coupon-stat-icon amber">✦</span><div><p>ارسال همگانی</p><strong>@Model.BroadcastCount.ToString("N0")</strong><small>برای همه مشتریان</small></div></div>
+</div>
+<section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b p-5 dark:border-gray-700"><h2 class="text-lg font-bold dark:text-white">کوپن‌های ثبت‌شده</h2><span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">@Model.TotalCount کارت</span></div>
+    <div class="overflow-x-auto"><table class="min-w-full divide-y text-sm dark:divide-gray-700"><thead class="bg-gray-50 text-gray-500 dark:bg-gray-700"><tr>
+        @foreach (var title in new[] { "کد و عنوان", "نوع تخفیف", "مقدار", "گیرنده", "تاریخ انقضا", "وضعیت", "اقدامات" }) { <th scope="col" class="whitespace-nowrap px-5 py-3 text-start">@title</th> }
+    </tr></thead><tbody class="divide-y dark:divide-gray-700">
+        @if (Model.Coupons.Count == 0) { <tr><td colspan="7" class="p-12 text-center text-gray-500"><span class="mb-3 block text-4xl text-indigo-400">٪</span>هنوز کوپنی ثبت نشده است.<div class="mt-4"><a asp-controller="AdminCoupons" asp-action="Create" class="text-primary font-semibold">ایجاد اولین کوپن ←</a></div></td></tr> }
+        @foreach (var coupon in Model.Coupons) {
+            <tr class="transition-colors hover:bg-indigo-50/40 dark:hover:bg-gray-700">
+                <td class="whitespace-nowrap px-5 py-4"><strong class="dark:text-white" dir="ltr">@coupon.Code</strong><div class="text-gray-500">@coupon.Title</div></td>
+                <td class="whitespace-nowrap px-5 py-4 dark:text-white">@(coupon.Kind switch { CouponKind.Percentage => "درصدی", CouponKind.FixedAmount => "مبلغ ثابت", _ => "ارسال رایگان" })</td>
+                <td class="whitespace-nowrap px-5 py-4 dark:text-white">@(coupon.Kind switch { CouponKind.Percentage => $"{coupon.Value:0.##}٪", CouponKind.FixedAmount => $"{coupon.Value:N0} تومان", _ => "رایگان" })</td>
+                <td class="whitespace-nowrap px-5 py-4 dark:text-white">@(coupon.RecipientUserId is null ? "همه مشتریان" : $"{coupon.RecipientUser?.FirstName} {coupon.RecipientUser?.LastName} ({coupon.RecipientUser?.PhoneNumber})")</td>
+                <td class="whitespace-nowrap px-5 py-4 dark:text-white">@AdminOrderDisplay.Date(coupon.ExpiresAt.AddTicks(-1))</td>
+                <td class="whitespace-nowrap px-5 py-4"><span class="rounded-full px-2 py-1 text-xs @(coupon.IsActive && coupon.ExpiresAt > now ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600")">@(coupon.IsActive ? (coupon.ExpiresAt > now ? "فعال" : "منقضی‌شده") : "بایگانی‌شده")</span></td>
+                <td class="whitespace-nowrap px-5 py-4"><div class="coupon-row-actions">
+                    <form asp-controller="AdminCoupons" asp-action="Toggle" asp-route-id="@coupon.Id" asp-route-page="@Model.Page" asp-route-pageSize="@Model.PageSize" method="post"><button class="coupon-row-action" type="submit">@(coupon.IsActive ? "بایگانی" : "فعال‌سازی")</button></form>
+                    <form asp-controller="AdminCoupons" asp-action="Delete" asp-route-id="@coupon.Id" asp-route-page="@Model.Page" asp-route-pageSize="@Model.PageSize" method="post" class="coupon-delete-form" data-code="@coupon.Code"><button class="coupon-row-action coupon-delete-action" type="submit">حذف</button></form>
+                </div></td>
+            </tr>
+        }
+    </tbody></table></div>
+    <nav aria-label="صفحه‌بندی کوپن‌ها" class="coupon-pagination">
+        <p>نمایش @(Model.TotalCount == 0 ? 0 : (Model.Page - 1) * Model.PageSize + 1) تا @Math.Min(Model.Page * Model.PageSize, Model.TotalCount) از @Model.TotalCount کوپن</p>
+        <div class="coupon-page-links">
+            @if (Model.Page > 1) { <a href="@PageUrl(Model.Page - 1)">قبلی</a> }
+            @for (var number = Math.Max(1, Model.Page - 2); number <= Math.Min(Model.TotalPages, Model.Page + 2); number++)
+            { <a href="@PageUrl(number)" aria-current="@(number == Model.Page ? "page" : null)" class="@(number == Model.Page ? "current" : "")">@number</a> }
+            @if (Model.Page < Model.TotalPages) { <a href="@PageUrl(Model.Page + 1)">بعدی</a> }
+        </div>
+        <form asp-controller="AdminCoupons" asp-action="Index" method="get" class="coupon-page-size">
+            <label for="coupon-page-size">نمایش در صفحه</label>
+            <span class="coupon-page-size-control"><select id="coupon-page-size" name="pageSize" onchange="this.form.submit()">@foreach (var size in new[] { 10, 25, 50 }) { <option value="@size" selected="@(Model.PageSize == size)">@size</option> }</select><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" /></svg></span>
+        </form>
+    </nav>
+</section>
+<style>
+    .coupon-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid #e5e7eb; padding: 18px 20px; color: #4b5563; font-size: 13px; }
+    .coupon-page-links { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .coupon-page-links a { display: inline-flex; min-width: 34px; height: 34px; align-items: center; justify-content: center; border: 1px solid #e5e7eb; border-radius: 9px; padding: 0 9px; color: #4b5563; }
+    .coupon-page-links a:hover { background: #eef2ff; }
+    .coupon-page-links a.current { border-color: #4f46e5; background: #4f46e5; color: white; }
+    .coupon-page-size { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+    .coupon-page-size label { font-weight: 600; }
+    .coupon-page-size-control { position: relative; display: inline-flex; align-items: center; }
+    .coupon-page-size select { width: 76px; height: 36px; appearance: none; border: 1px solid #d1d5db; border-radius: 9px; background: white; padding: 0 12px 0 30px; color: #111827; font-size: 13px; text-align: right; cursor: pointer; outline: none; }
+    .coupon-page-size select:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.13); }
+    .coupon-page-size-control svg { position: absolute; left: 10px; width: 15px; height: 15px; pointer-events: none; color: #6b7280; }
+    .dark .coupon-pagination { border-color: #374151; color: #d1d5db; }
+    .dark .coupon-page-links a, .dark .coupon-page-size select { border-color: #4b5563; background: #374151; color: white; }
+    .dark .coupon-page-size-control svg { color: #d1d5db; }
+    .coupon-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; margin-bottom: 32px; }
+    .coupon-stat { display: flex; align-items: center; gap: 16px; min-height: 120px; border: 1px solid #e5e7eb; border-radius: 16px; background: white; padding: 20px; box-shadow: 0 8px 24px rgba(15,23,42,.04); }
+    .coupon-stat-icon { display: grid; width: 52px; height: 52px; flex: none; place-items: center; border-radius: 15px; background: #eef2ff; color: #4f46e5; font-size: 26px; font-weight: 700; }
+    .coupon-stat-icon.green { background: #dcfce7; color: #15803d; }
+    .coupon-stat-icon.amber { background: #fef3c7; color: #b45309; }
+    .coupon-stat p { color: #6b7280; font-size: 13px; }
+    .coupon-stat strong { display: block; margin: 3px 0; color: #111827; font-size: 26px; line-height: 1.25; }
+    .coupon-stat small { color: #9ca3af; font-size: 12px; }
+    .dark .coupon-stat { border-color: #374151; background: #1f2937; }
+    .dark .coupon-stat strong { color: white; }
+    @@media (max-width: 900px) { .coupon-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @@media (max-width: 560px) { .coupon-stats { grid-template-columns: 1fr; } }
+    .coupon-primary-action { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; border-radius: 12px; background: linear-gradient(135deg,#4f46e5,#7c3aed); padding: 0 22px; color: white; font-size: 14px; font-weight: 700; box-shadow: 0 8px 18px rgba(79,70,229,.18); transition: transform .2s, box-shadow .2s; }
+    .coupon-primary-action:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(79,70,229,.26); }
+    .coupon-row-action { min-width: 88px; border: 1px solid #c7d2fe; border-radius: 9px; padding: 7px 12px; color: #4f46e5; font-weight: 600; }
+    .coupon-row-actions { display: flex; align-items: center; gap: 8px; }
+    .coupon-row-action:hover { background: #eef2ff; }
+    .coupon-delete-action { min-width: 60px; border-color: #fecaca; color: #b91c1c; }
+    .coupon-delete-action:hover { background: #fef2f2; }
+    .dark .coupon-row-action { border-color: #6366f1; color: #c7d2fe; }
+    .dark .coupon-delete-action { border-color: #7f1d1d; color: #fca5a5; }
+</style>
+@section Scripts {
+<script>
+document.querySelectorAll('.coupon-delete-form').forEach(form => {
+    form.addEventListener('submit', event => {
+        if (!window.confirm(`کوپن «${form.dataset.code}» برای همیشه حذف شود؟ این کارت از پروفایل گیرنده نیز برداشته می‌شود.`)) event.preventDefault();
+    });
+});
+</script>
+}

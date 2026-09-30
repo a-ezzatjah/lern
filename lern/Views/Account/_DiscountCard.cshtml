@@ -1,0 +1,21 @@
+@model AccountDiscountCardViewModel
+@using Entities
+@{
+    var coupon = Model.Coupon;
+    var available = !Model.IsUsed && coupon.IsActive && coupon.ExpiresAt > DateTime.UtcNow;
+    var description = coupon.Kind switch
+    {
+        CouponKind.Percentage => $"{coupon.Value:0.##}٪ تخفیف",
+        CouponKind.FixedAmount => $"{coupon.Value:N0} تومان تخفیف",
+        _ => "ارسال رایگان"
+    };
+}
+<article class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div class="bg-primary-grad p-5 text-white"><span class="text-sm opacity-90">کارت تخفیف فروشگاه</span><h2 class="mt-2 text-xl font-bold">@coupon.Title</h2><p class="mt-2 text-lg font-semibold">@description</p></div>
+    <div class="space-y-3 p-5 text-sm dark:text-gray-200">
+        <div class="flex items-center justify-between gap-2"><span class="text-gray-500">کد تخفیف</span><strong class="rounded-lg border border-dashed border-primary px-3 py-1 font-mono text-primary" dir="ltr">@coupon.Code</strong></div>
+        @if (coupon.MinimumOrderAmount > 0) { <p>حداقل سفارش: @coupon.MinimumOrderAmount.ToString("N0") تومان</p> }
+        <p>اعتبار تا: @AdminOrderDisplay.Date(coupon.ExpiresAt.AddTicks(-1))</p>
+        <span class="inline-block rounded-full px-3 py-1 @(available ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600")">@(Model.IsUsed ? "استفاده‌شده" : available ? "فعال" : "منقضی یا بایگانی‌شده")</span>
+    </div>
+</article>

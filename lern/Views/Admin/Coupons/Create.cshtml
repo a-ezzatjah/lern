@@ -1,0 +1,260 @@
+@model AdminCouponPageModel
+@using Entities
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "ایجاد کوپن جدید";
+}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div><h1 class="text-2xl font-bold dark:text-white">ایجاد کارت تخفیف</h1><p class="mt-1 text-gray-500 dark:text-gray-400">جزئیات کارت و گیرنده آن را مشخص کنید.</p></div>
+    <a asp-controller="AdminCoupons" asp-action="Index" class="coupon-back">بازگشت به فهرست</a>
+</div>
+<section class="coupon-create-card">
+    <div class="coupon-create-heading"><span class="coupon-create-icon">٪</span><div><h2 class="text-lg font-bold dark:text-white">اطلاعات کوپن</h2><p class="text-sm text-gray-500 dark:text-gray-400">بعد از ثبت، کارت در پروفایل گیرنده نمایش داده می‌شود.</p></div></div>
+    <form asp-controller="AdminCoupons" asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700" data-valmsg-summary="true"></div>
+        <div class="coupon-form-grid">
+            <label><span class="coupon-field-title">عنوان کارت</span><input asp-for="Form.Title" placeholder="مثلاً هدیه خرید بعدی" required maxlength="150" /></label>
+            <div class="coupon-field"><label for="Form_Code" class="coupon-field-title">کد کوپن</label><div class="coupon-input-action"><input asp-for="Form.Code" placeholder="مثلاً WELCOME20" required dir="ltr" maxlength="40" /><button id="generate-coupon-code" type="button" title="تولید کد تصادفی">تولید خودکار</button></div></div>
+            <label><span class="coupon-field-title">نوع تخفیف</span><span class="coupon-select"><select asp-for="Form.Kind"><option value="1">درصدی</option><option value="2">مبلغ ثابت</option><option value="3">ارسال رایگان</option></select></span></label>
+            <label><span class="coupon-field-title">مقدار تخفیف <small>(برای ارسال رایگان صفر)</small></span><input asp-for="Form.Value" type="number" min="0" step="0.01" /></label>
+            <label><span class="coupon-field-title">حداقل مبلغ سفارش (تومان)</span><input asp-for="Form.MinimumOrderAmount" type="number" min="0" step="1" /></label>
+            <label><span class="coupon-field-title">تاریخ انقضا (شمسی)</span><input asp-for="Form.ExpiresOnJalali" placeholder="انتخاب تاریخ از تقویم شمسی" readonly required class="coupon-date-input" autocomplete="off" aria-haspopup="dialog" /></label>
+            <div class="coupon-recipient coupon-field"><span class="coupon-field-title">گیرنده کارت تخفیف</span>
+                <label class="coupon-broadcast"><input asp-for="Form.SendToAll" type="checkbox" /><span>ارسال برای همه مشتریان</span></label>
+                <div id="coupon-customer-picker" class="coupon-customer-picker">
+                    <label for="customer-search" class="sr-only">جستجوی مشتری</label>
+                    <input id="customer-search" type="search" autocomplete="off" placeholder="نام، نام خانوادگی، ایمیل، شناسه حساب یا شماره موبایل را جستجو کنید" aria-controls="customer-results" />
+                    <input asp-for="Form.RecipientUserId" type="hidden" />
+                    <div id="customer-results" class="coupon-customer-results" role="listbox" hidden></div>
+                    <p id="selected-customer" class="coupon-selected-customer" @(Model.Customers.Count == 0 ? "hidden" : "")>
+                        @if (Model.Customers.Count > 0) { var selected = Model.Customers[0]; <span><strong>@selected.FirstName @selected.LastName</strong> — شناسه #@selected.Id — موبایل: <bdi>@selected.PhoneNumber</bdi> — ایمیل: <bdi>@(selected.Email ?? "ثبت نشده")</bdi> — نقش: @(selected.Role == "Admin" ? "مدیر" : "مشتری")</span> }
+                    </p>
+                    <p class="coupon-search-hint">برای انتخاب، روی ردیف مشتری بزنید. شناسه حساب و موبایل را قبل از ارسال بررسی کنید.</p>
+                </div>
+            </div>
+        </div>
+        <p class="coupon-help">در حالت ارسال همگانی، کارت در پروفایل همه حساب‌های مشتری نمایش داده می‌شود. برای یک نفر، انتخاب از نتایج جستجو الزامی است.</p>
+        <div class="coupon-form-actions"><button type="submit" class="coupon-save">ثبت و ارسال کارت</button><a asp-controller="AdminCoupons" asp-action="Index" class="coupon-cancel">انصراف</a></div>
+    </form>
+</section>
+<style>
+    .coupon-create-card { max-width: 950px; border: 1px solid #e5e7eb; border-radius: 18px; background: white; padding: clamp(20px,3vw,32px); box-shadow: 0 12px 30px rgba(15,23,42,.05); }
+    .coupon-create-heading { display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 24px; }
+    .coupon-create-icon { display: grid; width: 48px; height: 48px; flex: none; place-items: center; border-radius: 14px; background: #eef2ff; color: #4f46e5; font-size: 25px; font-weight: 700; }
+    .coupon-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+    .coupon-form-grid label, .coupon-field { display: flex; min-width: 0; flex-direction: column; gap: 8px; color: #374151; font-size: 14px; font-weight: 600; }
+    .coupon-field-title { display: flex; min-height: 40px; align-items: center; gap: 6px; line-height: 1.4; }
+    .coupon-form-grid label small { font-size: 11px; font-weight: 400; color: #6b7280; }
+    .coupon-form-grid input, .coupon-form-grid select { width: 100%; height: 46px; border: 1px solid #d1d5db; border-radius: 11px; background: white; padding: 9px 14px; color: #111827; font-weight: 400; outline: none; }
+    .coupon-input-action { display: flex; min-width: 0; gap: 8px; }
+    .coupon-input-action input { min-width: 0; flex: 1; }
+    .coupon-input-action button { flex: none; height: 46px; border: 1px solid #c7d2fe; border-radius: 11px; background: #eef2ff; padding: 0 13px; color: #4338ca; font-size: 12px; font-weight: 700; }
+    .coupon-input-action button:hover { background: #e0e7ff; }
+    .coupon-date-input { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M7 3v4m10-4v4M3 10h18'/%3E%3C/svg%3E") !important; background-position: left 13px center !important; background-repeat: no-repeat !important; background-size: 18px !important; padding-left: 40px !important; text-align: right; }
+    .coupon-form-grid input:focus, .coupon-form-grid select:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.13); }
+    .coupon-select { position: relative; }
+    .coupon-select:after { content: ''; position: absolute; left: 16px; top: 17px; width: 9px; height: 9px; border-left: 2px solid #6b7280; border-bottom: 2px solid #6b7280; transform: rotate(-45deg); pointer-events: none; }
+    .coupon-select select { appearance: none; padding-left: 40px; }
+    .coupon-recipient { grid-column: 1 / -1; }
+    .coupon-broadcast { display: inline-flex !important; width: fit-content; flex-direction: row !important; align-items: center; gap: 10px; border: 1px solid #c7d2fe; border-radius: 10px; background: #eef2ff; padding: 10px 14px; color: #4338ca !important; cursor: pointer; }
+    .coupon-broadcast input { width: 18px; height: 18px; accent-color: #4f46e5; }
+    .coupon-customer-picker { position: relative; max-width: 740px; }
+    .coupon-customer-picker[hidden], .coupon-customer-results[hidden], .coupon-selected-customer[hidden] { display: none; }
+    .coupon-customer-results { position: absolute; z-index: 20; top: 50px; right: 0; left: 0; max-height: 320px; overflow-y: auto; border: 1px solid #d1d5db; border-radius: 12px; background: white; box-shadow: 0 16px 30px rgba(15,23,42,.16); }
+    .coupon-customer-result { display: block; width: 100%; border-bottom: 1px solid #e5e7eb; padding: 11px 14px; text-align: right; }
+    .coupon-customer-result:hover, .coupon-customer-result:focus { background: #eef2ff; }
+    .coupon-customer-result strong, .coupon-customer-result small { display: block; }
+    .coupon-customer-result small { margin-top: 4px; color: #6b7280; font-size: 12px; }
+    .coupon-selected-customer { margin-top: 10px; border: 1px solid #86efac; border-radius: 10px; background: #f0fdf4; padding: 10px 14px; color: #166534; font-size: 13px; }
+    .coupon-search-hint { margin-top: 8px; color: #6b7280; font-size: 12px; }
+    .dark .coupon-customer-results { border-color: #4b5563; background: #1f2937; }
+    .dark .coupon-customer-result { border-color: #374151; color: white; }
+    .dark .coupon-customer-result:hover { background: #374151; }
+    .coupon-help { margin-top: 16px; border-radius: 10px; background: #eef2ff; padding: 12px 16px; color: #4338ca; font-size: 13px; }
+    .coupon-form-actions { display: flex; flex-wrap: wrap; gap: 12px; border-top: 1px solid #e5e7eb; margin-top: 24px; padding-top: 24px; }
+    .coupon-save, .coupon-cancel, .coupon-back { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; border-radius: 11px; padding: 0 22px; font-size: 14px; font-weight: 700; }
+    .coupon-save { background: linear-gradient(135deg,#4f46e5,#7c3aed); color: white; }
+    .coupon-save:hover { filter: brightness(.94); }
+    .coupon-cancel, .coupon-back { border: 1px solid #d1d5db; color: #4b5563; }
+    .coupon-cancel:hover, .coupon-back:hover { background: #f3f4f6; }
+    .dark .coupon-create-card { border-color: #374151; background: #1f2937; }
+    .dark .coupon-create-heading, .dark .coupon-form-actions { border-color: #374151; }
+    .dark .coupon-form-grid label, .dark .coupon-field { color: #d1d5db; }
+    .dark .coupon-form-grid input, .dark .coupon-form-grid select { border-color: #4b5563; background: #374151; color: white; }
+    .dark .coupon-cancel, .dark .coupon-back { border-color: #4b5563; color: #d1d5db; }
+    @@media (max-width: 650px) { .coupon-form-grid { grid-template-columns: 1fr; } }
+    .jalali-modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.55); backdrop-filter: blur(3px); }
+    .jalali-modal[hidden] { display: none; }
+    .jalali-calendar { width: 100%; max-width: 360px; overflow: hidden; border: 1px solid #e5e7eb; border-radius: 18px; background: white; box-shadow: 0 24px 70px rgba(15,23,42,.25); }
+    .jalali-calendar-header { padding: 18px; color: white; background: linear-gradient(135deg,#4f46e5,#7c3aed); }
+    .jalali-calendar-title { display: flex; align-items: center; justify-content: space-between; }
+    .jalali-calendar-title button { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: rgba(255,255,255,.15); font-size: 20px; }
+    .jalali-calendar-selects { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .jalali-calendar-selects select { width: 100%; border: 1px solid rgba(255,255,255,.35); border-radius: 10px; padding: 8px 10px 8px 32px; color: white; background: rgba(255,255,255,.14); appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 10px center; background-size: 15px; }
+    .jalali-calendar-selects option { color: #111827; background: white; }
+    .jalali-calendar-body { padding: 16px; }
+    .jalali-weekdays, .jalali-days { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 5px; text-align: center; }
+    .jalali-weekdays { margin-bottom: 8px; color: #6b7280; font-size: 12px; }
+    .jalali-day { aspect-ratio: 1; border-radius: 10px; font-size: 13px; }
+    .jalali-day:hover { color: #4f46e5; background: #eef2ff; }
+    .jalali-day.is-selected { color: white; background: #4f46e5; }
+    .jalali-day.is-today { border: 1px solid #8b5cf6; }
+    .jalali-day:disabled { color: #cbd5e1; cursor: not-allowed; }
+    .jalali-calendar-footer { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #e5e7eb; padding: 12px 16px; }
+    .jalali-calendar-footer button { border-radius: 10px; padding: 8px 14px; font-size: 13px; }
+    .jalali-cancel { color: #4b5563; background: #f3f4f6; }
+    .jalali-clear { color: #dc2626; background: #fef2f2; }
+    .dark .jalali-calendar { border-color: #374151; background: #1f2937; color: #f9fafb; }
+    .dark .jalali-weekdays { color: #9ca3af; }
+    .dark .jalali-calendar-footer { border-color: #374151; }
+</style>
+<div id="jalali-date-modal" class="jalali-modal" hidden role="dialog" aria-modal="true" aria-labelledby="jalali-calendar-heading">
+    <div class="jalali-calendar">
+        <div class="jalali-calendar-header">
+            <div class="jalali-calendar-title"><button id="jalali-next" type="button" aria-label="ماه بعد">›</button><strong id="jalali-calendar-heading">انتخاب تاریخ انقضا</strong><button id="jalali-prev" type="button" aria-label="ماه قبل">‹</button></div>
+            <div class="jalali-calendar-selects"><select id="jalali-month" aria-label="ماه"></select><select id="jalali-year" aria-label="سال"></select></div>
+        </div>
+        <div class="jalali-calendar-body"><div class="jalali-weekdays"><span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span></div><div id="jalali-days" class="jalali-days"></div></div>
+        <div class="jalali-calendar-footer"><button id="jalali-clear" type="button" class="jalali-clear">پاک کردن تاریخ</button><button id="jalali-cancel" type="button" class="jalali-cancel">انصراف</button></div>
+    </div>
+</div>
+@section Scripts {
+<script>
+(() => {
+    const search = document.getElementById('customer-search');
+    const selectedId = document.getElementById('Form_RecipientUserId');
+    const selectedCard = document.getElementById('selected-customer');
+    const results = document.getElementById('customer-results');
+    const broadcast = document.getElementById('Form_SendToAll');
+    const picker = document.getElementById('coupon-customer-picker');
+    let searchTimer, request;
+    const digits = value => value.replace(/[۰-۹]/g, c => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c))).replace(/[٠-٩]/g, c => String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)));
+    const setBroadcast = () => {
+        picker.hidden = broadcast.checked;
+        if (broadcast.checked) { selectedId.value = ''; selectedCard.hidden = true; results.hidden = true; search.value = ''; }
+    };
+    broadcast.addEventListener('change', setBroadcast);
+    setBroadcast();
+    search.addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        request?.abort();
+        selectedId.value = '';
+        selectedCard.hidden = true;
+        results.replaceChildren();
+        const q = search.value.trim();
+        if (q.length < 2 && !/[0-9۰-۹٠-٩]/.test(q)) { results.hidden = true; return; }
+        results.hidden = false;
+        results.textContent = 'در حال جستجو...';
+        searchTimer = setTimeout(async () => {
+            request = new AbortController();
+            try {
+                const response = await fetch('@Url.Action("SearchCustomers", "AdminCoupons")?q=' + encodeURIComponent(digits(q)), { signal: request.signal, credentials: 'same-origin' });
+                if (!response.ok) throw new Error();
+                const customers = await response.json();
+                results.replaceChildren();
+                if (!customers.length) { results.textContent = 'مشتری‌ای پیدا نشد.'; return; }
+                customers.forEach(customer => {
+                    const button = document.createElement('button');
+                    button.type = 'button'; button.className = 'coupon-customer-result'; button.setAttribute('role', 'option');
+                    const title = document.createElement('strong'); title.textContent = `${customer.firstName} ${customer.lastName}`;
+                    const details = document.createElement('small');
+                    details.textContent = `شناسه #${customer.id} · موبایل: ${customer.phoneNumber} · ایمیل: ${customer.email || 'ثبت نشده'} · نقش: ${customer.role === 'Admin' ? 'مدیر' : 'مشتری'}`;
+                    button.append(title, details);
+                    button.addEventListener('click', () => {
+                        selectedId.value = customer.id;
+                        selectedCard.replaceChildren(title.cloneNode(true), details.cloneNode(true));
+                        selectedCard.hidden = false;
+                        search.value = `${customer.firstName} ${customer.lastName}`;
+                        results.hidden = true;
+                    });
+                    results.append(button);
+                });
+            } catch (error) {
+                if (error.name !== 'AbortError') results.textContent = 'جستجوی مشتری انجام نشد؛ دوباره تلاش کنید.';
+            }
+        }, 250);
+    });
+    document.addEventListener('click', event => { if (!picker.contains(event.target)) results.hidden = true; });
+    document.querySelector('.coupon-create-card form').addEventListener('submit', event => {
+        if (broadcast.checked || selectedId.value) return;
+        event.preventDefault();
+        search.setCustomValidity('مشتری را از نتایج جستجو انتخاب کنید یا ارسال برای همه را فعال کنید.');
+        search.reportValidity();
+    });
+    search.addEventListener('input', () => search.setCustomValidity(''));
+    const code = document.getElementById('Form_Code');
+    document.getElementById('generate-coupon-code').addEventListener('click', () => {
+        const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        const random = new Uint8Array(10);
+        crypto.getRandomValues(random);
+        code.value = 'CP-' + Array.from(random, value => alphabet[value % alphabet.length]).join('');
+        code.dispatchEvent(new Event('input', { bubbles: true }));
+        code.focus();
+    });
+    const input = document.getElementById('Form_ExpiresOnJalali');
+    const modal = document.getElementById('jalali-date-modal');
+    const days = document.getElementById('jalali-days');
+    const monthSelect = document.getElementById('jalali-month');
+    const yearSelect = document.getElementById('jalali-year');
+    const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+    const formatter = new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    const parts = date => {
+        const values = Object.fromEntries(formatter.formatToParts(date).filter(x => x.type !== 'literal').map(x => [x.type, Number(x.value)]));
+        return { year: values.year, month: values.month, day: values.day };
+    };
+    const faNumber = value => Number(value).toLocaleString('fa-IR', { useGrouping: false });
+    const findGregorian = (year, month, day) => {
+        const cursor = new Date(year + 621, 1, 15, 12);
+        for (let i = 0; i < 430; i++) {
+            const value = parts(cursor);
+            if (value.year === year && value.month === month && value.day === day) return new Date(cursor);
+            cursor.setDate(cursor.getDate() + 1);
+        }
+        return null;
+    };
+    const today = new Date();
+    const todayPersian = parts(today);
+    let calendarYear = todayPersian.year, calendarMonth = todayPersian.month;
+    months.forEach((month, index) => monthSelect.add(new Option(month, String(index + 1))));
+    for (let year = todayPersian.year; year <= todayPersian.year + 10; year++) yearSelect.add(new Option(faNumber(year), String(year)));
+    function render() {
+        monthSelect.value = String(calendarMonth);
+        yearSelect.value = String(calendarYear);
+        days.replaceChildren();
+        const first = findGregorian(calendarYear, calendarMonth, 1);
+        const next = findGregorian(calendarMonth === 12 ? calendarYear + 1 : calendarYear, calendarMonth === 12 ? 1 : calendarMonth + 1, 1);
+        if (!first || !next) return;
+        for (let i = 0; i < (first.getDay() + 1) % 7; i++) days.append(document.createElement('span'));
+        const selected = input.value.replace(/[۰-۹]/g, digit => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)).split('/').map(Number);
+        for (let day = 1; day <= Math.round((next - first) / 86400000); day++) {
+            const date = new Date(first); date.setDate(first.getDate() + day - 1);
+            const button = document.createElement('button');
+            button.type = 'button'; button.className = 'jalali-day'; button.textContent = faNumber(day);
+            button.disabled = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            if (selected[0] === calendarYear && selected[1] === calendarMonth && selected[2] === day) button.classList.add('is-selected');
+            if (todayPersian.year === calendarYear && todayPersian.month === calendarMonth && todayPersian.day === day) button.classList.add('is-today');
+            button.addEventListener('click', () => {
+                input.value = `${faNumber(calendarYear)}/${String(faNumber(calendarMonth)).padStart(2,'۰')}/${String(faNumber(day)).padStart(2,'۰')}`;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                modal.hidden = true;
+            });
+            days.append(button);
+        }
+    }
+    input.addEventListener('click', () => {
+        const selected = input.value.replace(/[۰-۹]/g, digit => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)).split('/').map(Number);
+        calendarYear = selected.length === 3 && selected[0] >= todayPersian.year && selected[0] <= todayPersian.year + 10 ? selected[0] : todayPersian.year;
+        calendarMonth = selected.length === 3 && selected[1] >= 1 && selected[1] <= 12 ? selected[1] : todayPersian.month;
+        render(); modal.hidden = false;
+    });
+    document.getElementById('jalali-cancel').addEventListener('click', () => modal.hidden = true);
+    document.getElementById('jalali-clear').addEventListener('click', () => { input.value = ''; modal.hidden = true; });
+    document.getElementById('jalali-prev').addEventListener('click', () => { if (--calendarMonth < 1) { calendarMonth = 12; calendarYear--; } if (calendarYear < todayPersian.year) { calendarYear = todayPersian.year; calendarMonth = 1; } render(); });
+    document.getElementById('jalali-next').addEventListener('click', () => { if (++calendarMonth > 12) { calendarMonth = 1; calendarYear++; } if (calendarYear > todayPersian.year + 10) { calendarYear = todayPersian.year + 10; calendarMonth = 12; } render(); });
+    monthSelect.addEventListener('change', () => { calendarMonth = Number(monthSelect.value); render(); });
+    yearSelect.addEventListener('change', () => { calendarYear = Number(yearSelect.value); render(); });
+    modal.addEventListener('click', event => { if (event.target === modal) modal.hidden = true; });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') modal.hidden = true; });
+})();
+</script>
+}

@@ -34,11 +34,32 @@ namespace Entities
         public DbSet<ProductViewHistory> ProductViewHistories { get; set; }
 
         public DbSet<ProductFavorite> ProductFavorites { get; set; }
+        public DbSet<DiscountCoupon> DiscountCoupons { get; set; }
+        public DbSet<CouponRedemption> CouponRedemptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<ProductFavorite>().HasKey(x => new { x.UserId, x.ProductId });
+            modelBuilder.Entity<DiscountCoupon>().ToTable("DiscountCoupons");
+            modelBuilder.Entity<CouponRedemption>().ToTable("CouponRedemptions");
+            modelBuilder.Entity<CouponRedemption>().HasIndex(x => new { x.CouponId, x.UserId }).IsUnique();
+            modelBuilder.Entity<CouponRedemption>().HasIndex(x => x.OrderId).IsUnique();
+            modelBuilder.Entity<CouponRedemption>().Property(x => x.DiscountAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<Order>().Property(x => x.CouponDiscount).HasPrecision(18, 2);
+            modelBuilder.Entity<CouponRedemption>().HasOne(x => x.Coupon).WithMany()
+                .HasForeignKey(x => x.CouponId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<CouponRedemption>().HasOne(x => x.User).WithMany()
+                .HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<CouponRedemption>().HasOne(x => x.Order).WithMany()
+                .HasForeignKey(x => x.OrderId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<DiscountCoupon>().HasIndex(x => x.Code).IsUnique();
+            modelBuilder.Entity<DiscountCoupon>().Property(x => x.Code).IsRequired().HasMaxLength(40);
+            modelBuilder.Entity<DiscountCoupon>().Property(x => x.Title).IsRequired().HasMaxLength(150);
+            modelBuilder.Entity<DiscountCoupon>().Property(x => x.Value).HasPrecision(18, 2);
+            modelBuilder.Entity<DiscountCoupon>().Property(x => x.MinimumOrderAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<DiscountCoupon>().HasOne(x => x.RecipientUser).WithMany()
+                .HasForeignKey(x => x.RecipientUserId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<ProductFavorite>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<ProductFavorite>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Product>().ToTable("products");

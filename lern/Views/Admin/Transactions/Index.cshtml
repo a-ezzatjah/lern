@@ -1,0 +1,183 @@
+@model AdminTransactionListViewModel
+@using Entities
+@using System.Globalization
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "مدیریت تراکنش‌ها";
+    string PageUrl(int number) => Url.Action("Index", "AdminTransactions", new { page = number, pageSize = Model.PageSize, search = Model.Search, status = Model.Status, type = Model.Type, from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") })!;
+    string PersianDate(DateTime date) { var c = new PersianCalendar(); return $"{c.GetYear(date):0000}/{c.GetMonth(date):00}/{c.GetDayOfMonth(date):00}"; }
+}
+<div class="mb-6"><h1 class="text-2xl font-bold text-gray-900 dark:text-white">مدیریت تراکنش‌ها</h1><p class="text-gray-600 dark:text-gray-400">تاریخچه کامل تراکنش‌های مالی سیستم</p></div>
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="rounded-xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"><p class="text-sm text-gray-500">کل تراکنش‌ها</p><strong class="mt-2 block text-2xl dark:text-white">@Model.TotalCount.ToString("N0")</strong></div>
+    <div class="rounded-xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"><p class="text-sm text-gray-500">مبلغ موفق</p><strong class="mt-2 block text-2xl dark:text-white">@Model.SuccessfulAmount.ToString("N0") <small class="text-sm">تومان</small></strong></div>
+    <div class="rounded-xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"><p class="text-sm text-gray-500">تراکنش‌های ناموفق</p><strong class="mt-2 block text-2xl dark:text-white">@Model.FailedCount.ToString("N0")</strong></div>
+    <div class="rounded-xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"><p class="text-sm text-gray-500">میانگین ارزش تراکنش</p><strong class="mt-2 block text-2xl dark:text-white">@Model.AverageAmount.ToString("N0") <small class="text-sm">تومان</small></strong></div>
+</div>
+<form method="get" asp-controller="AdminTransactions" asp-action="Index" class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800">
+    <div class="transaction-filters border-b p-4 dark:border-gray-700">
+        <label class="transaction-filter-label">نوع تراکنش<span class="transaction-select-wrap"><select name="type" class="transaction-control"><option value="">همه انواع</option><option value="sale" selected="@(Model.Type == "sale")">فروش</option><option value="refund" selected="@(Model.Type == "refund")">عودت</option></select><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" /></svg></span></label>
+        <label class="transaction-filter-label">وضعیت<span class="transaction-select-wrap"><select name="status" class="transaction-control"><option value="">همه وضعیت‌ها</option>@foreach (var status in Enum.GetValues<PaymentStatus>()) { <option value="@status" selected="@(Model.Status == status)">@AdminOrderDisplay.Payment(status)</option> }</select><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" /></svg></span></label>
+        <div class="transaction-filter-label"><span>از تاریخ (شمسی)</span><input type="hidden" id="transaction-from" name="from" value="@Model.From?.ToString("yyyy-MM-dd")" /><button type="button" class="transaction-date-button transaction-control" data-field="transaction-from">@(Model.From.HasValue ? PersianDate(Model.From.Value) : "انتخاب تاریخ")</button></div>
+        <div class="transaction-filter-label"><span>تا تاریخ (شمسی)</span><input type="hidden" id="transaction-to" name="to" value="@Model.To?.ToString("yyyy-MM-dd")" /><button type="button" class="transaction-date-button transaction-control" data-field="transaction-to">@(Model.To.HasValue ? PersianDate(Model.To.Value) : "انتخاب تاریخ")</button></div>
+        <label class="transaction-filter-label transaction-search">جستجو<input name="search" value="@Model.Search" placeholder="شناسه تراکنش، کد رهگیری، سفارش یا نام مشتری" class="transaction-control" /></label>
+        <button class="transaction-submit">اعمال فیلتر</button><a asp-controller="AdminTransactions" asp-action="Index" class="transaction-reset">پاک کردن</a>
+        <div asp-validation-summary="All" class="text-sm text-red-600"></div>
+    </div>
+    <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
+        <thead class="bg-gray-50 text-gray-500 dark:bg-gray-700 dark:text-gray-300"><tr>@foreach (var title in new[] { "شناسه تراکنش", "تاریخ", "مشتری", "مبلغ", "درگاه پرداخت", "وضعیت", "اقدامات" }) { <th scope="col" class="whitespace-nowrap px-6 py-3 text-start">@title</th> }</tr></thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+        @if (Model.Transactions.Count == 0) { <tr><td colspan="7" class="p-8 text-center text-gray-500">تراکنشی با این شرایط پیدا نشد.</td></tr> }
+        @foreach (var transaction in Model.Transactions) {
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td class="whitespace-nowrap px-6 py-4 font-medium dark:text-white">#@transaction.Id <div class="text-xs text-gray-500">سفارش #@transaction.OrderId</div></td>
+                <td class="whitespace-nowrap px-6 py-4 dark:text-white">@AdminOrderDisplay.Date(transaction.CreatedAt)<div class="text-gray-500">@AdminOrderDisplay.LocalTime(transaction.CreatedAt).ToString("HH:mm")</div></td>
+                <td class="whitespace-nowrap px-6 py-4 dark:text-white">@transaction.Order.CustomerFirstName @transaction.Order.CustomerLastName<div class="text-gray-500" dir="ltr">@transaction.Order.CustomerPhone</div></td>
+                <td class="whitespace-nowrap px-6 py-4 font-medium dark:text-white">@transaction.Amount.ToString("N0") تومان</td>
+                <td class="whitespace-nowrap px-6 py-4 dark:text-white">@AdminOrderDisplay.Gateway(transaction.Gateway)</td>
+                <td class="whitespace-nowrap px-6 py-4"><span class="rounded-full px-2 py-1 text-xs font-semibold @(transaction.Status switch { PaymentStatus.Successful => "bg-green-100 text-green-800", PaymentStatus.Failed => "bg-red-100 text-red-800", PaymentStatus.Refunded => "bg-blue-100 text-blue-800", _ => "bg-yellow-100 text-yellow-800" })">@AdminOrderDisplay.Payment(transaction.Status)</span></td>
+                <td class="whitespace-nowrap px-6 py-4"><a asp-controller="AdminOrders" asp-action="Details" asp-route-id="@transaction.OrderId" class="text-primary">مشاهده سفارش</a><div class="max-w-48 truncate text-xs text-gray-500" title="@transaction.Reference">@transaction.Reference</div></td>
+            </tr>
+        }
+        </tbody>
+    </table></div>
+    <nav aria-label="صفحات تراکنش‌ها" class="flex flex-wrap items-center justify-between gap-4 border-t px-6 py-4 dark:border-gray-700">
+        <p class="text-sm text-gray-600 dark:text-gray-300">نمایش @(Model.TotalCount == 0 ? 0 : (Model.Page - 1) * Model.PageSize + 1) تا @Math.Min(Model.Page * Model.PageSize, Model.TotalCount) از @Model.TotalCount تراکنش</p>
+        <div class="flex gap-2 text-sm dark:text-white">@if (Model.Page > 1) { <a href="@PageUrl(Model.Page - 1)" class="rounded border px-3 py-1">قبلی</a> } @for (var number = Math.Max(1, Model.Page - 2); number <= Math.Min(Model.TotalPages, Model.Page + 2); number++) { <a href="@PageUrl(number)" aria-current="@(number == Model.Page ? "page" : null)" class="rounded border px-3 py-1 @(number == Model.Page ? "bg-primary text-white" : "")">@number</a> } @if (Model.Page < Model.TotalPages) { <a href="@PageUrl(Model.Page + 1)" class="rounded border px-3 py-1">بعدی</a> }</div>
+        <label class="transaction-filter-label transaction-page-size">نمایش در صفحه <span class="transaction-select-wrap"><select name="pageSize" class="transaction-control" onchange="this.form.submit()">@foreach (var size in new[] { 10, 25, 50 }) { <option value="@size" selected="@(Model.PageSize == size)">@size</option> }</select><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" /></svg></span></label>
+    </nav>
+</form>
+<style>
+    .transaction-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; }
+    .transaction-filter-label { display: flex; flex-direction: column; gap: 7px; min-width: 170px; color: #374151; font-size: 13px; font-weight: 600; }
+    .transaction-control { display: block; width: 100%; height: 43px; border: 1px solid #d1d5db; border-radius: 10px; background: #fff; padding: 0 14px; color: #111827; font-size: 14px; font-weight: 400; outline: none; transition: border-color .2s, box-shadow .2s; }
+    .transaction-control:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124, 58, 237, .12); }
+    .transaction-select-wrap { position: relative; display: block; }
+    .transaction-select-wrap select { appearance: none; padding-left: 42px; cursor: pointer; }
+    .transaction-select-wrap svg { position: absolute; left: 14px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%); pointer-events: none; color: #6b7280; }
+    .transaction-date-button { text-align: right; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M7 3v4m10-4v4M3 10h18'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 13px center; background-size: 18px; padding-left: 40px; }
+    .transaction-search { flex: 1 1 290px; min-width: min(100%, 290px); }
+    .transaction-search input::placeholder { color: #9ca3af; }
+    .transaction-submit, .transaction-reset { display: inline-flex; height: 43px; align-items: center; justify-content: center; border-radius: 10px; padding: 0 18px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .transaction-submit { background: #7c3aed; color: white; }
+    .transaction-submit:hover { background: #6d28d9; }
+    .transaction-reset { border: 1px solid #d1d5db; color: #4b5563; }
+    .transaction-reset:hover { background: #f3f4f6; }
+    .transaction-page-size { min-width: 112px; }
+    .dark .transaction-filter-label { color: #d1d5db; }
+    .dark .transaction-control { border-color: #4b5563; background-color: #374151; color: #f9fafb; }
+    .dark .transaction-select-wrap svg { color: #d1d5db; }
+    .dark .transaction-reset { border-color: #4b5563; color: #d1d5db; }
+    .dark .transaction-reset:hover { background: #374151; }
+    .jalali-modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15, 23, 42, .55); backdrop-filter: blur(3px); }
+    .jalali-modal[hidden] { display: none; }
+    .jalali-calendar { width: 100%; max-width: 360px; overflow: hidden; border: 1px solid #e5e7eb; border-radius: 18px; background: #fff; box-shadow: 0 24px 70px rgba(15, 23, 42, .25); }
+    .jalali-calendar-header { padding: 18px; color: #fff; background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .jalali-calendar-title { display: flex; align-items: center; justify-content: space-between; }
+    .jalali-calendar-title button { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: rgba(255,255,255,.15); font-size: 20px; }
+    .jalali-calendar-selects { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .jalali-calendar-selects select { width: 100%; border: 1px solid rgba(255,255,255,.35); border-radius: 10px; padding: 8px 12px 8px 32px; color: #fff; background: rgba(255,255,255,.14); outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 10px center; background-size: 15px; }
+    .jalali-calendar-selects option { color: #111827; background: #fff; }
+    .jalali-calendar-body { padding: 16px; }
+    .jalali-weekdays, .jalali-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; text-align: center; }
+    .jalali-weekdays { margin-bottom: 8px; color: #6b7280; font-size: 12px; }
+    .jalali-day { aspect-ratio: 1; border-radius: 10px; font-size: 13px; }
+    .jalali-day:hover { color: #4f46e5; background: #eef2ff; }
+    .jalali-day.is-selected { color: #fff; background: #4f46e5; }
+    .jalali-day.is-today { border: 1px solid #8b5cf6; }
+    .jalali-calendar-footer { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #e5e7eb; padding: 12px 16px; }
+    .jalali-calendar-footer button { border-radius: 10px; padding: 8px 14px; font-size: 13px; }
+    .jalali-cancel { color: #4b5563; background: #f3f4f6; }
+    .jalali-clear { color: #dc2626; background: #fef2f2; }
+    .dark .jalali-calendar { border-color: #374151; background: #1f2937; color: #f9fafb; }
+    .dark .jalali-weekdays { color: #9ca3af; }
+    .dark .jalali-calendar-footer { border-color: #374151; }
+</style>
+<div id="jalali-date-modal" class="jalali-modal" hidden role="dialog" aria-modal="true" aria-labelledby="jalali-calendar-heading">
+    <div class="jalali-calendar">
+        <div class="jalali-calendar-header">
+            <div class="jalali-calendar-title"><button id="jalali-next" type="button" aria-label="ماه بعد">›</button><strong id="jalali-calendar-heading">انتخاب تاریخ</strong><button id="jalali-prev" type="button" aria-label="ماه قبل">‹</button></div>
+            <div class="jalali-calendar-selects"><select id="jalali-month" aria-label="ماه"></select><select id="jalali-year" aria-label="سال"></select></div>
+        </div>
+        <div class="jalali-calendar-body"><div class="jalali-weekdays"><span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span></div><div id="jalali-days" class="jalali-days"></div></div>
+        <div class="jalali-calendar-footer"><button id="jalali-clear" type="button" class="jalali-clear">پاک کردن تاریخ</button><button id="jalali-cancel" type="button" class="jalali-cancel">انصراف</button></div>
+    </div>
+</div>
+@section Scripts {
+<script>
+(() => {
+    const modal = document.getElementById('jalali-date-modal');
+    const days = document.getElementById('jalali-days');
+    const monthSelect = document.getElementById('jalali-month');
+    const yearSelect = document.getElementById('jalali-year');
+    const months = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+    const formatter = new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    const parts = date => {
+        const values = Object.fromEntries(formatter.formatToParts(date).filter(x => x.type !== 'literal').map(x => [x.type, Number(x.value)]));
+        return { year: values.year, month: values.month, day: values.day };
+    };
+    const faNumber = value => Number(value).toLocaleString('fa-IR', { useGrouping: false });
+    const fromIso = value => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
+        const [year, month, day] = value.split('-').map(Number);
+        return new Date(year, month - 1, day, 12);
+    };
+    const toIso = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const findGregorian = (year, month, day) => {
+        const cursor = new Date(year + 621, 1, 15, 12);
+        for (let i = 0; i < 430; i += 1) {
+            const value = parts(cursor);
+            if (value.year === year && value.month === month && value.day === day) return new Date(cursor);
+            cursor.setDate(cursor.getDate() + 1);
+        }
+        return null;
+    };
+    const today = parts(new Date());
+    let activeInput, activeButton, calendarYear = today.year, calendarMonth = today.month;
+    months.forEach((month, index) => monthSelect.add(new Option(month, String(index + 1))));
+    for (let year = today.year + 1; year >= today.year - 120; year -= 1) yearSelect.add(new Option(faNumber(year), String(year)));
+    function render() {
+        monthSelect.value = String(calendarMonth);
+        yearSelect.value = String(calendarYear);
+        days.replaceChildren();
+        const first = findGregorian(calendarYear, calendarMonth, 1);
+        const next = findGregorian(calendarMonth === 12 ? calendarYear + 1 : calendarYear, calendarMonth === 12 ? 1 : calendarMonth + 1, 1);
+        if (!first || !next) return;
+        for (let i = 0; i < (first.getDay() + 1) % 7; i += 1) days.append(document.createElement('span'));
+        const selectedDate = fromIso(activeInput.value);
+        const selected = selectedDate && parts(selectedDate);
+        for (let day = 1; day <= Math.round((next - first) / 86400000); day += 1) {
+            const date = new Date(first);
+            date.setDate(first.getDate() + day - 1);
+            const button = document.createElement('button');
+            button.type = 'button'; button.className = 'jalali-day'; button.textContent = faNumber(day);
+            if (selected && selected.year === calendarYear && selected.month === calendarMonth && selected.day === day) button.classList.add('is-selected');
+            if (today.year === calendarYear && today.month === calendarMonth && today.day === day) button.classList.add('is-today');
+            button.addEventListener('click', () => {
+                activeInput.value = toIso(date);
+                activeButton.textContent = `${faNumber(calendarYear)}/${faNumber(calendarMonth).padStart(2, '۰')}/${faNumber(day).padStart(2, '۰')}`;
+                modal.hidden = true;
+            });
+            days.append(button);
+        }
+    }
+    document.querySelectorAll('.transaction-date-button').forEach(button => button.addEventListener('click', () => {
+        activeButton = button;
+        activeInput = document.getElementById(button.dataset.field);
+        const selected = fromIso(activeInput.value);
+        const value = selected ? parts(selected) : today;
+        calendarYear = value.year; calendarMonth = value.month;
+        document.getElementById('jalali-calendar-heading').textContent = button.dataset.field === 'transaction-from' ? 'انتخاب تاریخ شروع' : 'انتخاب تاریخ پایان';
+        render(); modal.hidden = false;
+    }));
+    document.getElementById('jalali-clear').addEventListener('click', () => { activeInput.value = ''; activeButton.textContent = 'انتخاب تاریخ'; modal.hidden = true; });
+    document.getElementById('jalali-cancel').addEventListener('click', () => modal.hidden = true);
+    document.getElementById('jalali-prev').addEventListener('click', () => { if (--calendarMonth < 1) { calendarMonth = 12; calendarYear--; } render(); });
+    document.getElementById('jalali-next').addEventListener('click', () => { if (++calendarMonth > 12) { calendarMonth = 1; calendarYear++; } render(); });
+    monthSelect.addEventListener('change', () => { calendarMonth = Number(monthSelect.value); render(); });
+    yearSelect.addEventListener('change', () => { calendarYear = Number(yearSelect.value); render(); });
+    modal.addEventListener('click', event => { if (event.target === modal) modal.hidden = true; });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') modal.hidden = true; });
+})();
+</script>
+}
