@@ -1,0 +1,29 @@
+@model lern.Models.AdminSettingsViewModel
+@using Entities
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "پیام‌ها و اعلان‌ها";
+}
+<link rel="stylesheet" href="~/assets/css/admin-settings.css" asp-append-version="true" />
+<div class="admin-page-heading"><div><span class="admin-eyebrow">نمای فروشگاه و ارتباط با کاربران</span><h1>پیام‌ها و اعلان‌ها</h1><p>برای همهٔ کاربران یا یک کاربر مشخص پیام و اعلان بفرستید.</p></div></div>
+@if (TempData["SettingsMessage"] is string success) { <div class="admin-alert" role="status">@success</div> }
+@if (TempData["SettingsError"] is string error) { <div class="admin-alert error" role="alert">@error</div> }
+<div class="settings-grid settings-inbox-page">
+    <div class="settings-side">
+        <section class="settings-card">
+            <div class="settings-card-head"><span class="settings-icon green">✉</span><div><h2>ارسال اعلان یا پیام</h2><p>اعلان کنار آیکن زنگ و پیام کنار آیکن گفتگو در حساب کاربری دیده می‌شود.</p></div></div>
+            <form asp-controller="AdminSettings" asp-action="Send" method="post" class="settings-form">
+                <label>نوع محتوا<select name="kind"><option value="1">اعلان</option><option value="2">پیام</option></select></label>
+                <label>عنوان<input name="title" required maxlength="120" placeholder="عنوان کوتاه و روشن" /></label>
+                <label>متن<textarea name="body" required maxlength="1000" rows="5" placeholder="متنی که در حساب کاربری نمایش داده می‌شود"></textarea></label>
+                <div class="settings-recipient"><span>گیرنده</span><label class="settings-check"><input id="settings-all" type="checkbox" name="sendToAll" value="true" checked /> همهٔ کاربران</label><div id="settings-specific" hidden><label for="settings-search">جست‌وجوی کاربر</label><input id="settings-search" type="search" autocomplete="off" placeholder="نام، شماره موبایل یا شناسه" /><input id="settings-user-id" type="hidden" name="recipientUserId" /><div id="settings-results" class="settings-results" role="listbox" hidden></div><p id="settings-selected">کاربری انتخاب نشده است.</p></div></div>
+                <button type="submit" class="admin-primary-button">ثبت و نمایش در پنل کاربری</button>
+            </form>
+        </section>
+        <section class="settings-card"><div class="settings-card-head"><span class="settings-icon">◷</span><div><h2>ارسال‌های اخیر</h2><p>آخرین ۲۰ مورد ثبت‌شده</p></div></div>
+            @if (Model.Inbox.Count == 0) { <p class="settings-empty">هنوز پیامی ارسال نشده است.</p> }
+            else { <div class="settings-history">@foreach (var item in Model.Inbox) { <article><div><strong>@item.Title</strong><span>@(item.Kind == SiteInboxKind.Notification ? "اعلان" : "پیام") · @(item.RecipientUserId is null ? "همهٔ کاربران" : $"{item.RecipientUser?.FirstName} {item.RecipientUser?.LastName}")</span></div><small>@item.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd")</small></article> }</div> }
+        </section>
+    </div>
+</div>
+@section Scripts { <script src="~/assets/js/admin-settings.js" asp-append-version="true"></script> }

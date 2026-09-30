@@ -1,0 +1,57 @@
+/* Shared responsive refinements for every administration view. */
+.admin-sidebar .admin-settings-menu summary.admin-nav-link { cursor: pointer; list-style: none; user-select: none; }
+.admin-sidebar .admin-settings-menu summary.admin-nav-link::-webkit-details-marker { display: none; }
+.admin-sidebar .admin-settings-menu summary.admin-nav-link:hover { color: #434ece; background: linear-gradient(135deg,#e4e9ff,#e5f5e8); }
+.admin-sidebar .admin-settings-chevron { margin-inline-start: auto; transition: transform .2s; }
+.admin-sidebar .admin-settings-menu[open] .admin-settings-chevron { transform: rotate(180deg); }
+.admin-sidebar .admin-settings-submenu { display: grid; gap: .25rem; margin: .25rem 1.2rem .5rem 0; padding-right: .75rem; border-right: 2px solid #dbe4ee; }
+.admin-sidebar .admin-settings-submenu a { display: flex; align-items: center; gap: .65rem; min-height: 2.8rem; padding: .65rem .8rem; border-radius: .75rem; color: #64748b; font-size: .82rem; font-weight: 700; cursor: pointer; }
+.admin-sidebar .admin-settings-submenu a:hover, .admin-sidebar .admin-settings-submenu a[aria-current="page"] { color: #434ece; background: #e7ebff; }
+.dark .admin-sidebar .admin-settings-submenu { border-color: #334155; }
+.admin-shell { overflow-x: clip; }
+.admin-content, .admin-content > *, .admin-card, .admin-main { min-width: 0; }
+.admin-content img, .admin-content video { max-width: 100%; }
+.admin-content .overflow-x-auto { max-width: 100%; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
+.admin-content :is(input, select, textarea) { max-width: 100%; }
+
+@media (max-width: 900px) {
+  .admin-sidebar { inset-inline-start: 0; inset-inline-end: auto; width: min(19rem, 85vw); height: 100dvh; overflow-y: auto; overscroll-behavior: contain; box-shadow: -1rem 0 2.5rem rgba(15,23,42,.16); }
+  .admin-sidebar-open { overflow: hidden; }
+  .admin-sidebar-overlay { backdrop-filter: blur(3px); }
+  .admin-topbar { position: sticky; top: 0; z-index: 10; gap: .7rem; box-shadow: 0 3px 14px rgba(15,23,42,.04); }
+  .admin-breadcrumb { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .admin-mobile-toggle, .admin-icon-button { flex: 0 0 auto; width: 2.7rem; height: 2.7rem; }
+}
+
+@media (max-width: 640px) {
+  .admin-content { padding: 1.1rem .85rem 4rem; }
+  .admin-page-heading { align-items: stretch; gap: .9rem; margin-bottom: 1.15rem; }
+  .admin-page-heading h1 { font-size: clamp(1.25rem, 5vw, 1.55rem); line-height: 1.5; }
+  .admin-page-heading p { line-height: 1.8; }
+  .admin-card { padding: 1rem; border-radius: .9rem; }
+  .admin-stat-grid, .admin-placeholder-grid { gap: .7rem; }
+  .admin-stat-card { padding: .9rem; }
+  .admin-content :is(.users-toolbar, .products-toolbar, .category-toolbar) { align-items: stretch; }
+  .admin-content :is(.users-search, .products-search) { width: 100%; flex-wrap: wrap; }
+  .admin-content :is(.users-search, .products-search) input { flex-basis: 100%; min-height: 2.8rem; }
+  .admin-content :is(.users-search, .products-search) :is(button, a) { flex: 1; min-width: 0; }
+  .admin-content :is(.pagination, .page-links, .coupon-page-links) { justify-content: center; }
+  .admin-content :is(.page-links, .coupon-page-links) { max-width: 100%; flex-wrap: wrap; }
+  .admin-content .overflow-x-auto { margin-inline: -.25rem; border-radius: .7rem; }
+  .admin-content .overflow-x-auto table { min-width: max(44rem, 100%); }
+  .admin-content table :is(th, td) { white-space: nowrap; }
+  .admin-content :is(.user-create-form, .dialog-body, .dialog-footer) { padding: 1rem; }
+  .admin-content :is(.user-create-grid, .coupon-form-grid, .form-grid) { grid-template-columns: minmax(0, 1fr); }
+  .admin-content :is(.user-actions, .dialog-footer) { flex-wrap: wrap; }
+  .admin-content .user-actions > * { flex: 1 1 100%; text-align: center; }
+}
+
+@media (max-width: 380px) {
+  .admin-topbar { padding: .6rem; }
+  .admin-content { padding-inline: .65rem; }
+  .admin-topbar-actions { gap: .35rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar { transition: none; }
+}

@@ -35,11 +35,17 @@ namespace Entities
 
         public DbSet<ProductFavorite> ProductFavorites { get; set; }
         public DbSet<DiscountCoupon> DiscountCoupons { get; set; }
+        public DbSet<SiteBanner> SiteBanners { get; set; }
+        public DbSet<SiteInboxItem> SiteInboxItems { get; set; }
         public DbSet<CouponRedemption> CouponRedemptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<SiteBanner>().HasIndex(x => new { x.IsActive, x.SortOrder });
+            modelBuilder.Entity<SiteInboxItem>().HasIndex(x => new { x.RecipientUserId, x.CreatedAt });
+            modelBuilder.Entity<SiteInboxItem>().HasOne(x => x.RecipientUser).WithMany()
+                .HasForeignKey(x => x.RecipientUserId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<ProductFavorite>().HasKey(x => new { x.UserId, x.ProductId });
             modelBuilder.Entity<DiscountCoupon>().ToTable("DiscountCoupons");
             modelBuilder.Entity<CouponRedemption>().ToTable("CouponRedemptions");

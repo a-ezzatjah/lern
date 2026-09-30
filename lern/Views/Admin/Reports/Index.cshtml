@@ -1,0 +1,66 @@
+@model lern.Models.AdminSalesReportViewModel
+@using System.Globalization
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "گزارشات فروش";
+    var calendar = new PersianCalendar();
+    string PersianDate(DateTime date) => $"{calendar.GetYear(date):0000}/{calendar.GetMonth(date):00}/{calendar.GetDayOfMonth(date):00}";
+}
+<link rel="stylesheet" href="~/assets/css/admin-reports.css" asp-append-version="true" />
+<div class="admin-page-heading report-heading">
+    <div><span class="admin-eyebrow">تحلیل فروشگاه</span><h1>گزارشات فروش</h1><p>عملکرد واقعی فروش، سفارش‌ها و مشتریان در بازه انتخابی</p></div>
+    <button type="button" class="admin-secondary-button print-button" onclick="window.print()">خروجی PDF / چاپ</button>
+</div>
+<form method="get" asp-controller="AdminReports" asp-action="Index" class="report-panel report-filters">
+    <label>از تاریخ (شمسی)<input type="hidden" name="from" id="report-from" value="@Model.From.ToString("yyyy-MM-dd")" /><button type="button" class="report-date-button" data-field="report-from">@PersianDate(Model.From)</button></label>
+    <label>تا تاریخ (شمسی)<input type="hidden" name="to" id="report-to" value="@Model.To.ToString("yyyy-MM-dd")" /><button type="button" class="report-date-button" data-field="report-to">@PersianDate(Model.To)</button></label>
+    <label>دسته‌بندی<select name="categoryId"><option value="">همه دسته‌ها</option>@foreach (var category in Model.Categories) { <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">@category.Name</option> }</select></label>
+    <button class="admin-primary-button" type="submit">اعمال فیلتر</button>
+    @if (!ViewData.ModelState.IsValid) { <div class="report-error" role="alert">@Html.ValidationSummary()</div> }
+</form>
+@if (Model.IsTruncated)
+{
+    <div class="report-limit-notice" role="status">بازهٔ انتخابی بیش از ۵۰ روز است. فقط ۵۰ روز اول، از @PersianDate(Model.From) تا @PersianDate(Model.ReportedTo)، در آمار و نمودارها محاسبه شده‌اند. برای دیدن روزهای بعد، بازهٔ تاریخ را کوچک‌تر انتخاب کنید.</div>
+}
+<div class="report-stats">
+    <article class="report-panel"><span class="report-symbol green">↗</span><small>فروش کل</small><strong>@Model.Sales.ToString("N0") <em>تومان</em></strong><p>سفارش‌های پرداخت‌شده در بازه</p></article>
+    <article class="report-panel"><span class="report-symbol blue">◈</span><small>میانگین سفارش</small><strong>@Model.AverageOrder.ToString("N0") <em>تومان</em></strong><p>بر اساس سفارش‌های دارای فروش</p></article>
+    <article class="report-panel"><span class="report-symbol purple">▤</span><small>تعداد سفارشات</small><strong>@Model.OrderCount.ToString("N0")</strong><p>بدون سفارش‌های در انتظار و لغوشده</p></article>
+    <article class="report-panel"><span class="report-symbol rose">♙</span><small>مشتریان جدید</small><strong>@Model.NewCustomers.ToString("N0")</strong><p>@(Model.CategoryId.HasValue ? "برای فیلتر دسته‌بندی قابل انتساب نیست" : "کاربران ثبت‌شده در بازه")</p></article>
+</div>
+<div class="report-charts">
+    <section class="report-panel"><h2>روند فروش ماهانه</h2><div class="report-chart"><canvas id="salesTrendChart"></canvas></div></section>
+    <section class="report-panel"><h2>توزیع فروش بر اساس دسته‌بندی</h2><div class="report-chart"><canvas id="categoryDistributionChart"></canvas></div></section>
+</div>
+<section class="report-panel report-table-panel"><div class="report-table-heading"><h2>گزارش روزانه فروش</h2><span>برای دیدن روزهای دیگر، بازهٔ تاریخ را از بالای صفحه انتخاب کنید.</span></div><div class="overflow-x-auto"><table><thead><tr><th>تاریخ شمسی</th><th>تعداد سفارشات</th><th>فروش خالص</th><th>میانگین سفارش</th><th>مشتریان جدید</th></tr></thead><tbody>
+@foreach (var day in Model.Daily) { <tr><td>@PersianDate(day.Date)</td><td>@day.Orders.ToString("N0")</td><td>@day.Sales.ToString("N0") تومان</td><td>@(day.Orders == 0 ? "۰" : (day.Sales / day.Orders).ToString("N0")) تومان</td><td>@(Model.CategoryId.HasValue ? "—" : day.NewCustomers.ToString("N0"))</td></tr> }
+</tbody></table></div>
+@if (Model.TotalPages > 1)
+{
+    <nav class="report-pagination" aria-label="صفحات گزارش روزانه">
+        <span>صفحه @Model.Page از @Model.TotalPages — هر صفحه ۱۰ روز</span>
+        <div>
+            @for (var p = 1; p <= Model.TotalPages; p++)
+            {
+                <a asp-controller="AdminReports" asp-action="Index" asp-route-from="@Model.From.ToString("yyyy-MM-dd")" asp-route-to="@Model.To.ToString("yyyy-MM-dd")" asp-route-categoryId="@Model.CategoryId" asp-route-page="@p" class="@(p == Model.Page ? "current" : "")" aria-current="@(p == Model.Page ? "page" : null)">@p</a>
+            }
+        </div>
+    </nav>
+}
+</section>
+<div id="jalali-date-modal" class="jalali-modal" hidden role="dialog" aria-modal="true" aria-labelledby="jalali-calendar-heading">
+    <div class="jalali-calendar"><div class="jalali-calendar-header"><div class="jalali-calendar-title"><button id="jalali-next" type="button" aria-label="ماه بعد">›</button><strong id="jalali-calendar-heading">انتخاب تاریخ</strong><button id="jalali-prev" type="button" aria-label="ماه قبل">‹</button></div><div class="jalali-calendar-selects"><select id="jalali-month" aria-label="ماه"></select><select id="jalali-year" aria-label="سال"></select></div></div>
+    <div class="jalali-calendar-body"><div class="jalali-weekdays"><span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span></div><div id="jalali-days" class="jalali-days"></div></div><div class="jalali-calendar-footer"><button id="jalali-clear" type="button" class="jalali-clear">پاک کردن تاریخ</button><button id="jalali-cancel" type="button" class="jalali-cancel">انصراف</button></div></div>
+</div>
+@section Scripts {
+<script src="~/assets/js/plugin/chart-js/chart.js"></script>
+<script src="~/assets/js/admin-reports-calendar.js" asp-append-version="true"></script>
+<script>
+const monthLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthLabels));
+const monthSales = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthSales));
+const categoryLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryLabels));
+const categorySales = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategorySales));
+new Chart(document.getElementById('salesTrendChart'), { type: 'line', data: { labels: monthLabels, datasets: [{ label: 'فروش (تومان)', data: monthSales, borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,.12)', fill: true, tension: .35 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
+new Chart(document.getElementById('categoryDistributionChart'), { type: 'doughnut', data: { labels: categoryLabels, datasets: [{ data: categorySales, backgroundColor: ['#4f46e5','#22c55e','#f59e0b','#ec4899','#06b6d4','#8b5cf6','#64748b'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
+</script>
+}

@@ -1,0 +1,41 @@
+@model lern.Models.AdminSettingsViewModel
+@using Entities
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "تغییر بنر سایت";
+}
+<link rel="stylesheet" href="~/assets/css/admin-settings.css" asp-append-version="true" />
+<div class="admin-page-heading"><div><span class="admin-eyebrow">نمای فروشگاه و ارتباط با کاربران</span><h1>تغییر بنر سایت</h1><p>بنرهای دسکتاپ و موبایل اسلایدر صفحهٔ اصلی را مدیریت کنید.</p></div></div>
+@if (TempData["SettingsMessage"] is string success) { <div class="admin-alert" role="status">@success</div> }
+@if (TempData["SettingsError"] is string error) { <div class="admin-alert error" role="alert">@error</div> }
+<div class="settings-grid">
+    <section class="settings-card settings-banners">
+        <div class="settings-card-head"><span class="settings-icon">▧</span><div><h2>بنرهای صفحهٔ اصلی</h2><p>هر جایگاه را جداگانه ذخیره کنید. تغییر پس از ذخیره در اسلایدر نمایش داده می‌شود.</p></div></div>
+        <div class="settings-banner-guides">
+            <div class="settings-guide"><strong>بنر دسکتاپ</strong><span>JPG یا PNG، دقیقاً <bdi>۲۰۴۸ × ۴۲۷</bdi> یا <bdi>۲۵۶۰ × ۵۳۳</bdi> پیکسل؛ حداکثر ۵ مگابایت.</span></div>
+            <div class="settings-guide"><strong>بنر موبایل</strong><span>JPG یا PNG، دقیقاً <bdi>۸۰۰ × ۱۰۰۰</bdi> پیکسل؛ حداکثر ۵ مگابایت. اگر تصویر موبایل ثبت نشود، تصویر دسکتاپ نمایش داده می‌شود.</span></div>
+        </div>
+        @foreach (var banner in Model.Banners)
+        {
+            <form asp-controller="AdminSettings" asp-action="Banner" asp-route-id="@banner.Id" method="post" enctype="multipart/form-data" class="banner-editor">
+                <div class="banner-previews"><div class="banner-preview"><span>دسکتاپ</span><img src="@banner.ImageUrl" alt="@banner.AltText" loading="lazy" /></div><div class="banner-preview mobile"><span>موبایل</span><img src="@(banner.MobileImageUrl ?? banner.ImageUrl)" alt="@banner.AltText" loading="lazy" /></div></div>
+                <div class="banner-fields"><h3>جایگاه @banner.SortOrder</h3><label>تصویر دسکتاپ جدید<input name="image" type="file" accept=".jpg,.jpeg,.png" /></label><label>تصویر موبایل جدید<input name="mobileImage" type="file" accept=".jpg,.jpeg,.png" /></label><label>متن جایگزین تصویر<input name="altText" value="@banner.AltText" maxlength="150" required /></label><label>لینک مقصد (اختیاری، از داخل سایت)<input name="linkUrl" value="@banner.LinkUrl" placeholder="/products" maxlength="400" dir="ltr" /></label><label class="settings-check"><input type="checkbox" name="isActive" value="true" checked="@banner.IsActive" /> فعال باشد</label><div class="banner-actions"><button type="submit" class="admin-primary-button">ذخیرهٔ بنر @banner.SortOrder</button><button type="submit" class="banner-delete" form="delete-banner-@banner.Id" onclick="return confirm('این بنر از اسلایدر حذف شود؟')">حذف بنر</button></div></div>
+            </form>
+            <form id="delete-banner-@banner.Id" asp-controller="AdminSettings" asp-action="DeleteBanner" asp-route-id="@banner.Id" method="post"></form>
+        }
+        @if (Model.Banners.Count >= 8)
+        {
+            <div class="settings-guide" role="status"><strong>ظرفیت بنرها تکمیل است</strong><span>حداکثر ۸ بنر می‌توان ثبت کرد. برای افزودن بنر جدید، یکی از کارت‌های بالا را حذف کنید.</span></div>
+        }
+        else
+        {
+        <form asp-controller="AdminSettings" asp-action="CreateBanner" method="post" enctype="multipart/form-data" class="banner-create banner-fields">
+            <h3>افزودن بنر جدید</h3>
+            <div class="banner-upload-grid"><label>تصویر دسکتاپ<input name="image" type="file" accept=".jpg,.jpeg,.png" required /></label><label>تصویر موبایل<input name="mobileImage" type="file" accept=".jpg,.jpeg,.png" /></label></div>
+            <label>متن جایگزین تصویر<input name="altText" maxlength="150" required /></label>
+            <label>لینک مقصد (اختیاری)<input name="linkUrl" placeholder="/products" maxlength="400" dir="ltr" /></label>
+            <button type="submit" class="admin-primary-button">افزودن به اسلایدر</button>
+        </form>
+        }
+    </section>
+</div>

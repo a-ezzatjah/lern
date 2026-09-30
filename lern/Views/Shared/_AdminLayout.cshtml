@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - پنل مدیریت</title>
     <link rel="stylesheet" href="~/assets/css/app.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/css/admin-mobile.css" asp-append-version="true" />
 </head>
 <body class="admin-shell bg-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark">
     <style>
@@ -29,7 +30,7 @@
         <symbol id="admin-i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></symbol>
     </svg>
     <div class="admin-frame">
-        <aside class="admin-sidebar">
+        <aside class="admin-sidebar" id="admin-sidebar" aria-label="منوی مدیریت">
             <div class="admin-brand">
                 <img src="~/assets/images/mountainous-logo-transparent.png" alt="خرازی کوهستانی" />
                 <span>پنل مدیریت</span>
@@ -55,8 +56,14 @@
                 <a class="admin-nav-link" href="@Url.Action("Index", "AdminCoupons")"><span class="admin-nav-icon"><svg><use href="#admin-i-percent"/></svg></span><span>تخفیف‌ها و کوپن‌ها</span></a>
                 <div class="admin-nav-group-title">مدیریت سیستم</div>
                 <a class="admin-nav-link" href="@Url.Action("Users", "Admin")"><span class="admin-nav-icon"><svg><use href="#admin-i-users"/></svg></span><span>کاربران</span></a>
-                <a class="admin-nav-link" href="#"><span class="admin-nav-icon"><svg><use href="#admin-i-chart"/></svg></span><span>گزارش‌ها</span></a>
-                <a class="admin-nav-link" href="#"><span class="admin-nav-icon"><svg><use href="#admin-i-settings"/></svg></span><span>تنظیمات</span></a>
+                <a class="admin-nav-link" href="@Url.Action("Index", "AdminReports")"><span class="admin-nav-icon"><svg><use href="#admin-i-chart"/></svg></span><span>گزارش‌ها</span></a>
+                <details class="admin-settings-menu" @(Context.Request.Path.StartsWithSegments("/Admin/Settings") ? "open" : "")>
+                    <summary class="admin-nav-link"><span class="admin-nav-icon"><svg><use href="#admin-i-settings"/></svg></span><span>تنظیمات</span><span class="admin-settings-chevron" aria-hidden="true">⌄</span></summary>
+                    <div class="admin-settings-submenu">
+                        <a href="@Url.Action("Banners", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/banners") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-box"/></svg></span>تغییر بنر سایت</a>
+                        <a href="@Url.Action("Inbox", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/inbox") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-wallet"/></svg></span>پیام‌ها و اعلان‌ها</a>
+                    </div>
+                </details>
                 <a class="admin-nav-link" href="#"><span class="admin-nav-icon"><svg><use href="#admin-i-backup"/></svg></span><span>پشتیبان‌گیری</span></a>
                 <a class="admin-nav-link" href="#"><span class="admin-nav-icon"><svg><use href="#admin-i-log"/></svg></span><span>لاگ‌های سیستم</span></a>
             </nav>
@@ -69,7 +76,7 @@
 
         <div class="admin-main">
             <header class="admin-topbar">
-                <button class="admin-mobile-toggle" type="button" aria-label="باز کردن منو" onclick="document.body.classList.toggle('admin-sidebar-open')">☰</button>
+                <button class="admin-mobile-toggle" type="button" aria-label="باز کردن منو" aria-controls="admin-sidebar" aria-expanded="false">☰</button>
                 <div class="admin-breadcrumb">@ViewData["Title"]</div>
                 <div class="admin-topbar-actions">
                     <button type="button" id="dark-mode-toggle" class="admin-icon-button" aria-label="تغییر حالت نمایش">
@@ -83,8 +90,9 @@
             </main>
         </div>
     </div>
-    <div class="admin-sidebar-overlay" onclick="document.body.classList.remove('admin-sidebar-open')"></div>
+    <div class="admin-sidebar-overlay" aria-hidden="true"></div>
     <script src="~/assets/js/dependencies/app.js" asp-append-version="true"></script>
+    <script src="~/assets/js/admin-mobile.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

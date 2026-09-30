@@ -5,16 +5,19 @@
 }
 
 <!-- ================= start slider section ================= -->
+@if (Model.Banners.Count > 0)
+{
 <section class="py-5">
     <h2 class="sr-only">اسلایدر فروشگاه</h2>
     <div class="w-full overflow-hidden">
         <div class="swiper max-w-[1920px] mx-auto !relative default-carousel swiper-container" aria-label="اسلایدر فروشگاه">
             <div class="swiper-wrapper" style="padding-bottom:0!important">
-                @foreach (var slide in new[] { "slider-2-1.jpg", "slider-2-2.jpg", "slider-2-3.jpg" })
+                @foreach (var slide in Model.Banners)
                 {
                     <div class="swiper-slide">
                         <div class="h-90 flex justify-center items-center">
-                            <img src="~/assets/images/slider/@slide" class="h-full w-full object-cover rounded-lg" loading="lazy" alt="تصویر تبلیغاتی فروشگاه">
+                            @if (!string.IsNullOrWhiteSpace(slide.LinkUrl)) { <a href="@slide.LinkUrl" class="block h-full w-full"><picture class="block h-full w-full"><source media="(max-width: 640px)" srcset="@(slide.MobileImageUrl ?? slide.ImageUrl)" /><img src="@slide.ImageUrl" class="h-full w-full object-cover rounded-lg" loading="lazy" alt="@slide.AltText" /></picture></a> }
+                            else { <picture class="block h-full w-full"><source media="(max-width: 640px)" srcset="@(slide.MobileImageUrl ?? slide.ImageUrl)" /><img src="@slide.ImageUrl" class="h-full w-full object-cover rounded-lg" loading="lazy" alt="@slide.AltText" /></picture> }
                         </div>
                     </div>
                 }
@@ -26,6 +29,7 @@
         </div>
     </div>
 </section>
+}
 
 @if (Model.DiscountedProducts.Count > 0)
 {
