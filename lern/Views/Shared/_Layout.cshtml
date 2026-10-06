@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8" />
@@ -53,33 +53,34 @@
                     </div>
                     <!-- logo -->
                     <div class="lg:col-span-2 lg:order-1 order-2 col-span-4 w-full">
-                        <a href="index.html">
+                        <a href="/">
                             <div class="lg:text-start text-center">
                                 <img class="site-logo site-logo-header" src="/assets/images/mountainous-logo-transparent.png" loading="lazy" alt="لوگوی خرازی کوهستانی">
                             </div>
                         </a>
                     </div>
                     <!-- search and filter -->
-                    <div class="lg:col-span-6 lg:block lg:order-2 order-4 hidden col-span-4 w-full">
+                    <div class="lg:col-span-6 lg:order-2 order-4 col-span-12 w-full">
                         <div class="flex items-center w-full justify-between">
                             <!-- search -->
-                            <div class="flex w-full items-center">
+                            <div class="relative flex w-full items-center">
                                 <!--Search component-->
-                                <div class="relative flex items-center w-full">
+                                <form action="/shop" method="get" role="search" class="relative flex items-center w-full">
                                     <input type="search"
                                            id="searchInput"
+                                           name="q" maxlength="100" autocomplete="off" aria-label="جستجوی محصولات"
                                            class="w-full appearance-none dark:text-white rounded-3xl border border-gray-300 dark:border-gray-600 py-3 ps-16 pe-4 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 shadow-sm"
                                            placeholder="جستجوی محصولات ....">
-                                    <button class="bg-primary-grad p-2 text-white rounded-3xl absolute start-1 hover:opacity-90 transition-opacity">
+                                    <button type="submit" aria-label="جستجو" class="bg-primary-grad p-2 text-white rounded-3xl absolute start-1 hover:opacity-90 transition-opacity">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                         </svg>
                                     </button>
+                                </form>
                                     <!--Search results-->
-                                    <div id="searchResults" class="bg-white absolute top-13 border border-gray-400 z-10 end-0 start-0 dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden hidden">
-                                        <!-- The results content will be filled by JavaScript -->
+                                    <div id="searchResults" class="bg-white absolute top-13 border border-gray-400 z-50 end-0 start-0 dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden hidden">
+                                        <!-- نتایج جستجو -->
                                     </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -145,7 +146,7 @@
 <div id="category-menu-panel" hidden><div class="category-loading" role="status">در حال دریافت دسته‌بندی‌ها…</div></div>
 </li>
                                 <li class="py-2">
-                                    <a href="" class="flex space-x-3 hover:text-primary transition">
+                                    <a href="/" class="flex space-x-3 hover:text-primary transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -155,7 +156,7 @@
                                     </a>
                                 </li>
                                 <li class="py-2">
-                                    <a href="" class="flex space-x-3 hover:text-primary transition">
+                                    <a href="/shop" class="flex space-x-3 hover:text-primary transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -457,7 +458,7 @@
     <nav class="fixed shadow-xl border-t-zinc-300 dark:border-0 bottom-0 z-20 lg:hidden end-0 start-0 dark:bg-gray-800 dark:text-white bg-white border-t border-gray-200">
         <div class="flex justify-around items-center flex-row-reverse py-3 px-4">
             <!-- Home -->
-            <a href="#" class="flex flex-col items-center text-primary space-y-2">
+            <a href="/" class="flex flex-col items-center text-primary space-y-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-primary">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                 </svg>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +22,8 @@ namespace ServiceContract.Interfaces
         public Task<PageResult<ProductListItemDto>> GetFilterAsync(ProductQuery query);
 
         public Task<List<ProductCardDto>> GetProductCardsAsync();
+
+        public Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? query, int[] categoryIds, bool availableOnly, string sort, decimal? minPrice, decimal? maxPrice, int offset, int take);
 
         public Task<PageResult<ProductCardDto>> GetCategoryProductCardsAsync(int categoryId, int page = 1);
 

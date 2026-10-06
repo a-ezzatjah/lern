@@ -52,5 +52,5 @@
     });
     window.addEventListener('focus', () => refresh().catch(console.error));
     window.addEventListener('pageshow', event => { if (event.persisted) refresh().catch(console.error); });
-    window.storeFavorites = { save, ready };
+    window.storeFavorites = { save, ready, refresh };
 })();

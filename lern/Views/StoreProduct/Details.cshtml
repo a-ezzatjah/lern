@@ -359,21 +359,10 @@
             margin-top: 0;
         }
 
-        #purchase-panel {
-            align-self: start;
-            margin-top: -56px;
-        }
-
         #shop-features {
             margin-top: 1.25rem;
         }
 
-
-
-        #product-title {
-            width: 46%;
-            margin-bottom: 1.5rem;
-        }
     }
 </style>
 
@@ -435,6 +424,7 @@
         </nav>
         <!-- main -->
         <div class="dark:bg-gray-800 dark:text-white bg-white rounded-lg drop-shadow-lg border-gray-300 border-1 px-4 pt-4">
+            <h1 id="product-title" class="mb-4 border-b border-gray-200 pb-4 text-xl font-bold dark:border-gray-700" itemprop="name">@Model.Name</h1>
             <div class="grid grid-cols-6 gap-4 place-items-start">
                 <!-- gallery -->
                 <section id="product-gallery-column" class="lg:col-span-2 col-span-6 pb-10 w-full lg:sticky top-24" itemprop="image" itemscope
@@ -583,10 +573,6 @@
                 </section>
                 <!-- meta -->
                 <section class="lg:col-span-4 col-span-6 w-full">
-                    <!-- title -->
-                    <div class="space-y-5 ">
-                        <h1 id="product-title" class="font-bold text-xl border-b border-b-gray-300 pb-3" itemprop="name">@Model.Name</h1>
-                    </div>
                     <!-- feature and meta -->
                     <div class="grid grid-cols-4 gap-4">
                         <!-- feature -->

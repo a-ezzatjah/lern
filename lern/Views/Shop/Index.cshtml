@@ -1,0 +1,39 @@
+@model lern.Models.ShopViewModel
+<section class="container category-results shop-page" id="shop-page">
+    <partial name="~/Views/Shop/_Breadcrumb.cshtml" model="Model" />
+    <div class="shop-layout">
+        <aside class="shop-filters" aria-label="فیلترهای محصولات">
+            <form id="shop-filter-form" method="get" action="/shop">
+                <input type="hidden" name="sort" value="@Model.Sort">
+                <h2>فیلتر محصولات</h2>
+                <label for="shop-query">جستجو در محصولات</label>
+                <input id="shop-query" name="q" type="search" value="@Model.Query" maxlength="100" placeholder="نام محصول را بنویسید">
+                <div class="shop-filter-heading">دسته‌بندی‌ها <span>انتخاب چندگانه</span></div>
+                <div class="shop-category-tree">
+                    @foreach (var root in Model.Categories.Where(c => !c.ParentId.HasValue || Model.Categories.All(parent => parent.Id != c.ParentId)))
+                    {
+                        <partial name="~/Views/Shop/_CategoryNode.cshtml" model="@(new lern.Models.ShopCategoryNodeViewModel(root, Model.Categories, Model.SelectedCategories, (IReadOnlySet<int>)ViewData["ExpandedCategories"]!))" />
+                    }
+                </div>
+                <div class="shop-filter-heading">بازه قیمت <span>تومان</span></div>
+                <div class="shop-price-range">
+                    <label for="shop-min-price">از<input id="shop-min-price" name="minPrice" type="number" min="0" step="1000" value="@(Model.MinPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" placeholder="حداقل"></label>
+                    <label for="shop-max-price">تا<input id="shop-max-price" name="maxPrice" type="number" min="0" step="1000" value="@(Model.MaxPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" placeholder="حداکثر"></label>
+                </div>
+                <label class="shop-check"><input name="available" type="checkbox" value="true" checked="@Model.AvailableOnly"> فقط کالاهای موجود</label>
+                <button type="submit">اعمال فیلترها</button>
+                <a class="shop-clear" href="/shop">پاک کردن فیلترها</a>
+            </form>
+        </aside>
+        <div class="shop-results">
+            <p id="shop-filter-status" class="shop-filter-status" role="status" hidden></p>
+            <div id="shop-ajax-results" aria-live="polite">
+                <partial name="~/Views/Shop/_Results.cshtml" model="Model" />
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/assets/js/shop-filters.js" asp-append-version="true" defer></script>
+}

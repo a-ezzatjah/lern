@@ -28,6 +28,37 @@ public sealed class AdminSettingsController(ShopDbContext db, IWebHostEnvironmen
             .OrderByDescending(x => x.CreatedAt).Take(20).ToListAsync()
     });
 
+    [HttpGet("category-images")]
+    public async Task<IActionResult> CategoryImages() => View("~/Views/Admin/Settings/CategoryImages.cshtml", new AdminSettingsViewModel
+    {
+        MainCategories = await db.Categories.AsNoTracking().Where(category => category.ParentId == null)
+            .OrderBy(category => category.SortOrder).ThenBy(category => category.Name).ToListAsync()
+    });
+
+    [HttpPost("category-images/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateCategoryImage(int id, IFormFile? image)
+    {
+        var category = await db.Categories.SingleOrDefaultAsync(category => category.Id == id && category.ParentId == null);
+        if (category is null) return NotFound();
+        var extension = Path.GetExtension(image?.FileName ?? "").ToLowerInvariant();
+        if (image is null || image.Length == 0 || image.Length > 5 * 1024 * 1024 ||
+            extension is not (".jpg" or ".jpeg" or ".png") ||
+            !await HasBannerDimensions(image, extension, false, categoryImage: true))
+        {
+            TempData["SettingsError"] = "تصویر دسته باید JPG یا PNG، حداکثر ۵ مگابایت و دقیقاً ۲۴۰×۱۸۰ یا ۴۸۰×۳۶۰ پیکسل باشد.";
+            return RedirectToAction(nameof(CategoryImages));
+        }
+        var previous = category.ImageUrl;
+        var saved = await SaveBannerImage(image);
+        category.ImageUrl = saved;
+        try { await db.SaveChangesAsync(); }
+        catch { RemoveUploaded(saved); throw; }
+        RemoveUploaded(previous);
+        TempData["SettingsMessage"] = "تصویر دسته‌بندی به‌روزرسانی شد.";
+        return RedirectToAction(nameof(CategoryImages));
+    }
+
     [HttpPost("banner/{id:int}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Banner(int id, IFormFile? image, IFormFile? mobileImage, string? altText, string? linkUrl, bool isActive)
@@ -51,7 +82,7 @@ public sealed class AdminSettingsController(ShopDbContext db, IWebHostEnvironmen
             if (image.Length > 5 * 1024 * 1024 || ext is not (".jpg" or ".jpeg" or ".png") ||
                 !await HasBannerDimensions(image, ext, mobile: false))
             {
-                TempData["SettingsError"] = "تصویر بنر باید JPG یا PNG، حداکثر ۵ مگابایت و دقیقاً ۲۰۴۸×۴۲۷ یا ۲۵۶۰×۵۳۳ پیکسل باشد.";
+                TempData["SettingsError"] = "تصویر بنر باید JPG یا PNG، حداکثر ۵ مگابایت و دقیقاً ۲۱۷۲×۷۲۴، ۲۰۴۸×۴۲۷ یا ۲۵۶۰×۵۳۳ پیکسل باشد.";
                 return RedirectToAction(nameof(Banners));
             }
         }
@@ -61,7 +92,7 @@ public sealed class AdminSettingsController(ShopDbContext db, IWebHostEnvironmen
             if (mobileImage.Length > 5 * 1024 * 1024 || ext is not (".jpg" or ".jpeg" or ".png") ||
                 !await HasBannerDimensions(mobileImage, ext, mobile: true))
             {
-                TempData["SettingsError"] = "بنر موبایل باید JPG یا PNG، حداکثر ۵ مگابایت و دقیقاً ۸۰۰×۱۰۰۰ پیکسل باشد.";
+                TempData["SettingsError"] = "بنر موبایل باید JPG یا PNG، حداکثر ۵ مگابایت و دقیقاً ۱۵۳۶×۱۰۲۴ یا ۸۰۰×۱۰۰۰ پیکسل باشد.";
                 return RedirectToAction(nameof(Banners));
             }
         }
@@ -210,7 +241,7 @@ public sealed class AdminSettingsController(ShopDbContext db, IWebHostEnvironmen
         catch (IOException) { /* Image is no longer referenced. */ }
     }
 
-    private static async Task<bool> HasBannerDimensions(IFormFile image, string extension, bool mobile)
+    private static async Task<bool> HasBannerDimensions(IFormFile image, string extension, bool mobile, bool categoryImage = false)
     {
         await using var stream = image.OpenReadStream();
         var bytes = new byte[Math.Min(image.Length, 65536)];
@@ -246,7 +277,8 @@ public sealed class AdminSettingsController(ShopDbContext db, IWebHostEnvironmen
                 i += length;
             }
         }
-        return mobile ? width == 800 && height == 1000 :
-            (width == 2048 && height == 427) || (width == 2560 && height == 533);
+        if (categoryImage) return (width == 240 && height == 180) || (width == 480 && height == 360);
+        return mobile ? (width == 1536 && height == 1024) || (width == 800 && height == 1000) :
+            (width == 2172 && height == 724) || (width == 2048 && height == 427) || (width == 2560 && height == 533);
     }
 }

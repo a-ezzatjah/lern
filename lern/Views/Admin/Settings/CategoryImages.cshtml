@@ -1,0 +1,23 @@
+@model lern.Models.AdminSettingsViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "تصاویر دسته‌های اصلی";
+}
+<link rel="stylesheet" href="~/assets/css/admin-settings.css" asp-append-version="true" />
+<div class="admin-page-heading"><div><span class="admin-eyebrow">تنظیمات فروشگاه</span><h1>تصاویر دسته‌های اصلی</h1><p>تصویر هر دسته در صفحهٔ اصلی را جداگانه تغییر دهید.</p></div></div>
+@if (TempData["SettingsMessage"] is string success) { <div class="admin-alert" role="status">@success</div> }
+@if (TempData["SettingsError"] is string error) { <div class="admin-alert error" role="alert">@error</div> }
+<section class="settings-card">
+    <div class="settings-guide"><strong>راهنمای ابعاد (عرض × ارتفاع)</strong><span>ابعاد اصلی <bdi>۲۴۰ × ۱۸۰</bdi> پیکسل، با نسبت <bdi>۴:۳</bdi> است. برای وضوح بیشتر، <bdi>۴۸۰ × ۳۶۰</bdi> پیکسل نیز پذیرفته می‌شود. فرمت JPG یا PNG و حداکثر حجم ۵ مگابایت. همان تصویر در موبایل و دسکتاپ، بدون برش و متناسب با کارت نمایش داده می‌شود؛ موضوع تصویر را وسط قرار دهید.</span></div>
+    <div class="category-image-editors">
+    @foreach (var category in Model.MainCategories)
+    {
+        <form asp-controller="AdminSettings" asp-action="UpdateCategoryImage" asp-route-id="@category.Id" method="post" enctype="multipart/form-data" class="banner-fields category-image-editor">
+            <h3>@category.Name</h3>
+            <img src="@CategoryImage.GetUrl(category)" width="240" height="180" alt="@category.Name" loading="lazy" />
+            <label>تصویر جدید<input name="image" type="file" accept=".jpg,.jpeg,.png" required /></label>
+            <button type="submit" class="admin-primary-button">ذخیرهٔ تصویر</button>
+        </form>
+    }
+    </div>
+</section>

@@ -1,0 +1,40 @@
+@model lern.Models.ShopViewModel
+@{
+    var sortOptions = new (string Value, string Label)[] {
+        ("bestselling", "پرفروش‌ترین"), ("popular", "محبوب‌ترین"), ("newest", "جدیدترین"),
+        ("price_desc", "گران‌ترین"), ("price_asc", "ارزان‌ترین")
+    };
+    string SortUrl(string sort) {
+        var parts = new List<string> { $"sort={sort}" };
+        if (!string.IsNullOrWhiteSpace(Model.Query)) parts.Add($"q={Uri.EscapeDataString(Model.Query)}");
+        parts.AddRange(Model.SelectedCategories.OrderBy(id => id).Select(id => $"category={id}"));
+        if (Model.AvailableOnly) parts.Add("available=true");
+        if (Model.MinPrice.HasValue) parts.Add($"minPrice={Model.MinPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
+        if (Model.MaxPrice.HasValue) parts.Add($"maxPrice={Model.MaxPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
+        return "/shop?" + string.Join("&", parts);
+    }
+}
+<div class="shop-sort-bar" aria-label="مرتب‌سازی محصولات">
+    <div class="shop-sort-heading"><span class="shop-sort-icon" aria-hidden="true">☷</span><strong>مرتب‌سازی</strong></div>
+    <div class="shop-sort-options">
+        @foreach (var option in sortOptions)
+        {
+            <a class="@(Model.Sort == option.Value ? "is-active" : "")" href="@SortUrl(option.Value)" aria-current="@(Model.Sort == option.Value ? "true" : null)">@option.Label</a>
+        }
+    </div>
+    <span class="shop-result-count">@Model.Products.TotalCount.ToString("N0") محصول</span>
+</div>
+@if (Model.Products.Items.Count == 0)
+{
+    <p class="category-results-empty">محصولی با این شرایط پیدا نشد.</p>
+}
+else
+{
+    <div class="shop-product-grid" id="shop-product-grid">
+        <partial name="~/Views/Shop/_Cards.cshtml" model="Model.Products.Items" />
+    </div>
+    @if (Model.Products.TotalCount > Model.Products.Items.Count)
+    {
+        <button type="button" id="shop-load-more" class="shop-load-more" data-total="@Model.Products.TotalCount" aria-label="بارگذاری محصولات بیشتر"></button>
+    }
+}

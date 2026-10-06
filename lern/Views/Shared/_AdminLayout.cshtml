@@ -61,6 +61,7 @@
                     <summary class="admin-nav-link"><span class="admin-nav-icon"><svg><use href="#admin-i-settings"/></svg></span><span>تنظیمات</span><span class="admin-settings-chevron" aria-hidden="true">⌄</span></summary>
                     <div class="admin-settings-submenu">
                         <a href="@Url.Action("Banners", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/banners") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-box"/></svg></span>تغییر بنر سایت</a>
+                        <a href="@Url.Action("CategoryImages", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/category-images") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-box"/></svg></span>تصاویر دسته‌های اصلی</a>
                         <a href="@Url.Action("Inbox", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/inbox") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-wallet"/></svg></span>پیام‌ها و اعلان‌ها</a>
                     </div>
                 </details>

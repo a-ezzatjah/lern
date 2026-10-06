@@ -1,0 +1,5 @@
+﻿@model List<ServiceContract.DTO.DtoProduct.ProductCardDto>
+@foreach (var product in Model)
+{
+    <partial name="_ProductCard" model="product" />
+}

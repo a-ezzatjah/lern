@@ -563,6 +563,97 @@ public async Task<List<ProductCardDto>> GetRelatedProductCardsAsync(int productI
 
 
 
+public async Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? search, int[] categoryIds, bool availableOnly,
+    string sort, decimal? minPrice, decimal? maxPrice, int offset, int take)
+{
+    take = Math.Clamp(take, 1, 10);
+    offset = Math.Max(0, offset);
+    var query = _shopDbContext.Products.AsNoTracking().Where(p => p.IsActive);
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var term = search.Trim();
+        query = query.Where(p => p.Name.Contains(term));
+    }
+    if (categoryIds.Length > 0)
+    {
+        var hierarchy = await _shopDbContext.Categories.AsNoTracking()
+            .Select(c => new { c.Id, c.ParentId }).ToListAsync();
+        var children = hierarchy.Where(c => c.ParentId.HasValue).ToLookup(c => c.ParentId!.Value, c => c.Id);
+        var ids = new HashSet<int>();
+        var pending = new Queue<int>(categoryIds);
+        while (pending.TryDequeue(out var id))
+        {
+            if (!ids.Add(id)) continue;
+            foreach (var childId in children[id]) pending.Enqueue(childId);
+        }
+        var expandedIds = ids.ToArray();
+        query = query.Where(p => p.ProductCategories.Any(c => expandedIds.Contains(c.CategoryId)));
+    }
+    if (availableOnly)
+        query = query.Where(p => p.SaleOptions.Any(o => o.ProductVariants.Any(v => v.StockQuantity > v.ReservedQuantity)
+            || o.SaleOptionColors.Any(c => c.ProductVariants.Any(v => v.StockQuantity > v.ReservedQuantity))));
+
+    var now = DateTime.UtcNow;
+    var priceByProduct = from product in query
+        from option in product.SaleOptions
+        from variant in option.ProductVariants
+        where variant.StockQuantity > variant.ReservedQuantity && variant.Price > 0
+        group new { product, variant } by product.Id into grouped
+        select new
+        {
+            ProductId = grouped.Key,
+            Price = grouped.Min(row => (decimal?)(
+                row.variant.DiscountValue > 0 &&
+                (!row.variant.DiscountStartAt.HasValue || row.variant.DiscountStartAt <= now) &&
+                (!row.variant.DiscountEndAt.HasValue || row.variant.DiscountEndAt >= now) &&
+                (row.variant.DisconType == DTO.DisconTypeEnum.percent || row.variant.DisconType == DTO.DisconTypeEnum.price)
+                    ? row.variant.DisconType == DTO.DisconTypeEnum.percent
+                        ? (row.variant.Price * (1 - row.variant.DiscountValue!.Value / 100m) < 0
+                            ? 0 : row.variant.Price * (1 - row.variant.DiscountValue!.Value / 100m))
+                        : (row.variant.Price - row.variant.DiscountValue!.Value < 0
+                            ? 0 : row.variant.Price - row.variant.DiscountValue!.Value)
+                    : row.product.DiscountValue > 0 &&
+                      (!row.product.DiscountStartAt.HasValue || row.product.DiscountStartAt <= now) &&
+                      (!row.product.DiscountEndAt.HasValue || row.product.DiscountEndAt >= now) &&
+                      row.product.DiscountType == DTO.DisconTypeEnum.percent
+                        ? (row.variant.Price * (1 - row.product.DiscountValue!.Value / 100m) < 0
+                            ? 0 : row.variant.Price * (1 - row.product.DiscountValue!.Value / 100m))
+                        : row.product.DiscountValue > 0 &&
+                          (!row.product.DiscountStartAt.HasValue || row.product.DiscountStartAt <= now) &&
+                          (!row.product.DiscountEndAt.HasValue || row.product.DiscountEndAt >= now) &&
+                          row.product.DiscountType == DTO.DisconTypeEnum.price
+                            ? (row.variant.Price - row.product.DiscountValue!.Value < 0
+                                ? 0 : row.variant.Price - row.product.DiscountValue!.Value)
+                            : row.variant.Price))
+        };
+    var priced = from product in query
+        join price in priceByProduct on product.Id equals price.ProductId into prices
+        from price in prices.DefaultIfEmpty()
+        select new { Product = product, Price = price == null ? null : price.Price };
+    if (minPrice.HasValue) priced = priced.Where(p => p.Price >= minPrice.Value);
+    if (maxPrice.HasValue) priced = priced.Where(p => p.Price <= maxPrice.Value);
+
+    var total = await priced.CountAsync();
+    var ordered = sort switch
+    {
+        "bestselling" => priced.OrderByDescending(p => _shopDbContext.OrderItems
+            .Where(i => i.ProductId == p.Product.Id && i.Order.Status != OrderStatus.Pending && i.Order.Status != OrderStatus.Cancelled)
+            .Sum(i => (int?)i.Quantity) ?? 0).ThenByDescending(p => p.Product.CreatedAt).ThenByDescending(p => p.Product.Id),
+        "popular" => priced.OrderByDescending(p => _shopDbContext.ProductFavorites.Count(f => f.ProductId == p.Product.Id))
+            .ThenByDescending(p => p.Product.CreatedAt).ThenByDescending(p => p.Product.Id),
+        "price_desc" => priced.OrderBy(p => p.Price == null).ThenByDescending(p => p.Price).ThenByDescending(p => p.Product.Id),
+        "price_asc" => priced.OrderBy(p => p.Price == null).ThenBy(p => p.Price).ThenByDescending(p => p.Product.Id),
+        _ => priced.OrderByDescending(p => p.Product.CreatedAt).ThenByDescending(p => p.Product.Id)
+    };
+    var pageIds = await ordered.Skip(offset).Take(take).Select(p => p.Product.Id).ToListAsync();
+    var products = await _shopDbContext.Products.AsNoTracking().Where(p => pageIds.Contains(p.Id))
+        .Include(p => p.SaleOptions).ThenInclude(o => o.ProductVariants)
+        .Include(p => p.SaleOptions).ThenInclude(o => o.SaleOptionColors).ThenInclude(c => c.ProductVariants)
+        .Include(p => p.ProductImages).AsSplitQuery().ToListAsync();
+    var byId = products.ToDictionary(p => p.Id);
+    return new PageResult<ProductCardDto> { Items = pageIds.Select(id => CreateProductCard(byId[id])).ToList(),
+        TotalCount = total, Page = 1, PageSize = take };
+}
 public async Task<PageResult<ProductCardDto>> GetCategoryProductCardsAsync(int categoryId, int page = 1)
 {
     const int pageSize = 24;

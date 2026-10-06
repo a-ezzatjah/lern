@@ -1,0 +1,22 @@
+@model lern.Models.ShopCategoryNodeViewModel
+@{
+    var children = Model.Depth < 12 ? Model.Categories.Where(c => c.ParentId == Model.Category.Id && c.Id != Model.Category.Id).ToList() : new List<Entities.Category>();
+    var expanded = Model.ExpandedCategories.Contains(Model.Category.Id);
+}
+@if (children.Count > 0)
+{
+    <details class="shop-category-branch" open="@expanded">
+        <summary><span>@Model.Category.Name</span><span class="shop-chevron" aria-hidden="true">⌄</span></summary>
+        <label class="shop-category-choice"><input type="checkbox" name="category" value="@Model.Category.Id" checked="@Model.SelectedCategories.Contains(Model.Category.Id)"> همه @Model.Category.Name</label>
+        <div class="shop-category-children">
+            @foreach (var child in children)
+            {
+                <partial name="~/Views/Shop/_CategoryNode.cshtml" model="@(new lern.Models.ShopCategoryNodeViewModel(child, Model.Categories, Model.SelectedCategories, Model.ExpandedCategories, Model.Depth + 1))" />
+            }
+        </div>
+    </details>
+}
+else
+{
+    <label class="shop-category-choice"><input type="checkbox" name="category" value="@Model.Category.Id" checked="@Model.SelectedCategories.Contains(Model.Category.Id)"> @Model.Category.Name</label>
+}

@@ -1204,134 +1204,71 @@ function copyComponentCode(btn) {
 
 // Safe function to execute code only when elements exist
 function initializeLiveSearch() {
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
-
-    // If the required elements are not present, the code will not be executed
-    if (!searchInput || !searchResults) {
-        return;
-    }
-
-    let debounceTimer;
-
-    // Sample product data
-    const products = [
-        { id: 1, name: "لپ تاپ ایسوس مدل ROG", category: "لپ تاپ و کامپیوتر" },
-        { id: 2, name: "گوشی سامسونگ گلکسی S23", category: "موبایل و تبلت" },
-        { id: 3, name: "هدفون بی سیم سونی", category: "لوازم جانبی" },
-        { id: 4, name: "ماوس گیمینگ رزر", category: "لوازم جانبی" },
-        { id: 5, name: "تلویزیون ال جی 55 اینچ", category: "صوتی و تصویری" },
-        { id: 6, name: "کتاب صوتی موفقیت در کسب و کار", category: "کتاب و رسانه" },
-        { id: 7, name: "کفش ورزشی نایک", category: "پوشاک و ورزش" },
-        { id: 8, name: "دستگاه غذاساز فیلیپس", category: "لوازم خانگی" },
-        { id: 9, name: "دوربین کانن EOS R5", category: "عکاسی" },
-        { id: 10, name: "کنسول بازی پلی استیشن 5", category: "بازی و سرگرمی" }
-    ];
-
-    // Search function
-    function performSearch(searchTerm) {
-        if (searchTerm.length < 2) {
-            searchResults.classList.add('hidden');
-            return;
-        }
-
-        // Show loading status
-        searchResults.innerHTML = `
-                    <div class="p-4 text-center text-gray-600 dark:text-gray-300">
-                        <div class="loading">در حال جستجو</div>
-                    </div>
-                `;
-        searchResults.classList.remove('hidden');
-
-        // Simulate server response delay
-        setTimeout(() => {
-            const results = products.filter(product =>
-                product.name.includes(searchTerm) ||
-                product.category.includes(searchTerm)
-            );
-
-            displayResults(results);
-        }, 600);
-    }
-
-    // Show results
-    function displayResults(results) {
-        if (results.length === 0) {
-            searchResults.innerHTML = `
-                        <div class="p-4 text-center text-gray-600 dark:text-gray-300">
-                            نتیجه‌ای یافت نشد
-                        </div>
-                    `;
-            return;
-        }
-
-        searchResults.innerHTML = '';
-        results.forEach(product => {
-            const resultItem = document.createElement('div');
-            resultItem.className = 'p-4 border-b border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors';
-            resultItem.innerHTML = `
-                        <a href='shop.html'>
-                            <div class="font-semibold text-gray-800 dark:text-white">${product.name}</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">${product.category}</div>
-                        </a>
-                    `;
-            resultItem.addEventListener('click', () => {
-                searchInput.value = product.name;
-                searchResults.classList.add('hidden');
-            });
-            searchResults.appendChild(resultItem);
-        });
-    }
-
-    // Event management for delayed live search (debounce)
-    searchInput.addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        const searchTerm = this.value.trim();
-
-        if (searchTerm) {
-            debounceTimer = setTimeout(() => {
-                performSearch(searchTerm);
-            }, 300);
-        } else {
-            searchResults.classList.add('hidden');
-        }
-    });
-
-    // Focus and blur management
-    searchInput.addEventListener('focus', function() {
-        const searchTerm = this.value.trim();
-        if (searchTerm.length >= 2) {
-            performSearch(searchTerm);
-        }
-    });
-
-    document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-            searchResults.classList.add('hidden');
-        }
-    });
-
-    // Ability to search with the Enter button
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            const searchTerm = this.value.trim();
-            if (searchTerm) {
-                alert(`جستجو برای: ${searchTerm} (این قسمت به صفحه نتایج جستجو هدایت می‌کند)`);
+    const input = document.getElementById('searchInput');
+    const results = document.getElementById('searchResults');
+    if (!input || !results) return;
+    let timer;
+    let request;
+    const hide = () => { results.classList.add('hidden'); results.replaceChildren(); };
+    const row = (product) => {
+        const link = document.createElement('a');
+        link.href = `/product/${product.id}`;
+        link.className = 'flex items-center gap-3 p-2 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-800 dark:text-white';
+        const image = document.createElement('img');
+        image.src = product.primaryImageUrl || '/assets/images/logo.png';
+        image.alt = '';
+        image.loading = 'lazy';
+        image.className = 'w-12 h-12 object-contain rounded';
+        const name = document.createElement('span');
+        name.textContent = product.name;
+        link.append(image, name);
+        return link;
+    };
+    const search = async () => {
+        const q = input.value.trim();
+        if (q.length < 2) { hide(); return; }
+        request?.abort();
+        request = new AbortController();
+        const current = request;
+        try {
+            const response = await fetch(`/shop/suggest?q=${encodeURIComponent(q)}`, { signal: current.signal });
+            if (!response.ok) throw new Error('جستجو انجام نشد.');
+            const data = await response.json();
+            if (input.value.trim() !== q) return;
+            results.replaceChildren();
+            if (!data.items.length) {
+                const empty = document.createElement('p');
+                empty.className = 'p-3 text-gray-600 dark:text-gray-300';
+                empty.textContent = 'محصولی یافت نشد';
+                results.append(empty);
+            } else {
+                data.items.forEach(product => results.append(row(product)));
             }
+            const more = document.createElement('a');
+            more.href = `/shop?q=${encodeURIComponent(q)}`;
+            more.className = 'block p-3 text-center text-primary border-t border-gray-200 dark:border-gray-600';
+            more.textContent = 'نمایش همه نتایج در فروشگاه';
+            results.append(more);
+            results.classList.remove('hidden');
+        } catch (error) {
+            if (error.name !== 'AbortError') hide();
         }
+    };
+    input.addEventListener('input', () => {
+        clearTimeout(timer);
+        request?.abort();
+        if (input.value.trim().length < 2) { hide(); return; }
+        timer = setTimeout(search, 300);
+    });
+    input.addEventListener('focus', () => { if (input.value.trim().length >= 2) search(); });
+    input.addEventListener('keydown', event => { if (event.key === 'Escape') hide(); });
+    document.addEventListener('click', event => {
+        if (!input.parentElement.parentElement.contains(event.target)) hide();
     });
 }
-
-// Execute the function when the DOM is fully loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeLiveSearch);
-} else {
-    initializeLiveSearch();
-}
-
-// You can also put the function in global scope so that it can be accessed from other pages
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeLiveSearch);
+else initializeLiveSearch();
 window.initializeLiveSearch = initializeLiveSearch;
-
 
 /**
  * login code

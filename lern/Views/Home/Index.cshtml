@@ -38,9 +38,9 @@
             <div class="bg-primary dark:bg-zinc-800 bg-contain bg-[url(../images/slider/patterns.png)] p-5 rounded-lg">
                 <header class="flex items-center justify-between mb-4">
                     <h2 class="font-black text-2xl text-white">پیشنهادهای شگفت‌انگیز</h2>
-                    <a href="/api/Product/cards" class="text-white">مشاهده همه ←</a>
+                    <a href="/shop" class="text-white">مشاهده همه ←</a>
                 </header>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     @foreach (var product in Model.DiscountedProducts.Take(8))
                     {
                         <partial name="_ProductCard" model="product" />
@@ -59,7 +59,7 @@
                 <p class="text-neutral-600 dark:text-white">محصولات تازه‌وارد فروشگاه</p>
             </div>
             <div class="sm:col-span-2 col-span-6 w-full sm:text-end">
-                <a href="/api/Product/cards" class="btn bg-transparent border-secondary border-2 hover:bg-secondary hover:text-white dark:text-white dark:border-white">مشاهده همه</a>
+                <a href="/shop" class="btn bg-transparent border-secondary border-2 hover:bg-secondary hover:text-white dark:text-white dark:border-white">مشاهده همه</a>
             </div>
         </header>
         @if (Model.NewestProducts.Count == 0)
@@ -68,7 +68,7 @@
         }
         else
         {
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 @foreach (var product in Model.NewestProducts.Take(8))
                 {
                     <partial name="_ProductCard" model="product" />
@@ -79,20 +79,31 @@
 </section>
 
 <!-- ================= start category section ================= -->
+<link rel="stylesheet" href="~/assets/css/home-categories.css" asp-append-version="true" />
 <section class="py-5">
     <div class="container">
-        <header class="mb-5">
+        <header class="mb-5 home-category-heading">
+            <div>
             <h2 class="font-black text-2xl dark:text-white">دسته‌بندی <span class="text-primary">فروشگاه</span></h2>
-            <p class="text-neutral-600 dark:text-white">محبوب‌ترین دسته‌بندی‌ها</p>
+            <p class="text-neutral-600 dark:text-white">دسته‌های اصلی خرازی</p>
+            </div>
         </header>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            @foreach (var item in new[] { ("محصولات دیجیتال", "mobile-5.png"), ("لپ‌تاپ و کامپیوتر", "laptop-1.png"), ("تلویزیون", "television-1.png"), ("ساعت و اکسسوری", "wach-1.png") })
+        <div class="home-category-carousel">
+        <div id="home-categories" class="swiper home-category-track" role="region" aria-label="دسته‌های اصلی فروشگاه">
+            <div class="swiper-wrapper">
+            @foreach (var category in Model.MainCategories)
             {
-                <a href="/api/Product/cards" class="group border border-gray-200 rounded-xl p-4 bg-white dark:bg-gray-800 text-center shadow-sm">
-                    <img src="~/assets/images/product/@item.Item2" class="h-28 w-full object-contain group-hover:scale-105 transition" loading="lazy" alt="@item.Item1">
-                    <h3 class="mt-3 font-bold dark:text-white">@item.Item1</h3>
+                <div class="swiper-slide">
+                <a href="/shop?category=@category.Id" class="home-category-card group border border-gray-200 rounded-xl p-4 bg-white dark:bg-gray-800 text-center shadow-sm">
+                    <img src="@CategoryImage.GetUrl(category)" width="240" height="180" class="w-full object-contain group-hover:scale-105 transition" loading="lazy" alt="@category.Name">
+                    <h3 class="mt-3 font-bold dark:text-white">@category.Name</h3>
                 </a>
+                </div>
             }
+            </div>
+        </div>
+        <button type="button" class="swiper-button-prev home-category-prev bg-white rounded-full border border-gray-200 !size-12 after:!text-xl after:text-primary" aria-label="دسته‌های قبلی" aria-controls="home-categories"></button>
+        <button type="button" class="swiper-button-next home-category-next bg-white rounded-full border border-gray-200 !size-12 after:!text-xl after:text-primary" aria-label="دسته‌های بعدی" aria-controls="home-categories"></button>
         </div>
     </div>
 </section>
@@ -138,11 +149,13 @@
 </section>
 
 @section Scripts {
+    <script src="~/assets/js/home-categories.js" asp-append-version="true"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (window.Swiper) {
+            if (window.Swiper && !document.querySelector('.default-carousel')?.swiper) {
                 new Swiper('.default-carousel', {
                     loop: true,
+                    autoHeight: true,
                     autoplay: { delay: 4500 },
                     pagination: { el: '.swiper-pagination', clickable: true },
                     navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }

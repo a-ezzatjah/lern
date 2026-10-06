@@ -1,4 +1,4 @@
-﻿(() => {
+(() => {
     const trigger = document.getElementById('category-menu-trigger');
     const button = trigger?.querySelector('button');
     const panel = document.getElementById('category-menu-panel');
@@ -43,21 +43,39 @@
             panel.innerHTML = html;
             mobile.innerHTML = html;
             mobile.querySelectorAll('.category-root').forEach(root => { root.open = false; });
+            const browser = panel.querySelector('.category-browser');
             const roots = [...panel.querySelectorAll('.category-root')];
-            const activate = root => roots.forEach(item => { item.open = item === root; });
-            roots.forEach(root => {
-                const summary = root.querySelector('summary');
-                summary.addEventListener('click', event => {
-                    if (event.target.closest('a')) return;
-                    event.preventDefault();
-                    activate(root);
+            if (browser && roots.length) {
+                // Keep the root list and the descendant panels in separate scroll containers.
+                const viewport = document.createElement('div');
+                viewport.className = 'category-panel-viewport';
+                browser.append(viewport);
+                const panels = roots.map(root => {
+                    const descendants = root.querySelector(':scope > .category-panel');
+                    viewport.append(descendants);
+                    return descendants;
                 });
-                summary.addEventListener('pointerenter', event => {
-                    if (event.pointerType === 'mouse') activate(root);
+                const activate = selected => {
+                    roots.forEach((root, index) => {
+                        const active = root === selected;
+                        root.open = active;
+                        panels[index].hidden = !active;
+                    });
+                };
+                activate(roots[0]);
+                roots.forEach(root => {
+                    const summary = root.querySelector('summary');
+                    summary.addEventListener('click', event => {
+                        if (event.target.closest('a')) return;
+                        event.preventDefault();
+                        activate(root);
+                    });
+                    summary.addEventListener('pointerenter', event => {
+                        if (event.pointerType === 'mouse') activate(root);
+                    });
+                    summary.addEventListener('focus', () => activate(root));
                 });
-                summary.addEventListener('focus', () => activate(root));
-            });
-        } catch {
+            }        } catch {
             [panel, mobile].forEach(container => {
                 container.innerHTML = '<div class="category-loading" role="status">دریافت دسته‌بندی‌ها انجام نشد.<button type="button">تلاش دوباره</button></div>';
                 container.querySelector('button').addEventListener('click', loadCategories);

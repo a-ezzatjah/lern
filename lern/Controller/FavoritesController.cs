@@ -33,7 +33,6 @@ public sealed class FavoritesController(ShopDbContext db, IProductService produc
         return View(new lern.Models.FavoritesViewModel {
             CartOptions = cartOptions,
             Products = ids.Where(byId.ContainsKey).Select(id => byId[id]).ToList(),
-            Suggested = cards.Where(x => !ids.Contains(x.Id)).Take(4).ToList(),
             Categories = categories.GroupBy(x => x.CategoryId).ToDictionary(x => x.Key, x => x.First().Name),
             ProductCategories = categories.GroupBy(x => x.ProductId).ToDictionary(x => x.Key, x => x.Select(c => c.CategoryId).ToArray())
         });

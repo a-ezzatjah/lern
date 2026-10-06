@@ -1,6 +1,7 @@
 
 const swiper = new Swiper(".default-carousel", {
     loop: true,
+    autoHeight: true,
     pagination: {
         el: ".swiper-pagination",
         clickable: true,
