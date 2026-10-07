@@ -1,0 +1,32 @@
+@model List<lern.Models.AdminSeoNode>
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "نقشه سایت و وضعیت ایندکس"; }
+<link rel="stylesheet" href="~/assets/css/admin-seo-tree.css" asp-append-version="true">
+<div class="seo-tree-heading">
+    <div><p class="seo-tree-eyebrow">مدیریت سئو</p><h1>نقشه سایت و وضعیت ایندکس</h1><p>هر بخش را باز کنید، صفحه را ببینید و تنظیمات ایندکس آن را مدیریت کنید.</p></div>
+    <a href="/sitemap.xml" target="_blank" rel="noopener" class="seo-tree-xml">مشاهده نقشه XML ↗</a>
+</div>
+@if (TempData["SeoMessage"] is string message) { <div class="admin-alert" role="status">@message</div> }
+<section class="admin-card seo-tree-help">
+    <p>نقشه سایت با ذخیره تنظیمات به‌روز می‌شود. صفحات noindex، محصولات غیرفعال و پیش‌نویس مقالات در نقشه قرار نمی‌گیرند.</p>
+    <p>برچسب index اجازهٔ ایندکس در تنظیمات سایت را نشان می‌دهد؛ وضعیت ثبت واقعی در گوگل از این صفحه مشخص نمی‌شود. برچسب XML حضور صفحه در نقشهٔ فعلی را نشان می‌دهد.</p>
+    <p>فهرست‌ها ده‌تا‌ده‌تا بارگیری می‌شوند؛ با پایین آمدن یا زدن «بارگیری بیشتر» موارد بعدی را ببینید.</p>
+    <a href="/robots.txt" target="_blank" rel="noopener">مشاهده robots.txt ↗</a>
+</section>
+<div class="seo-tree-toolbar">
+    <form action="/Admin/Seo" method="get" id="seo-search-form" role="search">
+        <label for="seo-search">جست‌وجو در نقشه سایت</label>
+        <div class="seo-search-controls">
+            <input id="seo-search" name="q" type="search" value="@ViewData["SeoQuery"]" maxlength="100" placeholder="عنوان صفحه، دسته‌بندی یا آدرس…" aria-controls="seo-tree" autocomplete="off">
+            <button type="submit" class="seo-load-more">جست‌وجو</button>
+            <button type="button" id="seo-search-clear" class="seo-load-more">پاک کردن</button>
+        </div>
+    </form>
+    <button type="button" id="seo-collapse-all" class="seo-load-more">بستن همه</button>
+</div>
+<p id="seo-search-status" class="seo-search-status" role="status" aria-live="polite">جست‌وجو شامل صفحات داخل شاخه‌های بازنشده هم می‌شود.</p>
+<div id="seo-tree" class="seo-tree" aria-label="بخش‌های نقشه سایت">
+    <partial name="~/Views/Admin/Seo/_Tree.cshtml" model="Model" />
+</div>
+@section Scripts {
+    <script src="~/assets/js/admin-seo-tree.js" asp-append-version="true" defer></script>
+}

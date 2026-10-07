@@ -21,6 +21,7 @@ public class HomeController : Microsoft.AspNetCore.Mvc.Controller
     {
         var viewModel = new HomeIndexViewModel
         {
+            Articles = await _db.Articles.AsNoTracking().Where(x => x.IsPublished).OrderByDescending(x => x.PublishedAt).ThenByDescending(x => x.Id).Take(3).ToListAsync(),
             Banners = await _db.SiteBanners.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.SortOrder).ToListAsync(),
             MainCategories = await _db.Categories.AsNoTracking().Where(x => x.ParentId == null)
                 .OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToListAsync(),

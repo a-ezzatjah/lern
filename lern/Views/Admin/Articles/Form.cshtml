@@ -1,0 +1,24 @@
+@model ArticleForm
+@{ Layout = "_AdminLayout"; ViewData["Title"] = Model.Id.HasValue ? "ویرایش مقاله" : "درج مقاله"; }
+<link rel="stylesheet" href="~/assets/css/admin-articles.css" asp-append-version="true">
+<section class="admin-card article-admin-card">
+    <div class="article-admin-heading"><h1 class="text-2xl font-bold">@ViewData["Title"]</h1><a href="/Admin/Articles">فهرست مقالات</a></div>
+    <form action="@(Model.Id.HasValue ? $"/Admin/Articles/{Model.Id}/edit" : "/Admin/Articles/create")" method="post" enctype="multipart/form-data" class="article-admin-form">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-red-600" role="alert"></div>
+        <div class="article-admin-fields">
+            <label>عنوان مقاله<input asp-for="Title" required maxlength="180"></label>
+            <label>نشانی مقاله (انگلیسی)<input asp-for="Slug" dir="ltr" required maxlength="160" placeholder="sewing-essentials" pattern="[a-z0-9]+(-[a-z0-9]+)*"></label>
+            <label>دسته‌بندی<input asp-for="Category" required maxlength="80" list="article-categories"><datalist id="article-categories"><option value="آموزش خیاطی"></option><option value="راهنمای خرید"></option><option value="ایده‌های خلاقانه"></option></datalist></label>
+            <label>نویسنده<input asp-for="Author" required maxlength="100"></label>
+        </div>
+        <label>خلاصه مقاله<textarea asp-for="Summary" rows="3" required maxlength="500"></textarea></label>
+        <label>متن مقاله<textarea asp-for="Content" data-rich-editor rows="22" required maxlength="100000"></textarea></label>
+        <label>تصویر اختصاصی مقاله<input asp-for="Image" type="file" accept="image/jpeg,image/png"></label>
+        <p class="text-sm text-gray-500">JPG یا PNG، حداکثر ۵ مگابایت. ابعاد پیشنهادی مطابق قالب آرینو: ۹۱۵×۵۸۰ پیکسل. نمایش کارت با ارتفاع ۲۰۰ پیکسل و برش مرکزی است.</p>
+        @if (!string.IsNullOrEmpty(Model.ExistingImageUrl)) { <img src="@Model.ExistingImageUrl" alt="@Model.ImageAlt" class="article-admin-preview" width="300" height="190"> }
+        <label>توضیح تصویر (متن جایگزین)<input asp-for="ImageAlt" required maxlength="180"></label>
+        <label class="article-publish"><input asp-for="IsPublished" type="checkbox"><span>انتشار مقاله در سایت</span></label>
+        <div class="article-admin-actions"><button type="submit" class="article-admin-button bg-primary-grad text-white">ذخیره مقاله</button><a href="/Admin/Articles">انصراف</a></div>
+    </form>
+</section>

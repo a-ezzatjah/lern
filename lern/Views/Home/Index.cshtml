@@ -1,7 +1,7 @@
 @model lern.Models.HomeIndexViewModel
 
 @{
-    ViewData["Title"] = "صفحه اصلی";
+    ViewData["Title"] ??= "صفحه اصلی";
 }
 
 <!-- ================= start slider section ================= -->
@@ -38,7 +38,7 @@
             <div class="bg-primary dark:bg-zinc-800 bg-contain bg-[url(../images/slider/patterns.png)] p-5 rounded-lg">
                 <header class="flex items-center justify-between mb-4">
                     <h2 class="font-black text-2xl text-white">پیشنهادهای شگفت‌انگیز</h2>
-                    <a href="/shop" class="text-white">مشاهده همه ←</a>
+                    <a href="/shop?discounted=true" class="text-white">مشاهده تخفیف‌های بیشتر ←</a>
                 </header>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     @foreach (var product in Model.DiscountedProducts.Take(8))
@@ -102,16 +102,16 @@
             }
             </div>
         </div>
-        <button type="button" class="swiper-button-prev home-category-prev bg-white rounded-full border border-gray-200 !size-12 after:!text-xl after:text-primary" aria-label="دسته‌های قبلی" aria-controls="home-categories"></button>
-        <button type="button" class="swiper-button-next home-category-next bg-white rounded-full border border-gray-200 !size-12 after:!text-xl after:text-primary" aria-label="دسته‌های بعدی" aria-controls="home-categories"></button>
+        <button type="button" class="home-category-prev bg-white rounded-full border border-gray-200" aria-label="دسته‌های قبلی" aria-controls="home-categories"></button>
+        <button type="button" class="home-category-next bg-white rounded-full border border-gray-200" aria-label="دسته‌های بعدی" aria-controls="home-categories"></button>
         </div>
     </div>
 </section>
 
 <section class="py-5">
     <div class="container grid md:grid-cols-2 gap-4">
-        <img src="~/assets/images/slider/slider-2-4.jpg" class="w-full rounded-xl object-cover" loading="lazy" alt="پیشنهاد ویژه">
-        <img src="~/assets/images/slider/slider-2-3.jpg" class="w-full rounded-xl object-cover" loading="lazy" alt="تخفیف‌های فروشگاه">
+        <img src="~/assets/images/slider/haberdashery-sewing-small-v2.jpg" asp-append-version="true" width="2048" height="427" style="height:auto" class="w-full rounded-xl" loading="lazy" alt="دوخت خوب، از اینجا شروع می‌شود؛ ابزار دوخت و خیاطی">
+        <img src="~/assets/images/slider/haberdashery-ribbon-small-v2.jpg" asp-append-version="true" width="2560" height="533" style="height:auto" class="w-full rounded-xl" loading="lazy" alt="جزئیات کوچک، جلوه‌ای بزرگ؛ روبان، دکمه و مهره">
     </div>
 </section>
 
@@ -128,19 +128,15 @@
             </div>
         </header>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            @foreach (var article in new[] {
-                ("راهنمای انتخاب محصول مناسب برای خرید", "نکات مهمی که قبل از خرید باید بدانید.", "slider-2-1.jpg"),
-                ("چطور از محصولات خود بهتر نگهداری کنیم؟", "روش‌های کاربردی برای افزایش عمر محصولات.", "slider-2-2.jpg"),
-                ("جدیدترین ترندهای بازار در سال جاری", "نگاهی به محصولات محبوب و پرفروش بازار.", "slider-2-3.jpg")
-            })
+            @foreach (var article in Model.Articles)
             {
                 <article class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-md hover:-translate-y-1 transition">
-                    <img src="~/assets/images/slider/@article.Item3" class="w-full h-48 object-cover" loading="lazy" alt="@article.Item1">
+                    <a href="/articles/@article.Slug"><img src="@article.ImageUrl" width="915" height="580" class="w-full h-48 object-cover" loading="lazy" alt="@article.ImageAlt"></a>
                     <div class="p-4">
-                        <span class="text-xs text-primary">مقالات فروشگاه</span>
-                        <h3 class="font-bold text-lg leading-8 mt-2 dark:text-white">@article.Item1</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-300 leading-7 mt-2">@article.Item2</p>
-                        <a href="/articles" class="inline-flex items-center text-primary mt-3">ادامه مطلب ←</a>
+                        <span class="text-xs text-primary">@article.Category</span>
+                        <h3 class="font-bold text-lg leading-8 mt-2 dark:text-white"><a href="/articles/@article.Slug">@article.Title</a></h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-300 leading-7 mt-2">@article.Summary</p>
+                        <a href="/articles/@article.Slug" class="inline-flex items-center text-primary mt-3">ادامه مطلب ←</a>
                     </div>
                 </article>
             }

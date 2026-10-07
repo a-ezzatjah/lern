@@ -38,10 +38,14 @@ namespace Entities
         public DbSet<SiteBanner> SiteBanners { get; set; }
         public DbSet<SiteInboxItem> SiteInboxItems { get; set; }
         public DbSet<CouponRedemption> CouponRedemptions { get; set; }
+        public DbSet<Article> Articles { get; set; }
+        public DbSet<SeoPage> SeoPages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Article>().HasIndex(x => x.Slug).IsUnique();
+            modelBuilder.Entity<Article>().HasIndex(x => new { x.IsPublished, x.PublishedAt });
             modelBuilder.Entity<SiteBanner>().HasIndex(x => new { x.IsActive, x.SortOrder });
             modelBuilder.Entity<SiteInboxItem>().HasIndex(x => new { x.RecipientUserId, x.CreatedAt });
             modelBuilder.Entity<SiteInboxItem>().HasOne(x => x.RecipientUser).WithMany()

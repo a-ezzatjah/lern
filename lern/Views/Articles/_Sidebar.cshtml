@@ -1,0 +1,27 @@
+@model ArticleListViewModel
+<aside class="xl:w-1/4 relative article-sidebar">
+    <div class="space-y-8 sticky top-0">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md transition-colors duration-200">
+            <h3 class="font-bold dark:text-white text-lg mb-4 article-sidebar-title">دسته‌بندی‌ها</h3>
+            <ul class="space-y-3">
+                <li><a href="/articles" class="flex justify-between text-gray-600 dark:text-gray-300 hover:text-primary"><span>همه مقالات</span><span>@Model.Categories.Values.Sum()</span></a></li>
+                @foreach (var category in Model.Categories)
+                {
+                    <li><a href="@Url.Action("Index", "Articles", new { category = category.Key })" class="flex justify-between text-gray-600 dark:text-gray-300 hover:text-primary"><span>@category.Key</span><span class="bg-gray-100 dark:bg-gray-700 text-xs px-2.5 py-0.5 rounded-full">@category.Value</span></a></li>
+                }
+            </ul>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+            <h3 class="font-bold dark:text-white text-lg mb-4 article-sidebar-title">آخرین مقالات</h3>
+            <div class="space-y-4">
+                @foreach (var article in Model.Latest)
+                {
+                    <a href="/articles/@article.Slug" class="flex items-start space-x-3 group">
+                        <img src="@article.ImageUrl" alt="@article.ImageAlt" width="64" height="64" class="w-16 h-16 object-cover rounded-lg" loading="lazy">
+                        <div><h4 class="text-sm font-medium dark:text-gray-200 group-hover:text-primary">@article.Title</h4><time datetime="@article.PublishedAt?.ToString("yyyy-MM-dd")" class="text-xs text-gray-500">@ArticleDisplay.Date(article.PublishedAt)</time></div>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</aside>

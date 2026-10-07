@@ -24,6 +24,8 @@
 
     const syncForm = url => {
         const params = url.searchParams;
+        form.elements.discounted.value = params.get('discounted') === 'true' ? 'true' : '';
+        form.querySelector('.shop-clear').href = params.get('discounted') === 'true' ? '/shop?discounted=true' : '/shop';
         form.elements.q.value = params.get('q') || '';
         form.elements.sort.value = params.get('sort') || 'newest';
         form.elements.minPrice.value = params.get('minPrice') || '';

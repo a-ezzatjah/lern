@@ -1,0 +1,82 @@
+[
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/hardware-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Assorted brass garment buckles, D rings, eyelets and decorative garment fasteners, clearly clothing haberdashery not construction hardware. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or extra unrelated products. Crisp recognizable silhouette when displayed small."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/thread-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Colorful sewing thread cones and small spools, visible fine thread texture. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or extra unrelated products. Crisp recognizable silhouette when displayed small."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/needles-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Hand sewing needles, embroidery needles and a small pin cushion, delicate polished metal. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or extra unrelated products. Crisp recognizable silhouette when displayed small."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/zippers-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Colorful garment zipper tapes coiled neatly with metal and plastic zipper sliders. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or extra unrelated products. Crisp recognizable silhouette when displayed small."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/scissors-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Tailor's polished steel dressmaking shears with black handles, small thread snips and a rotary fabric cutter. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/sewing-tools-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Sewing measuring tape, chalk, pin cushion, seam ripper and thimble, tidy set of hand sewing tools. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/machine-tools-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Sewing machine accessories only: metal presser feet, shiny bobbins, bobbin cases and machine needle pack, no full machine. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/beads-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Pearl beads, tiny colorful seed beads, gold embroidery purl threads and embroidered applique patch. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/elastic-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Lingerie-making sewing notions: coiled soft elastic bands in white black and blush, bra strap adjusters, small rings and hook-and-eye closure tape, no worn garments or people. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/curtain-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Curtain sewing accessories: curtain heading tape roll, plastic and metal curtain hooks, decorative curtain rings and a cream tassel tieback. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/yarn-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Soft balls of knitting yarn in sage, navy, cream and dusty pink, wooden knitting needles and crochet hooks. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/ribbon-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Haberdashery trims: satin ribbon spools, lace trim, decorative woven braid and fabric piping, rich soft colors. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/cord-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Coiled braided decorative garment cords and drawstrings in ivory navy gold and burgundy, distinct rope braid texture. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/snap-press-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Small cobalt blue manual tabletop snap button press with black handle, metal dies and silver gold black snap fasteners, entire machine visible. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/buttons-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Assortment of small shirt buttons in pearl white, navy, wood and pastel colors with clear two and four holes. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  },
+  {
+    "file": "lern/wwwroot/assets/images/category/haberdashery/coat-buttons-photo.png",
+    "tool": "built-in image_gen",
+    "prompt": "Use case: product-mockup. Create ONE dedicated ecommerce category thumbnail photograph. Subject: Large decorative coat and manteau buttons: ornate gold rim buttons, black resin buttons, marbled horn and fabric covered buttons, premium fashion fasteners. Photorealistic premium studio product photography, warm ivory seamless background, soft shadows, coherent boutique sewing supplies catalog style, centered compact arrangement, generous 12% empty margin on all sides, product fills 70% of frame. Landscape 4:3, EXACT output 480 x 360 pixels. No text, logo, watermark, border, UI, humans, or unrelated products. Crisp recognizable silhouette at small size."
+  }
+]

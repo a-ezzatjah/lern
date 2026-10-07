@@ -27,6 +27,6 @@ public static class CategoryImage
             "catalog-extra-147" => "coat-buttons",
             _ => "sewing-tools"
         };
-        return $"/assets/images/category/haberdashery/{name}.svg";
+        return $"/assets/images/category/haberdashery/{name}-photo.png";
     }
 }

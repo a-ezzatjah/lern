@@ -1,0 +1,22 @@
+{
+  "mode": "built-in image_gen",
+  "template": "C:/Users/aliwo/OneDrive/Desktop/آریو/1-Theme/FA/public/blog.html",
+  "dimensions": {
+    "width": 915,
+    "height": 580
+  },
+  "images": [
+    {
+      "file": "sewing-essentials.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset type: Persian haberdashery blog cover, image 1 of 3. Professional editorial photograph of essential sewing tools arranged neatly on a warm ivory linen work table: fabric shears, measuring tape, needles in a pincushion, several spools of thread, small wooden buttons, folded natural fabric. Cohesive muted teal, cream and warm wood colors. Soft daylight, realistic details, no text, no logo, no watermark. Landscape 915:580 aspect ratio, ideally 1830x1160 pixels. Keep main objects safely within central framing for card crops."
+    },
+    {
+      "file": "thread-and-needle.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset type: Persian haberdashery blog cover, image 2 of 3. Professional editorial closeup photograph of a spool of teal sewing thread, several matching cotton and polyester thread spools in ivory, navy and rust, sewing machine needle and swatches of cotton, denim and soft knit fabrics on a warm ivory sewing table. Soft natural daylight, detailed realistic fiber texture, elegant teal and cream palette. No people, text, logos or watermark. Landscape 915:580 aspect ratio, ideally 1830x1160 pixels. Centered crop safe subjects."
+    },
+    {
+      "file": "ribbon-and-lace.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset type: Persian haberdashery blog cover, image 3 of 3. Professional editorial photograph of satin ribbons, grosgrain ribbons and delicate lace arranged on a warm ivory work table next to a simple handmade fabric gift pouch; loose coils of muted teal, cream and dusty rose ribbon, fine realistic lace texture, small sewing scissors. Soft natural daylight, tasteful restrained styling, teal accents. No text, logos, watermark or people. Landscape 915:580 aspect ratio, ideally 1830x1160 pixels. Crop safe composition."
+    }
+  ]
+}

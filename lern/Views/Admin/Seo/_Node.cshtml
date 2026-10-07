@@ -1,0 +1,31 @@
+@model lern.Models.AdminSeoNode
+@if (Model.Kind == "page" || (Model.Kind == "category" && Model.Children.Count == 0))
+{
+    <partial name="~/Views/Admin/Seo/_Page.cshtml" model="Model.Entry" />
+}
+else
+{
+    <details class="seo-tree-branch seo-kind-@Model.Kind" data-seo-branch data-key="@Model.Key" data-query="@ViewData["SeoQuery"]">
+        <summary class="seo-tree-row">
+            <span class="seo-tree-chevron" aria-hidden="true">‹</span>
+            <span class="seo-tree-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h6l2 2h10v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/><path d="M3 7V5a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v2"/></svg></span>
+            <span class="seo-tree-title">@Model.Title</span>
+            <span class="seo-tree-count">@Model.Children.Count زیرمجموعه</span>
+            @if (Model.PreviewPath is string preview)
+            {
+                <a href="@preview" target="_blank" rel="noopener" class="seo-preview" aria-label="مشاهده @Model.Title">مشاهده صفحه ↗</a>
+            }
+        </summary>
+        <div class="seo-tree-content">
+            @if (Model.Entry is not null)
+            {
+                <partial name="~/Views/Admin/Seo/_Page.cshtml" model="Model.Entry" />
+            }
+            <div class="seo-tree-list" data-seo-list aria-live="polite"></div>
+            <div class="seo-tree-pagination" data-seo-pagination>
+                <p data-seo-progress role="status"></p>
+                <button type="button" class="seo-load-more" data-seo-more data-offset="0">نمایش فهرست</button>
+            </div>
+        </div>
+    </details>
+}

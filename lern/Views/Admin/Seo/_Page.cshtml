@@ -1,0 +1,30 @@
+@model lern.Infrastructure.SeoEntry
+<article class="seo-page" data-seo-page>
+    <div class="seo-page-heading">
+        <details class="seo-page-settings">
+            <summary class="seo-tree-row">
+                <span class="seo-tree-chevron" aria-hidden="true">‹</span>
+                <span class="seo-page-icon" aria-hidden="true">▤</span>
+                <span class="seo-tree-title">@Model.Title<small dir="ltr">@Model.Path</small></span>
+                <span class="seo-page-status">
+                    <span class="seo-index-badge @(Model.IndexPage ? "is-index" : "is-noindex")" data-seo-index title="اجازهٔ ایندکس طبق تنظیمات سایت">@(Model.IndexPage ? "index" : "noindex")</span>
+                    <span class="seo-sitemap-badge @(Model.IsInSitemap ? "is-included" : "is-excluded")" data-seo-sitemap>@(Model.IsInSitemap ? "در نقشه XML" : "خارج از نقشه XML")</span>
+                </span>
+                <span class="seo-settings-label">تنظیمات</span>
+            </summary>
+            <form action="/Admin/Seo" method="post" class="seo-settings-form" data-seo-form>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Path" value="@Model.Path">
+                <label>عنوان سئو<input name="MetaTitle" value="@Model.MetaTitle" maxlength="200"></label>
+                <label>توضیحات متا<textarea name="MetaDescription" maxlength="500" rows="3">@Model.MetaDescription</textarea></label>
+                <div class="seo-checkboxes">
+                    <label><input type="checkbox" name="IndexPage" value="true" checked="@Model.IndexPage"> اجازه ایندکس (index)</label><input type="hidden" name="IndexPage" value="false">
+                    <label><input type="checkbox" name="FollowPage" value="true" checked="@Model.FollowPage"> دنبال کردن لینک‌ها</label><input type="hidden" name="FollowPage" value="false">
+                    <label><input type="checkbox" name="IncludeInSitemap" value="true" checked="@Model.IncludeInSitemap"> درج در نقشه سایت</label><input type="hidden" name="IncludeInSitemap" value="false">
+                </div>
+                <div class="seo-save-row"><button type="submit">ذخیره تنظیمات صفحه</button><p data-seo-save-status role="status"></p></div>
+            </form>
+        </details>
+        <a href="@Model.Path" target="_blank" rel="noopener" class="seo-preview" aria-label="مشاهده @Model.Title">مشاهده صفحه ↗</a>
+    </div>
+</article>

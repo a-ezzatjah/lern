@@ -1,12 +1,19 @@
 .home-category-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.home-category-controls{display:flex;gap:.5rem;flex-shrink:0}
-.home-category-controls button{width:2.5rem;height:2.5rem;border:1px solid #cbd5e1;border-radius:50%;background:#fff;color:#434ece;font-size:1.3rem;cursor:pointer}
 .home-category-carousel{position:relative;padding-inline:1.5rem}
+.home-category-next,.home-category-prev{position:absolute;top:50%;transform:translateY(-50%);margin:0;width:3rem;height:3rem;display:grid;place-items:center;z-index:10;color:var(--color-primary,#434ece);cursor:pointer;pointer-events:auto!important}
+.home-category-prev{inset-inline-start:0}
+.home-category-next{inset-inline-end:0}
+.home-category-next::after,.home-category-prev::after{content:"";width:.7rem;height:.7rem;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg)}
+.home-category-next::after{transform:rotate(-135deg)}
+[dir="ltr"] .home-category-prev::after{transform:rotate(-135deg)}
+[dir="ltr"] .home-category-next::after{transform:rotate(45deg)}
+.home-category-carousel .swiper-button-disabled{opacity:.35;cursor:default;pointer-events:auto!important}
 .home-category-track{overflow:hidden;min-width:0;padding:.25rem}
-.home-category-track .swiper-wrapper{align-items:stretch;padding-bottom:0!important}
+.home-category-track .swiper-wrapper{align-items:stretch}
+@layer components{.home-category-track .swiper-wrapper{padding-bottom:0!important}}
 .home-category-track .swiper-slide{height:auto}
 .home-category-card{display:block;height:100%;min-width:0}
 .home-category-card img{height:9rem}
 .home-category-card h3{font-size:.9rem;line-height:1.8}
-.home-category-track:focus-visible,.home-category-card:focus-visible,.home-category-controls button:focus-visible{outline:3px solid #434ece;outline-offset:2px}
+.home-category-track:focus-visible,.home-category-card:focus-visible,.home-category-carousel button:focus-visible{outline:3px solid #434ece;outline-offset:2px}
 @media(max-width:480px){.home-category-card img{height:7rem}.home-category-heading{align-items:flex-start}}

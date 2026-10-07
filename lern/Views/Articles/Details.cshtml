@@ -1,0 +1,22 @@
+@model ArticleDetailsViewModel
+@{ var article = Model.Article; ViewData["Title"] ??= article.Title; ViewData["MetaDescription"] ??= article.Summary; }
+<link rel="stylesheet" href="~/assets/css/articles.css" asp-append-version="true">
+@* Adapted from Arino 5.2.0 / 1-Theme/FA/public/blog-single.html. *@
+<section class="py-5"><div class="container">
+    <nav class="article-breadcrumb" aria-label="مسیر صفحه"><a href="/">خانه</a><span> / </span><a href="/articles">مقالات</a><span> / </span><span>@article.Title</span></nav>
+    <main class="container !px-0 my-10"><div class="flex flex-col xl:flex-row gap-4 article-columns">
+        <article class="xl:w-3/4 bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden" itemscope itemtype="https://schema.org/BlogPosting">
+            <img src="@article.ImageUrl" alt="@article.ImageAlt" width="915" height="580" class="w-full h-64 md:h-96 object-cover article-detail-image" itemprop="image">
+            <div class="p-6 md:p-8 dark:bg-gray-800">
+                <div class="flex flex-wrap items-center gap-3 mb-6 text-sm text-gray-500 dark:text-gray-300"><a href="@Url.Action("Index", new { category = article.Category })" class="article-category-badge">@article.Category</a><time datetime="@article.PublishedAt?.ToString("yyyy-MM-dd")" itemprop="datePublished">@ArticleDisplay.Date(article.PublishedAt)</time><span>•</span><span>@ArticleDisplay.ReadingMinutes(article.Content) دقیقه مطالعه</span></div>
+                <h1 class="text-2xl md:text-3xl font-bold mb-6 dark:text-white" itemprop="headline">@article.Title</h1>
+                <div class="flex items-center mb-8 pb-6 border-b border-gray-200"><img src="/assets/images/mountainous-logo-transparent.png" alt="خرازی کوهستانی" class="w-12 h-12 object-contain"><div class="ms-4"><h4 class="font-medium dark:text-gray-300" itemprop="author">@article.Author</h4><p class="text-sm text-gray-500 dark:text-gray-300">مجله آموزش و ایده‌های خرازی</p></div></div>
+                <div class="article-content rich-content text-gray-700 dark:text-gray-300" itemprop="articleBody">
+                    @Html.Raw(lern.Infrastructure.RichText.Render(article.Content))
+                </div>
+                <div class="mt-8 pt-6 border-t border-gray-200"><a href="/articles" class="text-primary">← بازگشت به همه مقالات</a></div>
+            </div>
+        </article>
+        <partial name="_Sidebar" model="Model.Sidebar" />
+    </div></main>
+</div></section>

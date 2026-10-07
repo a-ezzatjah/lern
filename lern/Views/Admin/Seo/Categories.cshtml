@@ -1,0 +1,30 @@
+@model List<lern.Models.AdminSeoNode>
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "توضیحات سئوی دسته‌بندی"; }
+<link rel="stylesheet" href="~/assets/css/admin-seo-tree.css" asp-append-version="true">
+<div class="seo-tree-heading">
+    <div><p class="seo-tree-eyebrow">مدیریت سئو</p><h1>توضیحات سئوی دسته‌بندی</h1><p>دسته‌بندی را باز کنید و توضیحات و تنظیمات همان صفحه را ویرایش کنید.</p></div>
+    <a href="/Admin/Seo" class="seo-tree-xml">نقشه سایت و ایندکس</a>
+</div>
+@if (TempData["SeoMessage"] is string message) { <div class="admin-alert" role="status">@message</div> }
+<section class="admin-card seo-tree-help">
+    <p>توضیحات در صفحهٔ عمومی دسته‌بندی، داخل HTML اصلی نمایش داده می‌شوند. عنوان سئو و توضیحات متا نیز در سربرگ همان صفحه قرار می‌گیرند.</p>
+    <p>فهرست‌ها ۱۰تایی بارگیری می‌شوند و ویرایشگر فقط با باز کردن دسته‌بندی دریافت می‌شود. برای مشاهدهٔ متن ذخیره‌شده، «مشاهده صفحه» را بزنید.</p>
+</section>
+<div class="seo-tree-toolbar">
+    <form action="/Admin/Settings/category-seo" method="get" id="seo-search-form" role="search">
+        <label for="seo-search">جست‌وجو در دسته‌بندی‌ها</label>
+        <div class="seo-search-controls">
+            <input id="seo-search" name="q" type="search" value="@ViewData["SeoQuery"]" maxlength="100" placeholder="نام دسته‌بندی یا آدرس…" aria-controls="seo-tree" autocomplete="off">
+            <button type="submit" class="seo-load-more">جست‌وجو</button>
+            <button type="button" id="seo-search-clear" class="seo-load-more">پاک کردن</button>
+        </div>
+    </form>
+    <button type="button" id="seo-collapse-all" class="seo-load-more">بستن همه</button>
+</div>
+<p id="seo-search-status" class="seo-search-status" role="status" aria-live="polite">جست‌وجو شامل دسته‌بندی‌های داخل شاخه‌های بازنشده هم می‌شود.</p>
+<div id="seo-tree" class="seo-tree" aria-label="درخت دسته‌بندی‌ها" data-children-url="/Admin/Settings/category-seo/children">
+    <partial name="~/Views/Admin/Seo/_CategorySeoTree.cshtml" model="Model" />
+</div>
+@section Scripts {
+    <script src="~/assets/js/admin-seo-tree.js" asp-append-version="true" defer></script>
+}

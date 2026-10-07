@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="~/assets/css/rich-editor.css" asp-append-version="true" />
     <title>@ViewData["Title"] - پنل مدیریت</title>
     <link rel="stylesheet" href="~/assets/css/app.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/assets/css/admin-mobile.css" asp-append-version="true" />
@@ -55,14 +57,23 @@
                 <a class="admin-nav-link" href="@Url.Action("Index", "AdminTransactions")"><span class="admin-nav-icon"><svg><use href="#admin-i-wallet"/></svg></span><span>تراکنش‌ها</span></a>
                 <a class="admin-nav-link" href="@Url.Action("Index", "AdminCoupons")"><span class="admin-nav-icon"><svg><use href="#admin-i-percent"/></svg></span><span>تخفیف‌ها و کوپن‌ها</span></a>
                 <div class="admin-nav-group-title">مدیریت سیستم</div>
+                <a class="admin-nav-link" href="/Admin/Seo"><span class="admin-nav-icon"><svg><use href="#admin-i-grid"/></svg></span><span>نقشه سایت و ایندکس</span></a>
                 <a class="admin-nav-link" href="@Url.Action("Users", "Admin")"><span class="admin-nav-icon"><svg><use href="#admin-i-users"/></svg></span><span>کاربران</span></a>
                 <a class="admin-nav-link" href="@Url.Action("Index", "AdminReports")"><span class="admin-nav-icon"><svg><use href="#admin-i-chart"/></svg></span><span>گزارش‌ها</span></a>
                 <details class="admin-settings-menu" @(Context.Request.Path.StartsWithSegments("/Admin/Settings") ? "open" : "")>
                     <summary class="admin-nav-link"><span class="admin-nav-icon"><svg><use href="#admin-i-settings"/></svg></span><span>تنظیمات</span><span class="admin-settings-chevron" aria-hidden="true">⌄</span></summary>
                     <div class="admin-settings-submenu">
                         <a href="@Url.Action("Banners", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/banners") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-box"/></svg></span>تغییر بنر سایت</a>
+                        <a href="/Admin/Settings/category-seo" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/category-seo") ? "page" : null)"><span class="admin-nav-icon" aria-hidden="true"><svg><use href="#admin-i-log"/></svg></span>توضیحات سئوی دسته‌بندی</a>
                         <a href="@Url.Action("CategoryImages", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/category-images") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-box"/></svg></span>تصاویر دسته‌های اصلی</a>
                         <a href="@Url.Action("Inbox", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/inbox") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-wallet"/></svg></span>پیام‌ها و اعلان‌ها</a>
+                    </div>
+                </details>
+                <details class="admin-settings-group" open="@(Context.Request.Path.StartsWithSegments("/Admin/Articles"))">
+                    <summary class="admin-nav-link"><span class="admin-nav-icon"><svg><use href="#admin-i-log"/></svg></span><span>مقالات</span><span class="admin-settings-chevron" aria-hidden="true">⌄</span></summary>
+                    <div class="admin-settings-submenu">
+                        <a href="/Admin/Articles">فهرست مقالات</a>
+                        <a href="/Admin/Articles/create">درج مقاله</a>
                     </div>
                 </details>
                 <a class="admin-nav-link" href="#"><span class="admin-nav-icon"><svg><use href="#admin-i-backup"/></svg></span><span>پشتیبان‌گیری</span></a>
@@ -94,6 +105,7 @@
     <div class="admin-sidebar-overlay" aria-hidden="true"></div>
     <script src="~/assets/js/dependencies/app.js" asp-append-version="true"></script>
     <script src="~/assets/js/admin-mobile.js" asp-append-version="true"></script>
+    <script src="~/assets/js/rich-editor.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

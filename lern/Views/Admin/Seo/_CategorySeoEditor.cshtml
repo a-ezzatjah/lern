@@ -1,0 +1,24 @@
+@model lern.Models.CategorySeoEditorViewModel
+@{ var entry = Model.Entry; }
+<article class="seo-page seo-category-editor" data-seo-page>
+    <div class="seo-category-editor-heading">
+        <h2>توضیحات و سئوی @Model.Category.Name</h2>
+        <span class="seo-page-status">
+            <span class="seo-index-badge @(entry.IndexPage ? "is-index" : "is-noindex")" data-seo-index title="اجازهٔ ایندکس طبق تنظیمات سایت">@(entry.IndexPage ? "index" : "noindex")</span>
+            <span class="seo-sitemap-badge @(entry.IsInSitemap ? "is-included" : "is-excluded")" data-seo-sitemap>@(entry.IsInSitemap ? "در نقشه XML" : "خارج از نقشه XML")</span>
+        </span>
+    </div>
+    <form action="/Admin/Settings/category-seo/@Model.Category.Id" method="post" class="seo-settings-form" data-seo-form>
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Path" value="@entry.Path">
+        <label>عنوان سئو<input name="MetaTitle" value="@entry.MetaTitle" maxlength="200" placeholder="@Model.Category.Name"></label>
+        <label>توضیحات متا<textarea name="MetaDescription" maxlength="500" rows="3">@entry.MetaDescription</textarea></label>
+        <label>توضیحات دسته‌بندی<textarea name="Description" data-rich-editor maxlength="100000" rows="8">@lern.Infrastructure.RichText.Render(Model.Category.Description)</textarea></label>
+        <div class="seo-checkboxes">
+            <label><input type="checkbox" name="IndexPage" value="true" checked="@entry.IndexPage"> اجازه ایندکس (index)</label><input type="hidden" name="IndexPage" value="false">
+            <label><input type="checkbox" name="FollowPage" value="true" checked="@entry.FollowPage"> دنبال کردن لینک‌ها</label><input type="hidden" name="FollowPage" value="false">
+            <label><input type="checkbox" name="IncludeInSitemap" value="true" checked="@Model.IncludeInSitemap"> درج در نقشه سایت</label><input type="hidden" name="IncludeInSitemap" value="false">
+        </div>
+        <div class="seo-save-row"><button type="submit" class="admin-primary-button">ذخیره توضیحات</button><p data-seo-save-status role="status"></p></div>
+    </form>
+</article>

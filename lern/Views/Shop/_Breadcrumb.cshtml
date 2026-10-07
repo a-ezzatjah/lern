@@ -11,7 +11,7 @@
             }
             else
             {
-                <a href="/shop?category=@category.Id">@category.Name</a><span aria-hidden="true">/</span>
+                <a href="/shop?category=@category.Id@(Model.DiscountedOnly ? "&discounted=true" : "")">@category.Name</a><span aria-hidden="true">/</span>
             }
         }
     }
@@ -21,7 +21,7 @@
     }
     else
     {
-        <span aria-current="page">محصولات</span>
+        <span aria-current="page">@(Model.DiscountedOnly ? "محصولات تخفیف‌دار" : "محصولات")</span>
     }
     @if (!string.IsNullOrWhiteSpace(Model.Query))
     {

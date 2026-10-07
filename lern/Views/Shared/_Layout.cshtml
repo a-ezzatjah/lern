@@ -8,11 +8,9 @@
     @* ۱. بخش CSS ها را از index.html کپی کن و اینجا بگذار *@
     @* دقت کن مسیرها باید با /assets/ شروع شوند *@
 
-    <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>@ViewData["Title"] - Kohestani</title>
     <meta name="description" content="@(ViewData["MetaDescription"] ?? "فروشگاه اینترنتی کوهستانی")">
     <meta name="keywords" content="@(ViewData["MetaKeywords"] ?? "فروشگاه اینترنتی")">
     <meta name="robots" content="@(ViewData["Robots"] ?? "index, follow")">
@@ -28,6 +26,7 @@
     <link rel="stylesheet" href="~/assets/js/plugin/story-player/styles.css">
     <link rel="stylesheet" href="~/assets/js/plugin/swiper/swiper-bundle.min.css">
     <link rel="stylesheet" href="~/assets/css/app.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/assets/css/rich-editor.css" asp-append-version="true">
     <link rel="stylesheet" href="~/assets/css/category-menu.css" asp-append-version="true">
     <link rel="preload" href="~/assets/fonts/payda/PeydaWebFaNum-Medium.woff2" as="font" type="font/woff2" crossorigin>
 
@@ -186,7 +185,7 @@
                                     </a>
                                 </li>
                                 <li class="py-2">
-                                    <a href="" class="flex space-x-3 hover:text-primary transition">
+                                    <a href="/articles" class="flex space-x-3 hover:text-primary transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -446,7 +445,7 @@
                 </svg>
             </button>
         </div>
-<a class="category-home-link" href="/">صفحه اصلی <span aria-hidden="true">←</span></a>
+<a class="category-home-link" href="/">صفحه اصلی <span aria-hidden="true">←</span></a><a class="category-home-link" href="/articles">بلاگ <span aria-hidden="true">←</span></a>
         <div id="mobile-category-content" class="category-mobile-content"><div class="category-loading" role="status">در حال دریافت دسته‌بندی‌ها…</div></div>
     </div>
     <div class="overlay z-40 transition fixed inset-0 bg-black/70 hidden"

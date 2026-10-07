@@ -43,7 +43,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         };
     });
 builder.Services.AddAuthorization();
-builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<SeoCatalog>();
+builder.Services.AddScoped<SeoResultFilter>();
+builder.Services.AddControllersWithViews(options => options.Filters.AddService<SeoResultFilter>());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(cfg =>
@@ -67,6 +69,7 @@ try
     var db = scope.ServiceProvider.GetRequiredService<ShopDbContext>();
     await db.Database.MigrateAsync();
     await CategoryCatalogSeeder.SeedAsync(db);
+    await ArticleSeeder.SeedAsync(db, app.Environment);
 }
 catch (Exception ex)
 {

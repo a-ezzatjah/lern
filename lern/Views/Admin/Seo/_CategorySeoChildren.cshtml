@@ -1,0 +1,7 @@
+@model lern.Models.AdminSeoChildrenViewModel
+<div data-seo-batch data-next-offset="@Model.NextOffset" data-total="@Model.Total" data-has-more="@Model.HasMore.ToString().ToLowerInvariant()">
+    @foreach (var node in Model.Nodes)
+    {
+        <partial name="~/Views/Admin/Seo/_CategorySeoNode.cshtml" model="node" />
+    }
+</div>

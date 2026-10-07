@@ -9,10 +9,33 @@
         if (!string.IsNullOrWhiteSpace(Model.Query)) parts.Add($"q={Uri.EscapeDataString(Model.Query)}");
         parts.AddRange(Model.SelectedCategories.OrderBy(id => id).Select(id => $"category={id}"));
         if (Model.AvailableOnly) parts.Add("available=true");
+        if (Model.DiscountedOnly) parts.Add("discounted=true");
         if (Model.MinPrice.HasValue) parts.Add($"minPrice={Model.MinPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
         if (Model.MaxPrice.HasValue) parts.Add($"maxPrice={Model.MaxPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
         return "/shop?" + string.Join("&", parts);
     }
+}
+@if (Model.SelectedCategories.Count == 1)
+{
+    var category = Model.Categories.Single(x => x.Id == Model.SelectedCategories.Single());
+    var description = lern.Infrastructure.RichText.Render(category.Description);
+    <section class="category-seo-description mb-4" aria-label="توضیحات @category.Name">
+        <h1 class="text-2xl font-bold">@category.Name</h1>
+        @if (!string.IsNullOrWhiteSpace(description))
+        {
+            <details class="category-description-accordion">
+                <summary class="category-description-summary">
+                    <span class="category-description-preview">@lern.Infrastructure.RichText.Summary(category.Description, 600)</span>
+                    <span class="category-description-action">
+                        <span class="category-description-more">مشاهده بیشتر</span>
+                        <span class="category-description-less">مشاهده کمتر</span>
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 9 6 6 6-6" /></svg>
+                    </span>
+                </summary>
+                <div class="rich-content category-description-full" data-category-description>@Html.Raw(description)</div>
+            </details>
+        }
+    </section>
 }
 <div class="shop-sort-bar" aria-label="مرتب‌سازی محصولات">
     <div class="shop-sort-heading"><span class="shop-sort-icon" aria-hidden="true">☷</span><strong>مرتب‌سازی</strong></div>

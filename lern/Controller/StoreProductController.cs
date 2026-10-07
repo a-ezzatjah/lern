@@ -43,7 +43,7 @@ public class StoreProductController : Microsoft.AspNetCore.Mvc.Controller
         ViewData["MetaDescription"] = product.SeoData?.MetaDescription ?? product.ShortDescription;
         ViewData["MetaKeywords"] = product.SeoData?.MetaKeywords;
         ViewData["Robots"] = $"{(product.SeoData?.IndexPage ?? true ? "index" : "noindex")}, {(product.SeoData?.FollowPage ?? true ? "follow" : "nofollow")}";
-        ViewData["CanonicalUrl"] = product.SeoData?.CanonicalUrl ?? Url.Action(nameof(Details), "StoreProduct", new { id }, Request.Scheme);
+        ViewData["CanonicalUrl"] = product.SeoData?.CanonicalUrl;
         return View(StoreProductDetailsViewModel.FromProduct(product, relatedProducts));
     }
 }

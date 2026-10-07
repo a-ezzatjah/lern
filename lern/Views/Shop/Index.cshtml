@@ -5,6 +5,7 @@
         <aside class="shop-filters" aria-label="فیلترهای محصولات">
             <form id="shop-filter-form" method="get" action="/shop">
                 <input type="hidden" name="sort" value="@Model.Sort">
+                <input type="hidden" name="discounted" value="@(Model.DiscountedOnly ? "true" : "")">
                 <h2>فیلتر محصولات</h2>
                 <label for="shop-query">جستجو در محصولات</label>
                 <input id="shop-query" name="q" type="search" value="@Model.Query" maxlength="100" placeholder="نام محصول را بنویسید">
@@ -22,7 +23,7 @@
                 </div>
                 <label class="shop-check"><input name="available" type="checkbox" value="true" checked="@Model.AvailableOnly"> فقط کالاهای موجود</label>
                 <button type="submit">اعمال فیلترها</button>
-                <a class="shop-clear" href="/shop">پاک کردن فیلترها</a>
+                <a class="shop-clear" href="@(Model.DiscountedOnly ? "/shop?discounted=true" : "/shop")">پاک کردن فیلترها</a>
             </form>
         </aside>
         <div class="shop-results">

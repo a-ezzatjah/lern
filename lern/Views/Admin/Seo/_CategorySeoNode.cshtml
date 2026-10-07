@@ -1,0 +1,26 @@
+@model lern.Models.AdminSeoNode
+@{ var editorUrl = Model.Kind == "category-editor" ? "/Admin/Settings/category-seo/" + Model.Key[9..] + "/editor" : null; }
+<details class="seo-tree-branch seo-kind-category" data-seo-branch data-key="@Model.Key" data-query="@ViewData["SeoQuery"]" data-editor-url="@editorUrl">
+    <summary class="seo-tree-row">
+        <span class="seo-tree-chevron" aria-hidden="true">‹</span>
+        <span class="seo-tree-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h6l2 2h10v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/><path d="M3 7V5a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v2"/></svg></span>
+        <span class="seo-tree-title">@Model.Title</span>
+        <span class="seo-tree-count">@(Model.Children.Count > 0 ? Model.Children.Count + " زیرمجموعه" : "ویرایش توضیحات")</span>
+        @if (Model.PreviewPath is string preview)
+        {
+            <a href="@preview" target="_blank" rel="noopener" class="seo-preview" aria-label="مشاهده @Model.Title">مشاهده صفحه ↗</a>
+        }
+    </summary>
+    <div class="seo-tree-content">
+        @if (editorUrl is not null)
+        {
+            <div data-seo-editor aria-live="polite"></div>
+            <button type="button" class="seo-load-more" data-seo-editor-retry hidden>تلاش دوباره برای دریافت ویرایشگر</button>
+        }
+        <div class="seo-tree-list" data-seo-list aria-live="polite"></div>
+        <div class="seo-tree-pagination" data-seo-pagination hidden="@(Model.Children.Count == 0)">
+            <p data-seo-progress role="status"></p>
+            <button type="button" class="seo-load-more" data-seo-more data-offset="0" hidden="@(Model.Children.Count == 0)">نمایش فهرست</button>
+        </div>
+    </div>
+</details>

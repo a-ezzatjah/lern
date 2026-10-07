@@ -376,7 +376,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             Name = product.Name,
             Slug = product.Slug,
             ShortDescription = product.ShortDescription,
-            Description = product.Description,
+            Description = lern.Infrastructure.RichText.Render(product.Description),
             MetaTitle = product.Seo?.MetaTitle,
             MetaDescription = product.Seo?.MetaDescription,
             MetaKeywords = product.Seo?.MetaKeywords,
@@ -431,7 +431,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             return await InvalidProductForm(model, "فرمت تصویر باید JPG، PNG یا WEBP و حداکثر ۵ مگابایت باشد.");
 
         var now = DateTime.UtcNow;
-        product.Name = model.Name.Trim(); product.Slug = model.Slug.Trim(); product.ShortDescription = model.ShortDescription; product.Description = model.Description;
+        product.Name = model.Name.Trim(); product.Slug = model.Slug.Trim(); product.ShortDescription = model.ShortDescription; product.Description = lern.Infrastructure.RichText.Render(model.Description);
         product.IsActive = model.IsActive; product.DiscountValue = model.ProductDiscountValue; product.DiscountType = ToDiscountType(model.ProductDiscountType);
         product.DiscountStartAt = model.ProductDiscountValue > 0 ? now.AddDays(-1) : null; product.DiscountEndAt = model.ProductDiscountValue > 0 ? now.AddDays(30) : null; product.UpdatedAt = now;
         product.Seo ??= new SeoData();
@@ -588,7 +588,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             Name = model.Name.Trim(),
             Slug = model.Slug.Trim(),
             ShortDescription = model.ShortDescription,
-            Description = model.Description,
+            Description = lern.Infrastructure.RichText.Render(model.Description),
             IsActive = model.IsActive,
             DiscountValue = model.ProductDiscountValue,
             DiscountType = ToDiscountType(model.ProductDiscountType),

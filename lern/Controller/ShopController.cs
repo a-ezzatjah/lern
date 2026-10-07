@@ -12,7 +12,7 @@ public sealed class ShopController(ShopDbContext db, IProductService products) :
     [HttpGet("")]
     public async Task<IActionResult> Index(string? q, [FromQuery(Name = "category")] int[]? categories,
         bool available = false, string sort = "newest", decimal? minPrice = null, decimal? maxPrice = null,
-        int offset = 0, int take = 6, bool append = false)
+        int offset = 0, int take = 6, bool append = false, bool discounted = false)
     {
         q = q?.Trim();
         if (q?.Length > 100) q = q[..100];
@@ -44,9 +44,19 @@ public sealed class ShopController(ShopDbContext db, IProductService products) :
         maxPrice = maxPrice.HasValue && maxPrice >= 0 ? maxPrice : null;
         take = append ? Math.Clamp(take, 1, 3) : 6;
         offset = append ? Math.Max(0, offset) : 0;
-        var result = await products.GetShopProductCardsAsync(q, selected.ToArray(), available, sort, minPrice, maxPrice, offset, take);
-        ViewData["Title"] = string.IsNullOrWhiteSpace(q) ? "محصولات" : $"نتایج جستجوی {q}";
-        var model = new ShopViewModel(result, allCategories, trail, q ?? "", selected, available, sort, minPrice, maxPrice);
+        var result = await products.GetShopProductCardsAsync(q, selected.ToArray(), available, sort, minPrice, maxPrice, offset, take, discounted);
+        ViewData["Title"] = string.IsNullOrWhiteSpace(q) ? (discounted ? "محصولات تخفیف‌دار" : "محصولات") : $"نتایج جستجوی {q}";
+        if (selected.Count == 1)
+        {
+            var category = byId[selected.Single()];
+            ViewData["Title"] = string.IsNullOrWhiteSpace(category.Seo?.MetaTitle) ? category.Name : category.Seo.MetaTitle;
+            var description = string.IsNullOrWhiteSpace(category.Seo?.MetaDescription)
+                ? lern.Infrastructure.RichText.Summary(category.Description) : category.Seo.MetaDescription;
+            ViewData["MetaDescription"] = string.IsNullOrWhiteSpace(description) ? null : description;
+            ViewData["CanonicalUrl"] = category.Seo?.CanonicalUrl;
+            ViewData["Robots"] = $"{(category.Seo?.IndexPage ?? true ? "index" : "noindex")}, {(category.Seo?.FollowPage ?? true ? "follow" : "nofollow")}";
+        }
+        var model = new ShopViewModel(result, allCategories, trail, q ?? "", selected, available, sort, minPrice, maxPrice, discounted);
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             return append ? PartialView("~/Views/Shop/_Cards.cshtml", result.Items)
                 : PartialView("~/Views/Shop/_Ajax.cshtml", model);

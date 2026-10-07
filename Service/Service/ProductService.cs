@@ -564,7 +564,7 @@ public async Task<List<ProductCardDto>> GetRelatedProductCardsAsync(int productI
 
 
 public async Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? search, int[] categoryIds, bool availableOnly,
-    string sort, decimal? minPrice, decimal? maxPrice, int offset, int take)
+    string sort, decimal? minPrice, decimal? maxPrice, int offset, int take, bool discountedOnly = false)
 {
     take = Math.Clamp(take, 1, 10);
     offset = Math.Max(0, offset);
@@ -594,6 +594,18 @@ public async Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? s
             || o.SaleOptionColors.Any(c => c.ProductVariants.Any(v => v.StockQuantity > v.ReservedQuantity))));
 
     var now = DateTime.UtcNow;
+    if (discountedOnly)
+        query = query.Where(p => _shopDbContext.ProductVariants.Any(v =>
+            v.ProductSaleOption.ProductId == p.Id &&
+            v.StockQuantity > v.ReservedQuantity && v.Price > 0 &&
+            ((v.DiscountValue > 0 &&
+              (v.DisconType == DisconTypeEnum.percent || v.DisconType == DisconTypeEnum.price) &&
+              (!v.DiscountStartAt.HasValue || v.DiscountStartAt <= now) &&
+              (!v.DiscountEndAt.HasValue || v.DiscountEndAt >= now)) ||
+             (p.DiscountValue > 0 &&
+              (p.DiscountType == DisconTypeEnum.percent || p.DiscountType == DisconTypeEnum.price) &&
+              (!p.DiscountStartAt.HasValue || p.DiscountStartAt <= now) &&
+              (!p.DiscountEndAt.HasValue || p.DiscountEndAt >= now)))));
     var priceByProduct = from product in query
         from option in product.SaleOptions
         from variant in option.ProductVariants

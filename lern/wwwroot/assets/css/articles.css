@@ -1,0 +1,10 @@
+/* Arino Persian blog layouts; brand colors inherit from the store theme. */
+.article-hero{background-image:linear-gradient(120deg,color-mix(in srgb,var(--color-primary,#087c83) 60%,transparent),#12353c55),url('/assets/images/articles/sewing-essentials.jpg');padding-block:100px}
+.article-search input{padding-inline-end:52px;color:#263238}
+.article-sidebar-title{position:relative;padding-bottom:20px}.article-sidebar-title:after{content:"";display:block;position:absolute;bottom:0;inset-inline-start:0;width:160px;height:8px;border-radius:10px;background:var(--color-primary,#087c83)}
+.article-category-line{position:relative}.article-category-line:before{content:"";position:absolute;top:50%;width:100%;height:1px;background:#d1d5db}.article-category-line span{position:relative}
+.article-card{height:100%}.article-grid>div>a{height:100%}.article-card-title{line-height:1.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:72px}.article-summary{line-height:1.9;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:80px}
+.article-card img{height:200px}.article-content{font-size:16px;line-height:2.25;overflow-wrap:anywhere}.article-content p{margin-bottom:22px;white-space:pre-line}.article-content h2{font-size:23px;font-weight:700;line-height:1.8;margin:30px 0 14px;color:var(--color-primary,#087c83)}
+.article-category-badge{padding:4px 12px;border-radius:7px;background:color-mix(in srgb,var(--color-primary,#087c83) 12%,transparent);color:var(--color-primary,#087c83)}.article-breadcrumb{font-size:14px;line-height:1.9;overflow-wrap:anywhere}.article-pagination{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}.article-pagination a{padding:8px 16px;border-radius:8px}.article-sidebar .sticky{top:150px}.article-detail-image{height:384px}
+@media(max-width:1279px){.article-columns>div,.article-columns>article,.article-columns>aside{width:100%}.article-sidebar .sticky{position:static}}
+@media(max-width:767px){.article-hero{padding-block:64px}.article-hero h1{font-size:30px}.article-detail-image{height:256px}.article-breadcrumb{margin-bottom:0}}
