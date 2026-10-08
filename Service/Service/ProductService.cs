@@ -10,6 +10,7 @@ using Entities;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Service.Mapping;
+using Service.Search;
 using Service.Validators;
 using ServiceContract.Common;
 using ServiceContract.DTO.DtoCommit;
@@ -569,11 +570,7 @@ public async Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? s
     take = Math.Clamp(take, 1, 10);
     offset = Math.Max(0, offset);
     var query = _shopDbContext.Products.AsNoTracking().Where(p => p.IsActive);
-    if (!string.IsNullOrWhiteSpace(search))
-    {
-        var term = search.Trim();
-        query = query.Where(p => p.Name.Contains(term));
-    }
+    query = ProductNameSearch.Apply(query, search);
     if (categoryIds.Length > 0)
     {
         var hierarchy = await _shopDbContext.Categories.AsNoTracking()
@@ -641,21 +638,28 @@ public async Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? s
     var priced = from product in query
         join price in priceByProduct on product.Id equals price.ProductId into prices
         from price in prices.DefaultIfEmpty()
-        select new { Product = product, Price = price == null ? null : price.Price };
+        select new
+        {
+            Product = product,
+            Price = price == null ? null : price.Price,
+            IsAvailable = product.SaleOptions.Any(o => o.ProductVariants.Any(v => v.StockQuantity > v.ReservedQuantity)
+                || o.SaleOptionColors.Any(c => c.ProductVariants.Any(v => v.StockQuantity > v.ReservedQuantity)))
+        };
     if (minPrice.HasValue) priced = priced.Where(p => p.Price >= minPrice.Value);
     if (maxPrice.HasValue) priced = priced.Where(p => p.Price <= maxPrice.Value);
 
     var total = await priced.CountAsync();
+    var availableFirst = priced.OrderByDescending(p => p.IsAvailable);
     var ordered = sort switch
     {
-        "bestselling" => priced.OrderByDescending(p => _shopDbContext.OrderItems
+        "bestselling" => availableFirst.ThenByDescending(p => _shopDbContext.OrderItems
             .Where(i => i.ProductId == p.Product.Id && i.Order.Status != OrderStatus.Pending && i.Order.Status != OrderStatus.Cancelled)
             .Sum(i => (int?)i.Quantity) ?? 0).ThenByDescending(p => p.Product.CreatedAt).ThenByDescending(p => p.Product.Id),
-        "popular" => priced.OrderByDescending(p => _shopDbContext.ProductFavorites.Count(f => f.ProductId == p.Product.Id))
+        "popular" => availableFirst.ThenByDescending(p => _shopDbContext.ProductFavorites.Count(f => f.ProductId == p.Product.Id))
             .ThenByDescending(p => p.Product.CreatedAt).ThenByDescending(p => p.Product.Id),
-        "price_desc" => priced.OrderBy(p => p.Price == null).ThenByDescending(p => p.Price).ThenByDescending(p => p.Product.Id),
-        "price_asc" => priced.OrderBy(p => p.Price == null).ThenBy(p => p.Price).ThenByDescending(p => p.Product.Id),
-        _ => priced.OrderByDescending(p => p.Product.CreatedAt).ThenByDescending(p => p.Product.Id)
+        "price_desc" => availableFirst.ThenBy(p => p.Price == null).ThenByDescending(p => p.Price).ThenByDescending(p => p.Product.Id),
+        "price_asc" => availableFirst.ThenBy(p => p.Price == null).ThenBy(p => p.Price).ThenByDescending(p => p.Product.Id),
+        _ => availableFirst.ThenByDescending(p => p.Product.CreatedAt).ThenByDescending(p => p.Product.Id)
     };
     var pageIds = await ordered.Skip(offset).Take(take).Select(p => p.Product.Id).ToListAsync();
     var products = await _shopDbContext.Products.AsNoTracking().Where(p => pageIds.Contains(p.Id))
@@ -686,7 +690,10 @@ public async Task<PageResult<ProductCardDto>> GetCategoryProductCardsAsync(int c
         .Where(p => p.IsActive && p.ProductCategories.Any(c => ids.Contains(c.CategoryId)));
     var totalCount = await query.CountAsync();
     page = Math.Clamp(page, 1, Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize)));
-    var products = await query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id)
+    var products = await query.OrderByDescending(p => p.SaleOptions.Any(o =>
+            o.ProductVariants.Any(v => v.StockQuantity > v.ReservedQuantity) ||
+            o.SaleOptionColors.Any(c => c.ProductVariants.Any(v => v.StockQuantity > v.ReservedQuantity))))
+        .ThenByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id)
         .Skip((page - 1) * pageSize).Take(pageSize)
         .Include(p => p.SaleOptions).ThenInclude(o => o.ProductVariants)
         .Include(p => p.SaleOptions).ThenInclude(o => o.SaleOptionColors).ThenInclude(c => c.ProductVariants)

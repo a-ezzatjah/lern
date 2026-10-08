@@ -48,7 +48,8 @@
 (() => {
     const form = document.getElementById('address-form');
     const message = document.getElementById('address-message');
-    const showLimitMessage = () => { message.textContent = 'شما نمی‌توانید بیشتر از سه آدرس ذخیره کنید.'; message.className = 'address-limit-message mt-5 w-full rounded-xl px-5 py-4 text-center text-base font-bold shadow-lg'; message.style.cssText=''; };
+    const maxAddresses = @lern.Controller.AddressApiController.MaxAddresses;
+    const showLimitMessage = () => { message.textContent = 'حداکثر ۱۰ آدرس می‌توانید ذخیره کنید. برای افزودن آدرس جدید، یکی از آدرس‌های قبلی را حذف کنید.'; message.className = 'address-limit-message mt-5 w-full rounded-xl px-5 py-4 text-center text-base font-bold shadow-lg'; message.style.cssText=''; };
     const field = id => document.getElementById(id);
     const provinceCities = { 'آذربایجان شرقی':['تبریز','مراغه','مرند','میانه','اهر'], 'آذربایجان غربی':['ارومیه','خوی','مهاباد','بوکان','میاندوآب'], 'اردبیل':['اردبیل','مشگین‌شهر','خلخال','پارس‌آباد'], 'اصفهان':['اصفهان','کاشان','خمینی‌شهر','نجف‌آباد','شهرضا'], 'البرز':['کرج','فردیس','نظرآباد','هشتگرد'], 'ایلام':['ایلام','دهلران','مهران','آبدانان'], 'بوشهر':['بوشهر','کنگان','برازجان','جم'], 'تهران':['تهران','ری','کرج','شمیرانات','دماوند'], 'چهارمحال و بختیاری':['شهرکرد','بروجن','فارسان','لردگان'], 'خراسان جنوبی':['بیرجند','قائن','طبس','نهبندان'], 'خراسان رضوی':['مشهد','نیشابور','سبزوار','تربت حیدریه','قوچان'], 'خراسان شمالی':['بجنورد','شیروان','اسفراین','جاجرم'], 'خوزستان':['اهواز','آبادان','خرمشهر','دزفول','اندیمشک'], 'زنجان':['زنجان','ابهر','خرمدره','قیدار'], 'سمنان':['سمنان','شاهرود','دامغان','گرمسار'], 'سیستان و بلوچستان':['زاهدان','چابهار','زابل','ایرانشهر'], 'فارس':['شیراز','مرودشت','جهرم','فسا','لار'], 'قزوین':['قزوین','تاکستان','آبیک','الوند'], 'قم':['قم','جعفریه','کهک'], 'کردستان':['سنندج','سقز','مریوان','بانه','قروه'], 'کرمان':['کرمان','رفسنجان','سیرجان','جیرفت','بم'], 'کرمانشاه':['کرمانشاه','اسلام‌آباد غرب','سنقر','کنگاور'], 'کهگیلویه و بویراحمد':['یاسوج','دهدشت','گچساران'], 'گلستان':['گرگان','گنبد کاووس','علی‌آباد کتول','آق‌قلا'], 'گیلان':['رشت','انزلی','لاهیجان','رودسر','آستارا'], 'لرستان':['خرم‌آباد','بروجرد','دورود','الیگودرز'], 'مازندران':['ساری','بابل','آمل','قائم‌شهر','نوشهر'], 'مرکزی':['اراک','ساوه','خمین','محلات'], 'هرمزگان':['بندرعباس','قشم','کیش','بندر لنگه'], 'همدان':['همدان','ملایر','نهاوند','رزن'], 'یزد':['یزد','میبد','اردکان','بافق'] };
     const province = field('editProvince'), city = field('editCity'), provinceOptions = Object.keys(provinceCities);
@@ -84,7 +85,7 @@
             receiverName: field('editReceiverName').value, isDefault: field('editDefaultAddress').checked
         };
         if (isNew) {
-            try { const existing = await fetch('/api/address/list').then(r => r.ok ? r.json() : []); if (existing.length >= 3) { showLimitMessage(); return; } } catch (_) { }
+            try { const existing = await fetch('/api/address/list').then(r => r.ok ? r.json() : []); if (existing.length >= maxAddresses) { showLimitMessage(); return; } } catch (_) { }
         }
         try {
             const editId = new URLSearchParams(location.search).get('id');
@@ -104,7 +105,7 @@
             // بعد از ذخیره موفق، کاربر باید به مرحله تکمیل سفارش برگردد.
             window.setTimeout(() => window.location.assign(new URLSearchParams(location.search).get('from') === 'account' ? '/account/addresses' : '/checkout'), 250);
         } catch (error) {
-            if ((error.message || '').includes('سه آدرس') || (error.message || '').includes('نمی‌توانید')) { showLimitMessage(); return; }
+            if ((error.message || '').includes('حداکثر ۱۰ آدرس')) { showLimitMessage(); return; }
             message.textContent = error.message || 'ذخیره آدرس انجام نشد.';
             message.className = 'text-sm text-red-600';
         }

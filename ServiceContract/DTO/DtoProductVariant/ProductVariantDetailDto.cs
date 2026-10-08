@@ -18,6 +18,8 @@ namespace ServiceContract.DTO.DtoProductVariant
         public DateTime? DiscountEndAt { get; set; }
         public int StockQuantity { get; set; }
         public int ReservedQuantity { get; set; }
+        public int? MaxPurchaseQuantityPerUser { get; set; }
+        public int? RemainingPurchaseQuantity { get; set; }
         public int AvailableQuantity { get; set; }
         public bool IsAvailable { get; set; }
         public string? SaleOptionTitle { get; set; }

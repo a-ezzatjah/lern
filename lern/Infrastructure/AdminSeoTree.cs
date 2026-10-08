@@ -47,7 +47,8 @@ public sealed class AdminSeoTree(ShopDbContext db, SeoCatalog catalog)
             new() { Key = "products", Title = "محصولات", Kind = "products", Entry = entries["/shop"],
                 Children = entries.Values.Where(x => x.Path.StartsWith("/product/")).OrderBy(x => x.Title).ThenBy(x => x.Path).Select(Page).ToList() },
             new() { Key = "articles", Title = "مقالات", Kind = "articles", Entry = entries["/articles"], Children = articleGroups },
-            new() { Key = "categories", Title = "دسته‌بندی محصولات", Kind = "categories", Children = categoryRoots }
+            new() { Key = "categories", Title = "دسته‌بندی محصولات", Kind = "categories", Children = categoryRoots },
+            new() { Key = "support", Title = "درباره فروشگاه و پشتیبانی", Kind = "folder", Children = StoreSupportContent.Pages.Select(x => Page(entries[x.Path])).ToList() }
         ];
     }
 

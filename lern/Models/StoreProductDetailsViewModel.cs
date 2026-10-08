@@ -117,6 +117,8 @@ public class StoreProductDetailsViewModel
             OriginalPrice = variant.Price,
             FinalPrice = variant.FinalPrice,
             AvailableQuantity = availableQuantity,
+            MaxPurchaseQuantityPerUser = variant.MaxPurchaseQuantityPerUser,
+            RemainingPurchaseQuantity = variant.RemainingPurchaseQuantity,
             IsAvailable = availableQuantity > 0,
             IsSelected = variant.Id == selectedVariantId,
             ColorHexCode = string.IsNullOrWhiteSpace(colorHexCode)
@@ -162,6 +164,10 @@ public class ProductVariantOptionViewModel
     public decimal OriginalPrice { get; init; }
     public decimal FinalPrice { get; init; }
     public int AvailableQuantity { get; init; }
+    public int? MaxPurchaseQuantityPerUser { get; init; }
+    public int? RemainingPurchaseQuantity { get; init; }
+    public int PurchaseQuantityLimit => Math.Min(AvailableQuantity,
+        RemainingPurchaseQuantity ?? MaxPurchaseQuantityPerUser ?? int.MaxValue);
     public bool IsAvailable { get; init; }
     public bool IsSelected { get; init; }
     public string? ImageUrl { get; init; }

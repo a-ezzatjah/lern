@@ -92,10 +92,14 @@
         }
         @if (Model.TotalPages > 1)
         {
-            <nav aria-label="صفحات نظرات" class="mt-6 flex items-center justify-between border-t border-gray-200 pt-4 text-sm dark:border-gray-700">
+            <nav aria-label="صفحات نظرات" class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-4 text-sm dark:border-gray-700">
                 <span class="text-gray-500 dark:text-gray-400">صفحه @Model.Page از @Model.TotalPages</span>
-                <div class="flex gap-2">
+                <div class="flex flex-wrap gap-2">
                     @if (Model.Page > 1) { <a asp-action="Comments" asp-route-page="@(Model.Page - 1)" asp-route-status="@Model.Status" asp-route-rating="@Model.Rating" asp-route-period="@Model.Period" asp-route-sort="@Model.Sort" class="rounded-lg border px-3 py-1 dark:border-gray-600 dark:text-white">قبلی</a> }
+                    @for (var number = Math.Max(1, Model.Page - 2); number <= Math.Min(Model.TotalPages, Model.Page + 2); number++)
+                    {
+                        <a asp-action="Comments" asp-route-page="@number" asp-route-status="@Model.Status" asp-route-rating="@Model.Rating" asp-route-period="@Model.Period" asp-route-sort="@Model.Sort" aria-current="@(number == Model.Page ? "page" : null)" class="rounded-lg border px-3 py-1 @(number == Model.Page ? "bg-primary text-white" : "dark:text-white") dark:border-gray-600">@number</a>
+                    }
                     @if (Model.Page < Model.TotalPages) { <a asp-action="Comments" asp-route-page="@(Model.Page + 1)" asp-route-status="@Model.Status" asp-route-rating="@Model.Rating" asp-route-period="@Model.Period" asp-route-sort="@Model.Sort" class="rounded-lg border px-3 py-1 dark:border-gray-600 dark:text-white">بعدی</a> }
                 </div>
             </nav>

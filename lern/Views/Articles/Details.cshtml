@@ -1,22 +1,29 @@
 @model ArticleDetailsViewModel
-@{ var article = Model.Article; ViewData["Title"] ??= article.Title; ViewData["MetaDescription"] ??= article.Summary; }
+@{
+    var article = Model.Article;
+    ViewData["Title"] ??= article.Title;
+    ViewData["MetaDescription"] ??= article.Summary;
+    var related = Model.Sidebar.Latest.Where(x => x.Id != article.Id).Take(2).ToList();
+}
 <link rel="stylesheet" href="~/assets/css/articles.css" asp-append-version="true">
-@* Adapted from Arino 5.2.0 / 1-Theme/FA/public/blog-single.html. *@
-<section class="py-5"><div class="container">
-    <nav class="article-breadcrumb" aria-label="مسیر صفحه"><a href="/">خانه</a><span> / </span><a href="/articles">مقالات</a><span> / </span><span>@article.Title</span></nav>
-    <main class="container !px-0 my-10"><div class="flex flex-col xl:flex-row gap-4 article-columns">
-        <article class="xl:w-3/4 bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden" itemscope itemtype="https://schema.org/BlogPosting">
-            <img src="@article.ImageUrl" alt="@article.ImageAlt" width="915" height="580" class="w-full h-64 md:h-96 object-cover article-detail-image" itemprop="image">
-            <div class="p-6 md:p-8 dark:bg-gray-800">
-                <div class="flex flex-wrap items-center gap-3 mb-6 text-sm text-gray-500 dark:text-gray-300"><a href="@Url.Action("Index", new { category = article.Category })" class="article-category-badge">@article.Category</a><time datetime="@article.PublishedAt?.ToString("yyyy-MM-dd")" itemprop="datePublished">@ArticleDisplay.Date(article.PublishedAt)</time><span>•</span><span>@ArticleDisplay.ReadingMinutes(article.Content) دقیقه مطالعه</span></div>
-                <h1 class="text-2xl md:text-3xl font-bold mb-6 dark:text-white" itemprop="headline">@article.Title</h1>
-                <div class="flex items-center mb-8 pb-6 border-b border-gray-200"><img src="/assets/images/mountainous-logo-transparent.png" alt="خرازی کوهستانی" class="w-12 h-12 object-contain"><div class="ms-4"><h4 class="font-medium dark:text-gray-300" itemprop="author">@article.Author</h4><p class="text-sm text-gray-500 dark:text-gray-300">مجله آموزش و ایده‌های خرازی</p></div></div>
-                <div class="article-content rich-content text-gray-700 dark:text-gray-300" itemprop="articleBody">
-                    @Html.Raw(lern.Infrastructure.RichText.Render(article.Content))
-                </div>
-                <div class="mt-8 pt-6 border-t border-gray-200"><a href="/articles" class="text-primary">← بازگشت به همه مقالات</a></div>
+<section class="journal journal-detail" aria-label="مقاله مجله کوهستانی">
+    <div class="article-reading-progress" aria-hidden="true"><span data-reading-progress></span></div>
+    <div class="journal-shell">
+        <nav class="article-breadcrumb" aria-label="مسیر صفحه"><a href="/">خانه</a><span aria-hidden="true">/</span><a href="/articles">مجله کوهستانی</a><span aria-hidden="true">/</span><span aria-current="page">@article.Title</span></nav>
+        <article itemscope itemtype="https://schema.org/BlogPosting">
+            <header class="article-heading">
+                <h1 itemprop="headline">@article.Title</h1><p class="article-lead" itemprop="description">@article.Summary</p>
+                <div class="article-heading-footer"><div class="article-author"><span class="article-author-avatar"><img src="/assets/images/mountainous-logo-transparent.png" alt="" width="48" height="48"></span><div><span itemprop="author">@article.Author</span><span class="article-author-caption">مجله خرازی کوهستانی</span></div></div><div class="article-meta"><time datetime="@article.PublishedAt?.ToString("yyyy-MM-dd")" itemprop="datePublished">@ArticleDisplay.Date(article.PublishedAt)</time><span class="article-meta-dot" aria-hidden="true"></span><span>@ArticleDisplay.ReadingMinutes(article.Content) دقیقه مطالعه</span></div></div>
+            </header>
+            <figure class="article-cover"><img src="@article.ImageUrl" alt="@article.ImageAlt" width="915" height="580" fetchpriority="high" itemprop="image"><figcaption>@article.ImageAlt</figcaption></figure>
+            <div class="article-reading-layout">
+                <div class="article-reading-main"><div class="article-content rich-content" itemprop="articleBody" data-article-body>@Html.Raw(lern.Infrastructure.RichText.Render(article.Content))</div><footer class="article-endnote"><span aria-hidden="true">✦</span><div><strong>ایده‌های خوب، با ساختن زنده می‌شوند.</strong><p>حالا نوبت شماست که آموخته‌ها را به یک دست‌سازهٔ زیبا تبدیل کنید.</p></div><a href="/articles">بیشتر بخوانید <span aria-hidden="true">←</span></a></footer></div>
+                <aside class="article-reader-sidebar"><div class="article-reader-sticky"><nav class="article-toc" aria-label="فهرست بخش‌های مقاله" data-article-toc hidden><span class="journal-eyebrow">در این مطلب</span><h2>مسیر مطالعه</h2><ol data-toc-list></ol></nav><div class="article-reader-note"><span aria-hidden="true">✳</span><h2>یک قدم نزدیک‌تر به خلق کردن</h2><p>نخ، سوزن و هر چیزی که برای ایدهٔ بعدی‌تان نیاز دارید.</p><a href="/shop">گشت‌وگذار در فروشگاه <span aria-hidden="true">←</span></a></div><a href="/articles" class="article-back-link"><span aria-hidden="true">→</span> بازگشت به مجله</a></div></aside>
             </div>
         </article>
-        <partial name="_Sidebar" model="Model.Sidebar" />
-    </div></main>
-</div></section>
+        @if (related.Count > 0) { <section class="article-related" aria-labelledby="article-related-title"><div class="journal-section-heading"><div><span class="journal-eyebrow">ادامهٔ مسیر یادگیری</span><h2 id="article-related-title">این مطالب را هم بخوانید</h2></div><a href="/articles" class="article-back-link">همه مطالب <span aria-hidden="true">←</span></a></div><div class="article-grid">@foreach (var item in related) { <partial name="_Card" model="item" /> }</div></section> }
+    </div>
+</section>
+@section Scripts {
+    <script src="~/assets/js/articles.js" asp-append-version="true" defer></script>
+}

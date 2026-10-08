@@ -3,33 +3,38 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Kohestani</title>
+    <title>@(ViewData["Title"]?.ToString()?.Contains("خرازی کوهستانی") == true ? ViewData["Title"] : $"{ViewData["Title"]} - خرازی کوهستانی")</title>
 
     @* ۱. بخش CSS ها را از index.html کپی کن و اینجا بگذار *@
     @* دقت کن مسیرها باید با /assets/ شروع شوند *@
 
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="@(ViewData["MetaDescription"] ?? "فروشگاه اینترنتی کوهستانی")">
     <meta name="keywords" content="@(ViewData["MetaKeywords"] ?? "فروشگاه اینترنتی")">
     <meta name="robots" content="@(ViewData["Robots"] ?? "index, follow")">
-    <meta name="author" content="آرینو">
-    <meta name="copyright" content="All rights belong to Arino.">
+    <meta name="author" content="علی عزت جاه">
+    <meta name="copyright" content="خرازی کوهستانی">
+    <meta property="og:locale" content="fa_IR">
+    <meta property="og:site_name" content="خرازی کوهستانی">
+    <meta property="og:type" content="@(ViewData["OgType"] ?? "website")">
+    <meta property="og:title" content="@ViewData["Title"]">
+    <meta property="og:description" content="@(ViewData["MetaDescription"] ?? "فروش عمده و خرده لوازم خیاطی، خرج کار لباس و یراق‌آلات در خرازی کوهستانی")">
     <link rel="apple-touch-icon" sizes="180x180" href="~/assets/images/favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="~/assets/images/favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="~/assets/images/favicon_io/favicon-16x16.png">
     @if (ViewData["CanonicalUrl"] is string canonicalUrl && !string.IsNullOrWhiteSpace(canonicalUrl))
     {
         <link rel="canonical" href="@canonicalUrl">
+        <meta property="og:url" content="@canonicalUrl">
     }
     <link rel="stylesheet" href="~/assets/js/plugin/story-player/styles.css">
     <link rel="stylesheet" href="~/assets/js/plugin/swiper/swiper-bundle.min.css">
     <link rel="stylesheet" href="~/assets/css/app.css" asp-append-version="true">
     <link rel="stylesheet" href="~/assets/css/rich-editor.css" asp-append-version="true">
     <link rel="stylesheet" href="~/assets/css/category-menu.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/assets/css/store-support.css" asp-append-version="true">
     <link rel="preload" href="~/assets/fonts/payda/PeydaWebFaNum-Medium.woff2" as="font" type="font/woff2" crossorigin>
-
+    @await RenderSectionAsync("Head", required: false)
 </head>
 <body class="bg-light dark:bg-zinc-900 text-text-primary-light dark:text-text-primary-dark transition-colors duration-200">
 
@@ -107,7 +112,7 @@
                                 </button>
                                 <!-- dark mode -->
                                 <div class="md:ms-5 ms-2">
-                                    <button id="dark-mode-toggle">
+                                    <button id="dark-mode-toggle" type="button" aria-label="تغییر حالت روشن و تاریک">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="lg:size-8 size-6 dark:block hidden dark:text-white">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
                                         </svg>
@@ -165,7 +170,7 @@
                                     </a>
                                 </li>
                                 <li class="py-2">
-                                    <a href="" class="flex space-x-3 hover:text-primary transition">
+                                    <a href="/faq" class="flex space-x-3 hover:text-primary transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -175,7 +180,7 @@
                                     </a>
                                 </li>
                                 <li class="py-2">
-                                    <a href="" class="flex space-x-3 hover:text-primary transition">
+                                    <a href="/account/orders" class="flex space-x-3 hover:text-primary transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -195,7 +200,7 @@
                                     </a>
                                 </li>
                                 <li class="py-2">
-                                    <a href="" class="flex space-x-3 hover:text-primary transition">
+                                    <a href="/contact" class="flex space-x-3 hover:text-primary transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -219,171 +224,7 @@
         @RenderBody()
     </main>
 
-    @* ۳. بخش Footer را از index.html کپی کن و اینجا بگذار *@
-    <section class="py-5 dark:text-white dark:bg-gray-800 bg-white drop-shadow-md border-t border-gray-200" itemscope itemtype="http://schema.org/WPFooter">
-        <div class="container">
-            <!-- Logo and Back to Top -->
-            <div class="grid gap-4 grid-cols-4 place-items-center" itemscope itemtype="http://schema.org/Organization">
-                <div class="sm:col-span-3 col-span-2 w-full">
-                    <a href="/" itemprop="url">
-                        <figure itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
-                            <img src="/assets/images/mountainous-logo-transparent.png" class="site-logo site-logo-footer" alt="لوگوی خرازی کوهستانی" itemprop="contentUrl">
-                            <meta itemprop="caption" content="لوگوی رسمی خرازی کوهستانی">
-                        </figure>
-                    </a>
-                </div>
-                <div class="sm:col-span-1 col-span-2 w-full">
-                    <div class="text-end">
-                        <a href="#top" class="inline-flex border px-4 py-1.5 item-center justify-between rounded-lg" aria-label="بازگشت به بالای صفحه">
-                            <span>بازگشت بالا</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 ms-4">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <!-- Contact Information -->
-            <div class="flex my-10 items-start flex-wrap space-y-4 space-x-4 divide-x-2  sm:divide-neutral-600 divide-transparent" itemscope itemtype="http://schema.org/ContactPoint">
-                <div class="space-x-3 pe-2" itemprop="contactOption" itemscope itemtype="http://schema.org/ContactPoint">
-                    <span class="inline-block">شماره تماس:</span>
-                    <span class="inline-block" itemprop="telephone">021-12345678</span>
-                </div>
-                <div class="space-x-3 pe-2" itemprop="contactOption" itemscope itemtype="http://schema.org/ContactPoint">
-                    <span class="inline-block">آدرس ایمیل:</span>
-                    <a href="mailto:site@gmail.com" class="inline-block" itemprop="email">site@gmail.com</a>
-                </div>
-                <div class="space-x-3 pe-2">
-                    <meta itemprop="hoursAvailable" content="Mo-Su,00:00-23:59">
-                    <span class="inline-block">هفت روز هفته ، 24 ساعت شبانه‌روز پاسخگوی شما هستیم.</span>
-                </div>
-            </div>
-            <!-- Menu Columns -->
-            <div class="grid gap-4 grid-cols-4 place-items-start">
-                <div class="lg:col-span-1 sm:col-span-2 col-span-4 w-full">
-                    <h4 class="font-bold text-lg mb-5" aria-label="راهنمای خرید">راهنمای خرید</h4>
-                    <ul class="space-y-4 mt-1" role="menu">
-                        <li role="menuitem"><a href="/order-guide" itemprop="significantLink">نحوه ثبت سفارش</a></li>
-                        <li role="menuitem"><a href="/shipping-policy" itemprop="significantLink">رویه ارسال سفارش</a></li>
-                        <li role="menuitem"><a href="/payment-methods" itemprop="significantLink">شیوه های پرداخت</a></li>
-                        <li role="menuitem"><a href="/return-policy" itemprop="significantLink">رویه های بازگرداندن کالا</a></li>
-                    </ul>
-                </div>
-                <div class="lg:col-span-1 sm:col-span-2 col-span-4 w-full">
-                    <h4 class="font-bold text-lg mb-5" aria-label="سیاست‌های فروشگاه">فروشگاه</h4>
-                    <ul class="space-y-4 mt-1" role="menu">
-                        <li role="menuitem"><a href="/privacy" itemprop="significantLink">حریم خصوصی</a></li>
-                        <li role="menuitem"><a href="/terms" itemprop="significantLink">شرایط استفاده</a></li>
-                        <li role="menuitem"><a href="/return-policy" itemprop="significantLink">رویه های بازگرداندن کالا</a></li>
-                        <li role="menuitem"><a href="/faq" itemprop="significantLink">پاسخ به پرسش های متداول</a></li>
-                    </ul>
-                </div>
-                <div class="lg:col-span-1 sm:col-span-2 col-span-4 w-full">
-                    <h4 class="font-bold text-lg mb-5" aria-label="درباره ما">درباره ما</h4>
-                    <ul class="space-y-4 mt-1" role="menu">
-                        <li role="menuitem"><a href="/newsroom" itemprop="significantLink">اتاق خبر</a></li>
-                        <li role="menuitem"><a href="/sell-with-us" itemprop="significantLink">فروش در فروشگاه ما</a></li>
-                        <li role="menuitem"><a href="/careers" itemprop="significantLink">فرصت های شغلی</a></li>
-                        <li role="menuitem"><a href="/contact" itemprop="significantLink">تماس با ما</a></li>
-                    </ul>
-                </div>
-                <div class="lg:col-span-1 sm:col-span-2 col-span-4 w-full">
-                    <h4 class="font-bold text-lg mb-5" aria-label="شبکه‌های اجتماعی">رسانه های خبری ما</h4>
-                    <ul class="flex items-center space-x-4" role="list">
-                        <li role="listitem"><a href="rubika-link" itemprop="sameAs"><img src="/assets/images/social/rubika.png" alt="ربیکا" class="size-7"></a></li>
-                        <li role="listitem"><a href="aparat-link" itemprop="sameAs"><img src="/assets/images/social/aparat.png" alt="آپارات" class="size-7"></a></li>
-                        <li role="listitem"><a href="bale-link" itemprop="sameAs"><img src="/assets/images/social/bale.png" alt="بله" class="size-7"></a></li>
-                        <li role="listitem"><a href="eitta-link" itemprop="sameAs"><img src="/assets/images/social/eitta.png" alt="ایتا" class="size-7"></a></li>
-                        <li role="listitem"><a href="igap-link" itemprop="sameAs"><img src="/assets/images/social/igap.png" alt="ایگپ" class="size-7"></a></li>
-                        <li role="listitem"><a href="sorush-link" itemprop="sameAs"><img src="/assets/images/social/sorush.png" alt="سروش" class="size-7"></a></li>
-                    </ul>
-                    <h4 class="font-bold text-lg my-5" aria-label="عضویت در خبرنامه">عضویت در خبرنامه</h4>
-                    <form action="/newsletter" method="POST" itemprop="potentialAction" itemscope itemtype="http://schema.org/SubscribeAction">
-                        <meta itemprop="target" content="/newsletter-subscribe">
-                        <div class="flex items-center">
-                            <input type="tel" name="mobile" inputmode="numeric" pattern="[0-9]*"
-                                   class="w-full dark:bg-zinc-700 placeholder-dir focus:ring-primary direction outline-0 focus:border-primary border-2 border-transparent rounded-xl bg-gray-200 border-gray-300 py-4 px-3"
-                                   placeholder="شماره موبایل خود را وارد کنید"
-                                   itemprop="query-input">
-                            <button type="submit" class="bg-primary-grad ms-2 py-4 px-6 text-white rounded-xl" aria-label="ثبت شماره موبایل">ثبت</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <!-- Application Download -->
-            <div class="grid gap-4 bg-primary-grad no-hover px-4 py-5 rounded-xl mt-5 grid-cols-4 place-items-center">
-                <div class="lg:col-span-1 col-span-4 w-full">
-                    <h4 class="font-bold text-xl text-white">دانلود اپلیکیشن فروشگاهی آرینو</h4>
-                </div>
-                <div class="lg:col-span-3 col-span-4 w-full">
-                    <ul class="flex items-center justify-end space-x-3">
-                        <li>
-                            <a href="play-store-link" itemprop="downloadUrl" itemscope itemtype="http://schema.org/SoftwareApplication">
-                                <meta itemprop="applicationCategory" content="BusinessApplication">
-                                <img src="/assets/images/application/google-play-app.svg" alt="دانلود از گوگل پلی" class="h-12">
-                            </a>
-                        </li>
-                        <li>
-                            <a href="sibapp-link" itemprop="downloadUrl" itemscope itemtype="http://schema.org/SoftwareApplication">
-                                <meta itemprop="operatingSystem" content="Android">
-                                <img src="/assets/images/application/app-sibapp.svg" alt="دانلود از سیب‌اپ" class="h-12">
-                            </a>
-                        </li>
-                        <li>
-                            <a href="bazar-link" itemprop="downloadUrl" itemscope itemtype="http://schema.org/SoftwareApplication">
-                                <meta itemprop="operatingSystem" content="Android">
-                                <img src="/assets/images/application/bazar-app.svg" alt="دانلود از بازار" class="h-12">
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!-- Description & Trust Seals -->
-            <div class="grid gap-4 grid-cols-4 mt-10">
-                <div class="lg:col-span-3 col-span-4" itemprop="description">
-                    <h5 class="font-bold mb-5">فروشگاه اینترنتی آرینو، بررسی، انتخاب و خرید آنلاین</h5>
-                    <p class="text-neutral-600 dark:text-white leading-9">
-                        آرینو به عنوان یکی از قدیمی‌ترین فروشگاه های اینترنتی با بیش از یک دهه تجربه، با پایبندی به سه اصل، پرداخت در محل، ۷ روز ضمانت بازگشت کالا و تضمین اصل‌بودن کالا موفق شده تا همگام با فروشگاه‌های معتبر جهان، به بزرگ‌ترین فروشگاه اینترنتی ایران تبدیل شود.
-                    </p>
-                </div>
-                <div class="lg:col-span-1 col-span-4">
-                    <ul class="flex lg:justify-end justify-center items-center space-x-4">
-                        <li class="border border-gray-300 p-3 rounded-xl">
-                            <a href="/trust-seals" itemscope itemtype="https://schema.org/ImageObject">
-                                <img src="/assets/images/namad/namad-01.png" class="h-25" alt="نماد اعتماد الکترونیک" itemprop="contentUrl">
-                                <meta itemprop="caption" content="نماد رسمی اعتماد الکترونیک">
-                            </a>
-                        </li>
-                        <li class="border border-gray-300 p-3 rounded-xl">
-                            <a href="/enamad-verify" itemscope itemtype="https://schema.org/ImageObject">
-                                <img src="/assets/images/namad/enamad.png" class="h-25" alt="اینماد" itemprop="contentUrl">
-                                <meta itemprop="license" content="https://enamad.ir">
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!-- Copyright -->
-            <div class="grid gap-4 grid-cols-4 mt-10">
-                <div class="lg:col-span-3 col-span-4">
-                    <p class="text-neutral-500 dark:text-white leading-9" itemprop="copyrightNotice">
-                        استفاده از مطالب فروشگاه اینترنتی آرینو فقط برای مقاصد غیرتجاری و با ذکر منبع بلامانع است.
-                        <span itemprop="copyrightYear">2006-2024</span> کلیه حقوق این سایت متعلق به
-                        <span itemprop="copyrightHolder" itemscope itemtype="http://schema.org/Organization">
-                            <span itemprop="name">آرینو</span>
-                        </span> می‌باشد.
-                    </p>
-                </div>
-                <div class="lg:col-span-1 col-span-4">
-                    <p class="text-neutral-500 dark:text-white sm:text-end text-center leading-9">
-                        طراحی و توسعه توسط
-                        <a href="https://amir-rezaie.ir" itemprop="author">امیررضایی</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-    @* پایان فوتر  *@
+    <partial name="_StoreFooter" />
     <!-- ================= start cart offcanvas ================= -->
     <!-- Offcanvas Cart -->
     <div id="offcanvas-left"
@@ -609,6 +450,7 @@
     </script>
 
     @* ۴. بخش JS ها را از انتهای index.html کپی کن و اینجا بگذار *@
+    <script src="~/assets/js/store-support.js" asp-append-version="true" defer></script>
     @await RenderSectionAsync("Scripts", required: false)
 <partial name="_FavoriteAssets" />
 </body>

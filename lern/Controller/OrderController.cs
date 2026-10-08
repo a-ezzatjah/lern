@@ -13,7 +13,7 @@ public class OrderController : ControllerBase
 {
     private readonly ShopDbContext _db;
     public OrderController(ShopDbContext db) => _db = db;
-    private string Key => Request.Cookies["customer-key"] ?? "guest";
+    private string Key => PurchaseLimitPolicy.AccountKey(User) ?? Request.Cookies["customer-key"] ?? "guest";
 
     [HttpGet]
     public async Task<IActionResult> Mine() => Ok(await _db.Orders.AsNoTracking().Include(x => x.Items)
@@ -41,7 +41,7 @@ public class OrderController : ControllerBase
     [HttpPost("checkout")]
     public async Task<IActionResult> Checkout(CheckoutRequest request)
     {
-        if (Request.Cookies["customer-key"] is null) return BadRequest("شناسه مشتری وجود ندارد؛ ابتدا سبد خرید را دریافت کنید.");
+        if (PurchaseLimitPolicy.AccountKey(User) is null && Request.Cookies["customer-key"] is null) return BadRequest("شناسه مشتری وجود ندارد؛ ابتدا سبد خرید را دریافت کنید.");
         if (request.ShippingCost != 300000)
             return BadRequest("هزینه ارسال انتخاب‌شده معتبر نیست.");
         if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName) || string.IsNullOrWhiteSpace(request.Phone))
@@ -52,12 +52,15 @@ public class OrderController : ControllerBase
             || Key != $"user-{userId}" || !await _db.Users.AnyAsync(x => x.Id == userId && x.IsActive)))
             return BadRequest("برای استفاده از کوپن باید با حساب فعال خود وارد شوید.");
         await using var tx = await _db.Database.BeginTransactionAsync();
+        await PurchaseLimitPolicy.LockCustomerAsync(_db, Key);
         var cart = await _db.CartItems.Include(x => x.Product).Include(x => x.ProductVariant)
             .Where(x => x.CustomerKey == Key).ToListAsync();
         if (cart.Count == 0) return BadRequest("سبد خرید خالی است.");
         var order = new Order { CustomerKey = Key, Status = OrderStatus.Pending, CustomerFirstName = request.FirstName.Trim(), CustomerLastName = request.LastName.Trim(), CustomerPhone = request.Phone.Trim() };
         foreach (var c in cart)
         {
+            var limitError = await PurchaseLimitPolicy.ValidateAsync(_db, User, c.ProductVariant, c.Quantity);
+            if (limitError is not null) return BadRequest($"«{c.Product.Name}»: {limitError}");
             var available = c.ProductVariant.StockQuantity - c.ProductVariant.ReservedQuantity;
             if (available < c.Quantity) return BadRequest($"موجودی «{c.Product.Name}» کافی نیست.");
             var unitPrice = CartPricing.GetFinalPrice(c.Product, c.ProductVariant, DateTime.UtcNow);
@@ -93,10 +96,20 @@ public class OrderController : ControllerBase
     [HttpPost("{id}/pay")]
     public async Task<IActionResult> Pay(int id)
     {
+        await using var tx = await _db.Database.BeginTransactionAsync();
+        await PurchaseLimitPolicy.LockCustomerAsync(_db, Key);
         var order = await _db.Orders.Include(x => x.Items).ThenInclude(x => x.ProductVariant)
             .SingleOrDefaultAsync(x => x.Id == id && x.CustomerKey == Key);
         if (order is null) return NotFound();
-        if (order.Status == OrderStatus.Paid) return Ok(new { order.Id, order.Status });
+        if (order.Status is OrderStatus.Paid or OrderStatus.Processing or OrderStatus.Shipped or OrderStatus.Completed)
+            return Ok(new { order.Id, order.Status });
+        if (order.Status != OrderStatus.Pending) return Conflict("سفارش لغوشده قابل پرداخت نیست.");
+        foreach (var group in order.Items.GroupBy(x => x.ProductVariantId))
+        {
+            var limitError = await PurchaseLimitPolicy.ValidateAsync(_db, User, group.First().ProductVariant,
+                group.Sum(x => (long)x.Quantity), order.Id);
+            if (limitError is not null) return BadRequest(limitError);
+        }
         foreach (var item in order.Items)
         {
             item.ProductVariant.ReservedQuantity = Math.Max(0, item.ProductVariant.ReservedQuantity - item.Quantity);
@@ -104,7 +117,9 @@ public class OrderController : ControllerBase
         }
         order.Status = OrderStatus.Paid;
         _db.PaymentTransactions.Add(new PaymentTransaction { OrderId = id, Amount = order.Total, Status = PaymentStatus.Successful, Gateway = "manual", Reference = Guid.NewGuid().ToString("N") });
-        await _db.SaveChangesAsync(); return Ok(new { order.Id, order.Status });
+        await _db.SaveChangesAsync();
+        await tx.CommitAsync();
+        return Ok(new { order.Id, order.Status });
     }
 
     private async Task<(DiscountCoupon? Coupon, string? Error, decimal Discount)> ValidateCoupon(

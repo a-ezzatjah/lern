@@ -98,16 +98,28 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
 
     [Authorize]
     [HttpGet("/account/discounts")]
-    public async Task<IActionResult> Discounts()
+    public async Task<IActionResult> Discounts(string? tab = null, int page = 1)
     {
         if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) return Forbid();
+        tab = tab is "used" or "expired" ? tab : "active";
+        var now = DateTime.UtcNow;
+        var coupons = _db.DiscountCoupons.AsNoTracking()
+            .Where(x => x.RecipientUserId == null || x.RecipientUserId == userId);
+        var usedIds = _db.CouponRedemptions.Where(x => x.UserId == userId).Select(x => x.CouponId);
+        coupons = tab switch
+        {
+            "used" => coupons.Where(x => usedIds.Contains(x.Id)),
+            "expired" => coupons.Where(x => !usedIds.Contains(x.Id) && (!x.IsActive || x.ExpiresAt <= now)),
+            _ => coupons.Where(x => !usedIds.Contains(x.Id) && x.IsActive && x.ExpiresAt > now)
+        };
+        const int pageSize = 10;
+        var total = await coupons.CountAsync();
+        page = Math.Clamp(page, 1, Math.Max(1, (total + pageSize - 1) / pageSize));
         return View(new AccountDiscountsViewModel
         {
-            Coupons = await _db.DiscountCoupons.AsNoTracking()
-                .Where(x => x.RecipientUserId == null || x.RecipientUserId == userId)
-                .OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id).ToListAsync(),
-            UsedCouponIds = (await _db.CouponRedemptions.AsNoTracking().Where(x => x.UserId == userId)
-                .Select(x => x.CouponId).ToListAsync()).ToHashSet()
+            Coupons = await coupons.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
+                .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(),
+            Tab = tab, Page = page, TotalCount = total
         });
     }
 
@@ -157,8 +169,12 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
         search = search?.Trim().TrimStart('#');
         if (!string.IsNullOrEmpty(search))
         {
+            search = string.Concat(search.Select(c => c is >= '۰' and <= '۹' ? (char)('0' + c - '۰') :
+                c is >= '٠' and <= '٩' ? (char)('0' + c - '٠') : c));
             if (int.TryParse(search, out var orderId)) orders = orders.Where(x => x.Id == orderId);
             else orders = orders.Where(x => false);
+            // An order-number lookup covers all of this customer's orders, regardless of list filters.
+            status = null; period = null; amount = null;
         }
         if (status.HasValue && Enum.IsDefined(status.Value)) orders = orders.Where(x => x.Status == status.Value);
         else status = null;
@@ -272,8 +288,8 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
         query = sort switch
         {
             "oldest" => query.OrderBy(x => x.CreatedAt).ThenBy(x => x.Id),
-            "highest" => query.OrderByDescending(x => _db.ProductRatings.Where(r => r.ProductId == x.ProductId && r.CustomerKey == key).Select(r => (int?)r.Score).FirstOrDefault()).ThenByDescending(x => x.CreatedAt),
-            "lowest" => query.OrderBy(x => _db.ProductRatings.Where(r => r.ProductId == x.ProductId && r.CustomerKey == key).Select(r => (int?)r.Score).FirstOrDefault()).ThenByDescending(x => x.CreatedAt),
+            "highest" => query.OrderByDescending(x => _db.ProductRatings.Where(r => r.ProductId == x.ProductId && r.CustomerKey == key).Select(r => (int?)r.Score).FirstOrDefault()).ThenByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id),
+            "lowest" => query.OrderBy(x => _db.ProductRatings.Where(r => r.ProductId == x.ProductId && r.CustomerKey == key).Select(r => (int?)r.Score).FirstOrDefault()).ThenByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id),
             _ => query.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
         };
         const int pageSize = 10;

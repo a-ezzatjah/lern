@@ -24,7 +24,7 @@ public class SeoResultFilter(SeoCatalog catalog, ShopDbContext db) : IAsyncResul
             }
             else if (path == "/articles") filtered = request.Query.Count > 0;
             var data = view.ViewData ?? controller.ViewData;
-            var publicPage = path is "/" or "/shop" or "/articles" || path.StartsWith("/shop?category=") ||
+            var publicPage = path is "/" or "/shop" or "/articles" || StoreSupportContent.Pages.Any(x => x.Path == path) || path.StartsWith("/shop?category=") ||
                 path.StartsWith("/product/") || path.StartsWith("/articles/");
             if (publicPage)
             {

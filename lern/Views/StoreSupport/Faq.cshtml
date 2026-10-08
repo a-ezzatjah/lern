@@ -1,0 +1,8 @@
+@using lern.Infrastructure
+@{ ViewData["SupportIntro"] = "پاسخ‌های کوتاه برای انتخاب بهتر و خرید راحت‌تر."; }
+@section Head { <partial name="_StructuredData" /> }
+<div class="ks-support-page"><partial name="_Hero" />
+    <div class="ks-faq-layout"><aside class="ks-panel ks-faq-aside"><span class="ks-feature-icon"><svg aria-hidden="true"><use href="#ks-i-chat" /></svg></span><h2>دنبال پاسخ هستید؟</h2><p>سوال‌های رایج درباره محصولات، خرید و پیگیری سفارش را اینجا بخوانید.</p><label class="ks-search-label" for="ks-faq-search">جست‌وجو در سوال‌ها</label><input id="ks-faq-search" type="search" placeholder="مثلاً خرید عمده یا ارسال…" class="ks-input" autocomplete="off" /><a href="/contact" class="ks-text-link">پاسخ را پیدا نکردید؟ <svg aria-hidden="true"><use href="#ks-i-arrow" /></svg></a></aside>
+    <section class="ks-faq-list" aria-label="سوالات و پاسخ‌ها">@for (var i = 0; i < StoreSupportContent.Questions.Length; i++) { var question = StoreSupportContent.Questions[i]; <details class="ks-faq-item" open="@(i == 0)"><summary><span><small>@question.Category</small>@question.Question</span><span class="ks-faq-plus" aria-hidden="true"></span></summary><div class="ks-faq-answer"><p>@question.Answer</p></div></details> }<p id="ks-faq-empty" class="ks-panel" role="status" hidden>سوالی با این عبارت پیدا نشد. برای دریافت پاسخ با فروشگاه تماس بگیرید.</p></section></div>
+</div>
+

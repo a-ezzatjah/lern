@@ -67,7 +67,8 @@ public sealed class ShopController(ShopDbContext db, IProductService products) :
     public async Task<IActionResult> Suggest(string? q)
     {
         q = q?.Trim();
-        if (string.IsNullOrWhiteSpace(q) || q.Length < 2) return Ok(new { items = Array.Empty<object>(), hasMore = false });
+        if (string.IsNullOrWhiteSpace(q) || (q.Length < 2 && !char.IsDigit(q[0])))
+            return Ok(new { items = Array.Empty<object>(), hasMore = false });
         if (q.Length > 100) q = q[..100];
         var results = await products.GetShopProductCardsAsync(q, [], false, "newest", null, null, 0, 10);
         return Ok(new { items = results.Items.Select(p => new { p.Id, p.Name, p.PrimaryImageUrl }), hasMore = results.TotalCount > results.Items.Count });

@@ -12,8 +12,24 @@ namespace lern.Controller;
 public class AdminArticlesController(ShopDbContext db, IWebHostEnvironment environment) : Microsoft.AspNetCore.Mvc.Controller
 {
     [HttpGet("")]
-    public async Task<IActionResult> Index() => View("~/Views/Admin/Articles/Index.cshtml",
-        await db.Articles.AsNoTracking().OrderByDescending(x => x.CreatedAt).ToListAsync());
+    public async Task<IActionResult> Index(string? q = null, int page = 1)
+    {
+        const int pageSize = 10;
+        q = q?.Trim();
+        var query = db.Articles.AsNoTracking();
+        if (!string.IsNullOrEmpty(q))
+            query = query.Where(x => x.Title.Contains(q) || x.Summary.Contains(q) ||
+                x.Category.Contains(q) || x.Author.Contains(q) || x.Slug.Contains(q));
+        var totalCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        page = Math.Clamp(page, 1, Math.Max(1, totalPages));
+        return View("~/Views/Admin/Articles/Index.cshtml", new AdminArticleListViewModel
+        {
+            Articles = await query.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
+                .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(),
+            Query = q, Page = page, TotalPages = totalPages, TotalCount = totalCount
+        });
+    }
 
     [HttpGet("create")]
     public IActionResult Create() => View("~/Views/Admin/Articles/Form.cshtml", new ArticleForm());

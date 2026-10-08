@@ -30,6 +30,7 @@ namespace Entities
 
         public int StockQuantity { get; set; } // موجودی واقعی فیزیکی در انبار
         public int ReservedQuantity { get; set; } // موجودی رزرو شده (مثلاً در سبد خریدهای معلق)
+        public int? MaxPurchaseQuantityPerUser { get; set; }
       
 
         public int AvailableQuantity => StockQuantity - ReservedQuantity;

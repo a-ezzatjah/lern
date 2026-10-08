@@ -1,12 +1,39 @@
-@model List<Entities.Article>
+@model lern.Models.AdminArticleListViewModel
 @{ Layout = "_AdminLayout"; ViewData["Title"] = "مقالات"; }
 <link rel="stylesheet" href="~/assets/css/admin-articles.css" asp-append-version="true">
 <section class="admin-card article-admin-card">
     <div class="article-admin-heading"><h1 class="text-2xl font-bold">مقالات</h1><a href="/Admin/Articles/create" class="article-admin-button bg-primary-grad text-white">+ درج مقاله</a></div>
     @if (TempData["ArticleMessage"] is string message) { <p role="status" class="article-admin-message">@message</p> }
+    <form method="get" action="/Admin/Articles" class="article-admin-search" role="search">
+        <label for="article-search">جست‌وجوی مقاله</label>
+        <div class="article-admin-search-controls">
+            <input id="article-search" type="search" name="q" value="@Model.Query" placeholder="عنوان، خلاصه، دسته‌بندی یا نویسنده">
+            <button type="submit" class="article-admin-button bg-primary-grad text-white">جست‌وجو</button>
+            @if (!string.IsNullOrEmpty(Model.Query)) { <a href="/Admin/Articles" class="text-primary">پاک کردن جست‌وجو</a> }
+        </div>
+    </form>
+    <p class="article-admin-results" role="status">@Model.TotalCount مقاله</p>
     <div class="article-admin-table"><table><thead><tr><th>تصویر</th><th>عنوان مقاله</th><th>دسته‌بندی</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>
-        @foreach (var article in Model)
+        @foreach (var article in Model.Articles)
         { <tr><td><img src="@article.ImageUrl" alt="@article.ImageAlt" width="90" height="57"></td><td>@article.Title</td><td>@article.Category</td><td>@(article.IsPublished ? "منتشرشده" : "پیش‌نویس")</td><td><a href="/Admin/Articles/@article.Id/edit" class="text-primary">ویرایش</a> @if (article.IsPublished) { <a href="/articles/@article.Slug" class="text-primary"> | مشاهده</a> }</td></tr> }
     </tbody></table></div>
-    @if (Model.Count == 0) { <p>هنوز مقاله‌ای ثبت نشده است.</p> }
+    @if (Model.Articles.Count == 0) { <p>@(string.IsNullOrEmpty(Model.Query) ? "هنوز مقاله‌ای ثبت نشده است." : "مقاله‌ای با این عبارت پیدا نشد.")</p> }
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="article-admin-pagination" aria-label="صفحه‌بندی مقالات">
+            @if (Model.Page > 1)
+            {
+                <a href="@Url.Action("Index", "AdminArticles", new { q = Model.Query, page = Model.Page - 1 })" class="article-admin-page">قبلی</a>
+            }
+            @for (var pageNumber = Math.Max(1, Model.Page - 2); pageNumber <= Math.Min(Model.TotalPages, Model.Page + 2); pageNumber++)
+            {
+                <a href="@Url.Action("Index", "AdminArticles", new { q = Model.Query, page = pageNumber })" class="article-admin-page @(pageNumber == Model.Page ? "is-current" : "")" aria-current="@(pageNumber == Model.Page ? "page" : null)">@pageNumber</a>
+            }
+            @if (Model.Page < Model.TotalPages)
+            {
+                <a href="@Url.Action("Index", "AdminArticles", new { q = Model.Query, page = Model.Page + 1 })" class="article-admin-page">بعدی</a>
+            }
+            <span>صفحه @Model.Page از @Model.TotalPages</span>
+        </nav>
+    }
 </section>

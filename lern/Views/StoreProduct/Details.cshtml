@@ -674,7 +674,9 @@
                                         <button type="button"
                                                 class="sale-option-button w-full text-start text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-200 @(choices.Any(x => x.IsSelected) ? "is-selected" : "")"
                                                 data-variant-id="@firstChoice.Id"
-                                                data-max-quantity="@firstChoice.AvailableQuantity"
+                                                data-max-quantity="@firstChoice.PurchaseQuantityLimit"
+                                                data-purchase-limit="@firstChoice.MaxPurchaseQuantityPerUser"
+                                                data-purchase-remaining="@firstChoice.RemainingPurchaseQuantity"
                                                 data-price="@firstChoice.PriceDataValue"
                                                 data-original-price="@firstChoice.OriginalPriceDataValue"
                                                 data-discount-percent="@firstChoice.DiscountPercentDataValue">
@@ -686,7 +688,9 @@
                                                 <button type="button"
                                                         class="variant-choice text-xs text-gray-600 dark:text-gray-200 @(choice.IsSelected ? "is-selected border-primary-500 bg-primary-50 text-primary-700 dark:bg-gray-700 dark:text-white" : "")"
                                                         data-variant-id="@choice.Id"
-                                                        data-max-quantity="@choice.AvailableQuantity"
+                                                        data-max-quantity="@choice.PurchaseQuantityLimit"
+                                                        data-purchase-limit="@choice.MaxPurchaseQuantityPerUser"
+                                                        data-purchase-remaining="@choice.RemainingPurchaseQuantity"
                                                         data-price="@choice.PriceDataValue"
                                                         data-original-price="@choice.OriginalPriceDataValue"
                                                         data-discount-percent="@choice.DiscountPercentDataValue"
@@ -822,13 +826,22 @@
                                     <button id="add-to-cart-button"
                                             type="button"
                                             data-variant-id="@selectedVariant?.Id"
-                                            data-max-quantity="@selectedVariant?.AvailableQuantity"
+                                            data-max-quantity="@selectedVariant?.PurchaseQuantityLimit"
                                             class="bg-green-600 w-full mt-3 hover:bg-green-700 text-white font-semibold rounded-md px-6 py-3 text-sm disabled:cursor-not-allowed disabled:bg-gray-400"
-                                            disabled="@(hasAvailableVariant ? null : "disabled")">
+                                            disabled="@(hasAvailableVariant && selectedVariant?.PurchaseQuantityLimit > 0 ? null : "disabled")">
                                         افزودن به سبد خرید
                                     </button>
                                     <p id="add-to-cart-status" class="mt-2 text-center text-sm" role="status"></p>
                                 </div>
+                                <p id="purchase-limit-hint" class="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+                                    @if (selectedVariant?.MaxPurchaseQuantityPerUser is int purchaseLimit)
+                                    {
+                                        @if (lern.Infrastructure.PurchaseLimitPolicy.AccountKey(User) is null)
+                                        { <span>سقف مجموع خرید این حالت فروش @purchaseLimit واحد است. برای خرید، وارد حساب کاربری شوید.</span> }
+                                        else
+                                        { <span>سقف مجموع خرید: @purchaseLimit واحد؛ سهمیه باقی‌مانده با احتساب سفارش‌های قبلی: @selectedVariant.RemainingPurchaseQuantity واحد.</span> }
+                                    }
+                                </p>
                                 @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
                                 {
                                     <p class="mt-6 border-t border-gray-200 pt-3 text-sm leading-7 text-gray-600 dark:border-zinc-600 dark:text-gray-300" itemprop="description">
@@ -2841,6 +2854,14 @@
                 if (!button || button.disabled) return;
                 cartButton.dataset.variantId = button.dataset.variantId || '';
                 cartButton.dataset.maxQuantity = button.dataset.maxQuantity || '0';
+                const limitHint = document.getElementById('purchase-limit-hint');
+                if (limitHint) {
+                    const limit = Number(button.dataset.purchaseLimit);
+                    const signedIn = @((lern.Infrastructure.PurchaseLimitPolicy.AccountKey(User) is not null).ToString().ToLowerInvariant());
+                    limitHint.textContent = !limit ? '' : !signedIn
+                        ? 'سقف مجموع خرید این حالت فروش ' + limit.toLocaleString('fa-IR') + ' واحد است. برای خرید، وارد حساب کاربری شوید.'
+                        : 'سقف مجموع خرید: ' + limit.toLocaleString('fa-IR') + ' واحد؛ سهمیه باقی‌مانده با احتساب سفارش‌های قبلی: ' + Number(button.dataset.purchaseRemaining || 0).toLocaleString('fa-IR') + ' واحد.';
+                }
                 if (priceElement && button.dataset.price) {
                     const price = Number(button.dataset.price);
                     priceElement.textContent = Number.isFinite(price)

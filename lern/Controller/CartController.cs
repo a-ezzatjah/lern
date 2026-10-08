@@ -61,13 +61,17 @@ public class CartController : ControllerBase
     public async Task<IActionResult> Add(AddCartItemRequest request)
     {
         var customerKey = EnsureCustomerKey();
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        await PurchaseLimitPolicy.LockCustomerAsync(_db, customerKey);
         var variant = await _db.ProductVariants.Include(x => x.ProductSaleOption).ThenInclude(x => x.Product)
             .SingleOrDefaultAsync(x => x.Id == request.ProductVariantId);
         if (variant is null || request.Quantity <= 0)
             return BadRequest("تنوع محصول یا تعداد درخواستی معتبر نیست.");
 
         var item = await _db.CartItems.SingleOrDefaultAsync(x => x.CustomerKey == customerKey && x.ProductVariantId == request.ProductVariantId);
-        var requestedQuantity = (item?.Quantity ?? 0) + request.Quantity;
+        var requestedQuantity = (long)(item?.Quantity ?? 0) + request.Quantity;
+        var limitError = await PurchaseLimitPolicy.ValidateAsync(_db, User, variant, requestedQuantity);
+        if (limitError is not null) return BadRequest(limitError);
         if (variant.AvailableQuantity < requestedQuantity)
             return BadRequest("موجودی محصول برای تعداد درخواستی کافی نیست.");
 
@@ -81,11 +85,12 @@ public class CartController : ControllerBase
             });
         else
         {
-            item.Quantity = requestedQuantity;
+            item.Quantity = (int)requestedQuantity;
             item.UpdatedAt = DateTime.UtcNow;
         }
 
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
         return Ok();
     }
 
@@ -93,6 +98,8 @@ public class CartController : ControllerBase
     public async Task<IActionResult> Update(int id, UpdateCartItemRequest request)
     {
         var customerKey = EnsureCustomerKey();
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        await PurchaseLimitPolicy.LockCustomerAsync(_db, customerKey);
         var item = await _db.CartItems.SingleOrDefaultAsync(x => x.Id == id && x.CustomerKey == customerKey);
         if (item is null) return NotFound();
         if (request.Quantity <= 0)
@@ -101,10 +108,13 @@ public class CartController : ControllerBase
         var variant = await _db.ProductVariants.SingleOrDefaultAsync(x => x.Id == item.ProductVariantId);
         if (variant is null || variant.AvailableQuantity < request.Quantity)
             return BadRequest("موجودی محصول برای تعداد درخواستی کافی نیست.");
+        var limitError = await PurchaseLimitPolicy.ValidateAsync(_db, User, variant, request.Quantity);
+        if (limitError is not null) return BadRequest(limitError);
 
         item.Quantity = request.Quantity;
         item.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
         return Ok();
     }
 
@@ -118,6 +128,8 @@ public class CartController : ControllerBase
     }
     private string EnsureCustomerKey()
     {
+        var accountKey = PurchaseLimitPolicy.AccountKey(User);
+        if (accountKey is not null) return accountKey;
         var customerKey = Request.Cookies["customer-key"];
         if (!string.IsNullOrWhiteSpace(customerKey)) return customerKey;
 

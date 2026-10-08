@@ -40,10 +40,21 @@ namespace Entities
         public DbSet<CouponRedemption> CouponRedemptions { get; set; }
         public DbSet<Article> Articles { get; set; }
         public DbSet<SeoPage> SeoPages { get; set; }
+        public DbSet<StoreComplaint> StoreComplaints { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<StoreComplaint>(complaint =>
+            {
+                complaint.HasIndex(x => x.Reference).IsUnique();
+                complaint.HasIndex(x => new { x.IsReviewed, x.CreatedAt });
+                complaint.Property(x => x.Reference).HasMaxLength(32).IsRequired();
+                complaint.Property(x => x.FullName).HasMaxLength(100).IsRequired();
+                complaint.Property(x => x.Phone).HasMaxLength(11).IsRequired();
+                complaint.Property(x => x.OrderNumber).HasMaxLength(12);
+                complaint.Property(x => x.Message).HasMaxLength(3000).IsRequired();
+            });
             modelBuilder.Entity<Article>().HasIndex(x => x.Slug).IsUnique();
             modelBuilder.Entity<Article>().HasIndex(x => new { x.IsPublished, x.PublishedAt });
             modelBuilder.Entity<SiteBanner>().HasIndex(x => new { x.IsActive, x.SortOrder });

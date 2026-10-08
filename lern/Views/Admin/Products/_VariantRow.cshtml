@@ -3,14 +3,16 @@
 <div class="admin-variant-row" data-variant-row>
     <div class="admin-variant-heading"><strong>حالت فروش @(i + 1)</strong><button type="button" class="remove-variant admin-link-button" hidden>حذف</button></div>
     <div class="admin-field-grid">
-        <label>عنوان فروش<input name="@($"{prefix}.SaleTitle")" value="@Model.Item.SaleTitle" placeholder="مثلاً توپی مشکی" /></label>
-        <label>نوع فروش<select name="@($"{prefix}.SaleType")"><option value="1" selected="@(Model.Item.SaleType == 1 ? "selected" : null)">بسته/توپی</option><option value="2" selected="@(Model.Item.SaleType == 2 ? "selected" : null)">متری</option><option value="4" selected="@(Model.Item.SaleType == 4 ? "selected" : null)">عددی</option></select></label>
-        <label>رنگ<input name="@($"{prefix}.Color")" value="@Model.Item.Color" placeholder="مشکی" /></label>
-        <label>کد رنگ<input name="@($"{prefix}.HexCode")" value="@Model.Item.HexCode" placeholder="#000000" /></label>
-        <label>قیمت (تومان)<input name="@($"{prefix}.Price")" value="@Model.Item.Price" type="number" step="0.01" min="0" /></label>
-        <label>موجودی<input name="@($"{prefix}.StockQuantity")" value="@Model.Item.StockQuantity" type="number" min="0" /></label>
-        <label>تخفیف Variant<input name="@($"{prefix}.DiscountValue")" value="@Model.Item.DiscountValue" type="number" step="0.01" min="0" /></label>
-        <label>نوع تخفیف<select name="@($"{prefix}.DiscountType")"><option value="">بدون تخفیف</option><option value="1">درصدی</option><option value="2">مبلغی</option></select></label>
+        <label><span class="variant-field-title">عنوان فروش</span><input name="@($"{prefix}.SaleTitle")" value="@Model.Item.SaleTitle" placeholder="مثلاً توپی مشکی" /></label>
+        <label><span class="variant-field-title">نوع فروش</span><select name="@($"{prefix}.SaleType")"><option value="1" selected="@(Model.Item.SaleType == 1 ? "selected" : null)">بسته/توپی</option><option value="2" selected="@(Model.Item.SaleType == 2 ? "selected" : null)">متری</option><option value="4" selected="@(Model.Item.SaleType == 4 ? "selected" : null)">عددی</option></select></label>
+        <label><span class="variant-field-title">رنگ</span><input name="@($"{prefix}.Color")" value="@Model.Item.Color" placeholder="مشکی" /></label>
+        <label><span class="variant-field-title">کد رنگ</span><input name="@($"{prefix}.HexCode")" value="@Model.Item.HexCode" placeholder="#000000" /></label>
+        <label><span class="variant-field-title">قیمت (تومان)</span><input name="@($"{prefix}.Price")" value="@Model.Item.Price" type="number" step="0.01" min="0" /></label>
+        <label><span class="variant-field-title">موجودی</span><input name="@($"{prefix}.StockQuantity")" value="@Model.Item.StockQuantity" type="number" min="0" /></label>
+        <label><span class="variant-field-title">نوع تخفیف</span><select name="@($"{prefix}.DiscountType")"><option value="">بدون تخفیف</option><option value="1">درصدی</option><option value="2">مبلغی</option></select></label>
+        <label><span class="variant-field-title">تخفیف Variant</span><input name="@($"{prefix}.DiscountValue")" value="@Model.Item.DiscountValue" type="number" step="0.01" min="0" /></label>
+        <label><span class="variant-field-title">سقف مجموع خرید هر کاربر</span><input name="@($"{prefix}.MaxPurchaseQuantityPerUser")" value="@Model.Item.MaxPurchaseQuantityPerUser" type="text" inputmode="numeric" pattern="[1-9][0-9]*" maxlength="10" autocomplete="off" dir="ltr" data-purchase-limit-input placeholder="بدون محدودیت" title="عدد صحیح بزرگ‌تر از صفر وارد کنید یا برای نداشتن محدودیت خالی بگذارید." /></label>
+        <p class="variant-limit-help">سقف خرید با احتساب تمام سفارش‌های قبلی و در انتظار پرداخت است؛ سفارش‌های لغوشده حساب نمی‌شوند. واحد مطابق همین حالت فروش است: متر، توپ، بسته یا عدد. خالی یعنی بدون محدودیت. خرید این حالت فروش نیازمند ورود به حساب است.</p>
         <label class="full variant-image-upload-field">تصویر این حالت فروش
             <span class="primary-image-upload-box variant-image-upload-box">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m3 17 4.5-4.5 3.5 3.5 2.5-2.5L21 18"/><path d="M18 5v5m-2.5-2.5h5"/></svg>

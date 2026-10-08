@@ -51,6 +51,8 @@ public class AdminVariantInputViewModel
     public string? HexCode { get; set; }
     public decimal Price { get; set; }
     public int StockQuantity { get; set; } = 10;
+    [Range(1, int.MaxValue, ErrorMessage = "محدودیت خرید باید یک عدد صحیح بزرگ‌تر از صفر باشد.")]
+    public int? MaxPurchaseQuantityPerUser { get; set; }
     public decimal? DiscountValue { get; set; }
     public int? DiscountType { get; set; }
     public IFormFile? Image { get; set; }

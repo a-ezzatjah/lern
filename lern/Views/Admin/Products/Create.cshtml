@@ -71,6 +71,12 @@
     .primary-image-input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
     .primary-image-preview { max-width:12rem; max-height:9rem; margin-top:.35rem; border:1px solid #dbe4ee; border-radius:.85rem; object-fit:cover; box-shadow:0 8px 18px rgba(15,23,42,.1); }
     .variant-image-upload-field { gap:.4rem !important; }
+    .product-editor-form .admin-variant-row .admin-field-grid { align-items:start; }
+    .product-editor-form .admin-variant-row .variant-field-title { display:flex; align-items:flex-end; min-height:2.6rem; line-height:1.5; }
+    .product-editor-form .admin-variant-row .admin-field-grid label:not(.variant-image-upload-field) > input,
+    .product-editor-form .admin-variant-row .admin-field-grid label:not(.variant-image-upload-field) > select { height:2.85rem; }
+    .variant-limit-help { grid-column:1/-1; margin:0; padding:.7rem .85rem; border-radius:.65rem; color:#64748b; background:#eef3f8; font-size:.78rem; line-height:1.9; }
+    .dark .variant-limit-help { color:#cbd5e1; background:#172235; }
     .variant-image-upload-box { min-height:5.5rem; padding:.7rem; border-radius:.8rem; }
     .variant-image-upload-box svg { width:2rem; height:2rem; }
     .variant-image-upload-box strong { font-size:.84rem; }
@@ -226,6 +232,11 @@
     const reindex = () => [...list.querySelectorAll("[data-variant-row]")].forEach((row, i) => {
         row.querySelectorAll("input,select").forEach(x => x.name = x.name.replace(/Variants\[-?\d+\]/, `Variants[${i}]`));
         row.querySelector(".remove-variant").hidden = list.children.length === 1;
+    });
+    list.addEventListener('input', event => {
+        if (!event.target.matches('[data-purchase-limit-input]')) return;
+        event.target.value = event.target.value.replace(/[۰-۹٠-٩]/g, digit =>
+            String(digit.charCodeAt(0) - (digit >= '۰' ? '۰'.charCodeAt(0) : '٠'.charCodeAt(0))));
     });
     add.addEventListener("click", () => { list.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("Variants[-1]", `Variants[${list.children.length}]`)); reindex(); });
     list.addEventListener("click", e => {

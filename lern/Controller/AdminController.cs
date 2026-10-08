@@ -400,6 +400,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
                 HexCode = variant.saleoptioncolor?.HexCode,
                 Price = variant.Price,
                 StockQuantity = variant.StockQuantity,
+                MaxPurchaseQuantityPerUser = variant.MaxPurchaseQuantityPerUser,
                 DiscountValue = variant.DiscountValue,
                 DiscountType = variant.DisconType is null ? null : (int)variant.DisconType.Value
             })).ToList()
@@ -634,6 +635,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
                     Sku = $"{product.Slug}-{Guid.NewGuid():N}"[..24],
                     Price = input.Price,
                     StockQuantity = Math.Max(input.StockQuantity, 0),
+                    MaxPurchaseQuantityPerUser = input.MaxPurchaseQuantityPerUser,
                     ReservedQuantity = 0,
                     DiscountValue = input.DiscountValue,
                     DisconType = ToDiscountType(input.DiscountType),
@@ -769,7 +771,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             {
                 ProductSaleOptionColor? color = null;
                 if (!string.IsNullOrWhiteSpace(input.Color)) color = new ProductSaleOptionColor { Color = input.Color.Trim(), HexCode = input.HexCode, ProductSaleOption = option };
-                var variant = new ProductVariant { ProductSaleOption = option, saleoptioncolor = color, Sku = $"{product.Slug}-{Guid.NewGuid():N}"[..24], Price = input.Price, StockQuantity = Math.Max(input.StockQuantity, 0), ReservedQuantity = 0, DiscountValue = input.DiscountValue, DisconType = ToDiscountType(input.DiscountType), DiscountStartAt = input.DiscountValue > 0 ? now.AddDays(-1) : null, DiscountEndAt = input.DiscountValue > 0 ? now.AddDays(30) : null };
+                var variant = new ProductVariant { ProductSaleOption = option, saleoptioncolor = color, Sku = $"{product.Slug}-{Guid.NewGuid():N}"[..24], Price = input.Price, StockQuantity = Math.Max(input.StockQuantity, 0), MaxPurchaseQuantityPerUser = input.MaxPurchaseQuantityPerUser, ReservedQuantity = 0, DiscountValue = input.DiscountValue, DisconType = ToDiscountType(input.DiscountType), DiscountStartAt = input.DiscountValue > 0 ? now.AddDays(-1) : null, DiscountEndAt = input.DiscountValue > 0 ? now.AddDays(30) : null };
                 option.ProductVariants.Add(variant); created.Add((input, variant));
             }
             product.SaleOptions.Add(option);
@@ -846,6 +848,7 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
                 variant.saleoptioncolor = color;
                 variant.Price = input.Price;
                 variant.StockQuantity = Math.Max(input.StockQuantity, 0);
+                variant.MaxPurchaseQuantityPerUser = input.MaxPurchaseQuantityPerUser;
                 variant.DiscountValue = input.DiscountValue;
                 variant.DisconType = ToDiscountType(input.DiscountType);
                 variant.DiscountStartAt = input.DiscountValue > 0 ? now.AddDays(-1) : null;

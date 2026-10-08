@@ -67,6 +67,7 @@
                         <a href="/Admin/Settings/category-seo" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/category-seo") ? "page" : null)"><span class="admin-nav-icon" aria-hidden="true"><svg><use href="#admin-i-log"/></svg></span>توضیحات سئوی دسته‌بندی</a>
                         <a href="@Url.Action("CategoryImages", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/category-images") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-box"/></svg></span>تصاویر دسته‌های اصلی</a>
                         <a href="@Url.Action("Inbox", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/inbox") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-wallet"/></svg></span>پیام‌ها و اعلان‌ها</a>
+                        <a href="/Admin/Settings/complaints" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/complaints") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-log"/></svg></span>شکایت‌ها و درخواست‌های رسیدگی</a>
                     </div>
                 </details>
                 <details class="admin-settings-group" open="@(Context.Request.Path.StartsWithSegments("/Admin/Articles"))">

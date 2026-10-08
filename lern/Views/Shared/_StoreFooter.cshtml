@@ -1,0 +1,32 @@
+@using lern.Infrastructure
+<partial name="_SupportIcons" />
+<footer class="ks-footer" aria-label="فوتر خرازی کوهستانی" itemscope itemtype="https://schema.org/WPFooter">
+    <div class="ks-footer-inner">
+        <div class="ks-footer-intro">
+            <div><span class="ks-eyebrow"><span class="ks-dot" aria-hidden="true"></span> از بازار بزرگ تهران، برای هنر شما</span><h2>جزئیات کوچک، <span>خلق‌های بزرگ.</span></h2><p>لوازم خیاطی، خرج کار لباس و یراق‌آلات؛ همراه خیاطان، مزون‌ها و تولیدی‌ها.</p></div>
+            <a class="ks-back-top" href="#topHeader" data-ks-back-top>بازگشت به بالا <svg aria-hidden="true"><use href="#ks-i-up" /></svg></a>
+        </div>
+        <div class="ks-footer-grid">
+            <section class="ks-footer-brand" aria-labelledby="ks-footer-name">
+                <a href="/" class="ks-brand"><img src="/assets/images/mountainous-logo-transparent.png" alt="لوگوی خرازی کوهستانی" width="76" height="76" loading="lazy" /><div><h3 id="ks-footer-name">خرازی کوهستانی</h3><span>از ایده تا دوخت، کنار شما</span></div></a>
+                <p>انتخاب جزئیات لباس از همین‌جا شروع می‌شود. محصولات موردنیازتان را برای خرید عمده و خرده در فروشگاه پیدا کنید.</p>
+                <span class="ks-sale-badge"><svg aria-hidden="true"><use href="#ks-i-thread" /></svg> فروش عمده و خرده</span>
+            </section>
+            <nav class="ks-footer-links" aria-label="راهنمای فروشگاه"><h3>همراه شما</h3><a href="/about">درباره ما</a><a href="/contact">تماس با ما</a><a href="/faq">سوالات متداول</a><a href="/complaints">ثبت شکایت و درخواست رسیدگی</a><a href="/articles">مجله خرازی کوهستانی</a></nav>
+            <section class="ks-footer-contact" aria-labelledby="ks-footer-contact-title"><h3 id="ks-footer-contact-title">یک تماس تا پاسخ شما</h3><ul>
+                @foreach (var person in StoreSupportContent.Contacts)
+                { <li><a href="tel:@person.Phone" aria-label="تماس با @person.Name، @person.Display"><span>@person.Name</span><bdi dir="ltr">@person.Display</bdi><svg aria-hidden="true"><use href="#ks-i-phone" /></svg></a></li> }
+            </ul></section>
+            <section class="ks-footer-address" aria-labelledby="ks-footer-address-title"><h3 id="ks-footer-address-title">ما را اینجا پیدا کنید</h3><div class="ks-address"><svg aria-hidden="true"><use href="#ks-i-pin" /></svg><address>@StoreSupportContent.Address</address></div><div class="ks-socials" aria-label="شبکه‌های اجتماعی فروشگاه"><span title="ایتا"><img src="/assets/images/social/eitta.png" alt="ایتا" width="24" height="24" loading="lazy" /></span><span title="تلگرام"><img src="/assets/images/logo/telegram.png" alt="تلگرام" width="24" height="24" loading="lazy" /></span><span title="واتس‌اپ"><img src="/assets/images/social/whatsapp.svg" asp-append-version="true" alt="واتس‌اپ" width="24" height="24" loading="lazy" /></span><small>در شبکه‌های اجتماعی کنار شما هستیم</small></div>
+        <section class="ks-footer-trust" aria-labelledby="ks-enamad-title">
+            <div class="ks-enamad-copy"><h3 id="ks-enamad-title">نماد اعتماد الکترونیکی</h3><p>جایگاه نمایش نشان اینماد فروشگاه</p></div>
+            <div id="enamad-badge" class="ks-enamad-slot">
+                @* Replace the placeholder below with the store's official eNAMAD embed code when available. *@
+                <div class="ks-enamad-placeholder"><span>اینماد</span><small>محل درج نشان</small></div>
+            </div>
+        </section>
+            </section>
+        </div>
+        <div class="ks-footer-bottom"><p>© @DateTime.Now.Year خرازی کوهستانی. تمامی حقوق محفوظ است.</p><p>طراحی و توسعه <strong>علی عزت جاه</strong></p></div>
+    </div>
+</footer>

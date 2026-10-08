@@ -21,6 +21,7 @@ public class SeoCatalog(ShopDbContext db, IConfiguration config)
     public async Task<List<SeoEntry>> Entries()
     {
         var result = new List<SeoEntry> { new("/", "صفحه اصلی"), new("/shop", "فروشگاه"), new("/articles", "مقالات") };
+        result.AddRange(StoreSupportContent.Pages);
         var products = await db.Products.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.Id)
             .Select(x => new { x.Id, x.Name, x.Seo }).ToListAsync();
         result.AddRange(products.Select(x => new SeoEntry($"/product/{x.Id}", x.Name, x.Seo?.IndexPage ?? true, x.Seo?.FollowPage ?? true,
@@ -37,6 +38,7 @@ public class SeoCatalog(ShopDbContext db, IConfiguration config)
             ? x with { IncludeInSitemap = x.IncludeInSitemap && s.IncludeInSitemap }
             : settings.TryGetValue(x.Path, out s) ? x with {
             IndexPage = s.IndexPage, FollowPage = s.FollowPage, IncludeInSitemap = x.IncludeInSitemap && s.IncludeInSitemap,
-            MetaTitle = s.MetaTitle, MetaDescription = s.MetaDescription } : x).ToList();
+            MetaTitle = string.IsNullOrWhiteSpace(s.MetaTitle) ? x.MetaTitle : s.MetaTitle,
+            MetaDescription = string.IsNullOrWhiteSpace(s.MetaDescription) ? x.MetaDescription : s.MetaDescription } : x).ToList();
     }
 }

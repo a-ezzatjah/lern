@@ -1,48 +1,42 @@
 @model ArticleListViewModel
-@{ ViewData["Title"] ??= "مقالات خرازی کوهستانی"; ViewData["MetaDescription"] ??= "آموزش خیاطی، راهنمای انتخاب نخ و لوازم خرازی و ایده‌های روبان و توری در مجله خرازی کوهستانی."; }
+@{
+    ViewData["Title"] ??= "مجله خرازی کوهستانی";
+    ViewData["MetaDescription"] ??= "آموزش خیاطی، راهنمای انتخاب نخ و لوازم خرازی و ایده‌های خلاقانه در مجله خرازی کوهستانی.";
+    var filtered = !string.IsNullOrEmpty(Model.Query);
+    var featured = !filtered && Model.Page == 1 ? Model.Articles.FirstOrDefault() : null;
+}
 <link rel="stylesheet" href="~/assets/css/articles.css" asp-append-version="true">
-@* Adapted from Arino 5.2.0 / 1-Theme/FA/public/blog.html. *@
-<section class="py-5">
-    <div class="container">
-        <section class="article-hero bg-cover bg-center rounded-lg shadow-md py-25 transition-colors duration-200 relative">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm rounded-lg"></div>
-            <div class="container mx-auto px-4 text-center relative z-10">
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-100 mb-4">مجله خرازی کوهستانی</h1>
-                <p class="text-lg text-gray-300 max-w-2xl mx-auto">آموزش خیاطی، راهنمای خرید و ایده‌های خلاقانه برای دست‌سازه‌های شما</p>
-                <form action="/articles" method="get" role="search" class="mt-8 max-w-md mx-auto relative article-search">
-                    <label class="sr-only" for="article-search">جستجو در مقالات</label>
-                    <input id="article-search" type="search" name="q" value="@Model.Query" maxlength="100" placeholder="جستجو در مقالات..." class="w-full py-3 px-4 rounded-full border border-gray-300 bg-white dark:bg-zinc-900 dark:text-white">
-                    @if (!string.IsNullOrEmpty(Model.Category)) { <input type="hidden" name="category" value="@Model.Category"> }
-                    <button type="submit" class="absolute end-3 top-3 text-primary" aria-label="جستجو در مقالات"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
-                </form>
-            </div>
+<section class="journal" aria-label="مجله کوهستانی">
+    <div class="journal-shell">
+        <nav class="article-breadcrumb" aria-label="مسیر صفحه"><a href="/">خانه</a><span aria-hidden="true">/</span><span aria-current="page">مجله کوهستانی</span></nav>
+        <section class="journal-intro">
+            <div><span class="journal-eyebrow"><span aria-hidden="true">✦</span> برای دست‌هایی که خلق می‌کنند</span><h1>هر دوخت، <span>یک داستان تازه.</span></h1><p>آموزش‌های کاربردی، راهنمای انتخاب و ایده‌های کوچک برای خلق چیزهای زیبا؛ به مجله خرازی کوهستانی خوش آمدید.</p></div>
+            <form action="/articles" method="get" role="search" class="article-search">
+                <label for="article-search">دنبال چه ایده‌ای می‌گردید؟</label>
+                <div class="article-search-field"><svg width="21" height="21" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-width="1.7" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input id="article-search" type="search" name="q" value="@Model.Query" maxlength="100" placeholder="جستجو در مجله…"><button type="submit">جستجو</button></div>
+            </form>
         </section>
-        <main class="container !px-0 my-10">
-            <div class="flex flex-col xl:flex-row gap-4 article-columns">
-                <div class="xl:w-3/4">
-                    @if (!string.IsNullOrEmpty(Model.Query) || !string.IsNullOrEmpty(Model.Category)) { <p class="mb-4 dark:text-white">نتایج: @Model.Query @Model.Category — <a href="/articles" class="text-primary">نمایش همه</a></p> }
-                    <div class="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-4 article-grid">
-                        @foreach (var article in Model.Articles)
-                        {
-                            <div class="space-y-3 px-1.5 py-2" itemscope itemtype="https://schema.org/BlogPosting">
-                                <a href="/articles/@article.Slug" class="w-full block" itemprop="url">
-                                    <article class="p-4 space-y-3 rounded-xl hover:-translate-y-2 transition border border-gray-200 bg-white drop-shadow-md dark:bg-gray-800 article-card">
-                                        <figure class="text-center block py-4"><img src="@article.ImageUrl" width="915" height="580" class="h-50 rounded-xl w-full block mx-auto object-cover" alt="@article.ImageAlt" itemprop="image" loading="lazy"></figure>
-                                        <section class="space-y-5"><div class="space-y-4"><h4 class="article-category-line"><span class="bg-secondary text-sm rounded text-white px-3" itemprop="articleSection">@article.Category</span></h4><h2 class="text-xl font-bold dark:text-white article-card-title" itemprop="headline">@article.Title</h2></div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-300 article-summary" itemprop="description">@article.Summary</p>
-                                            <div class="flex flex-wrap justify-between items-center text-sm text-gray-500 dark:text-gray-300"><time datetime="@article.PublishedAt?.ToString("yyyy-MM-dd")" itemprop="datePublished">@ArticleDisplay.Date(article.PublishedAt)</time><span>@ArticleDisplay.ReadingMinutes(article.Content) دقیقه مطالعه</span></div>
-                                            <span class="text-primary block">ادامه مطلب ←</span>
-                                        </section>
-                                    </article>
-                                </a>
-                            </div>
-                        }
-                    </div>
-                    @if (Model.Articles.Count == 0) { <p class="p-6 bg-white dark:bg-gray-800 rounded-xl dark:text-white">مقاله‌ای با این مشخصات پیدا نشد.</p> }
-                    @if (Model.TotalPages > 1) { <nav aria-label="صفحه‌بندی مقالات" class="article-pagination">@for (var page = 1; page <= Model.TotalPages; page++) { <a class="@(page == Model.Page ? "bg-primary text-white" : "bg-white text-primary")" aria-current="@(page == Model.Page ? "page" : null)" href="@Url.Action("Index", new { q = Model.Query, category = Model.Category, page })">@(page)</a> }</nav> }
-                </div>
-                <partial name="_Sidebar" model="Model" />
-            </div>
-        </main>
+        @if (featured is not null)
+        {
+            <article class="journal-feature" itemscope itemtype="https://schema.org/BlogPosting">
+                <a href="/articles/@featured.Slug" class="journal-feature-image" tabindex="-1" aria-hidden="true"><img src="@featured.ImageUrl" alt="@featured.ImageAlt" width="915" height="580" fetchpriority="high" itemprop="image"><span class="journal-image-label">تازه در مجله</span></a>
+                <div class="journal-feature-copy"><span class="journal-eyebrow">یک ایده برای شروع</span><h2 itemprop="headline"><a href="/articles/@featured.Slug" itemprop="url">@featured.Title</a></h2><p itemprop="description">@featured.Summary</p><div class="article-meta"><time datetime="@featured.PublishedAt?.ToString("yyyy-MM-dd")" itemprop="datePublished">@ArticleDisplay.Date(featured.PublishedAt)</time><span class="article-meta-dot" aria-hidden="true"></span><span>@ArticleDisplay.ReadingMinutes(featured.Content) دقیقه مطالعه</span></div><a class="journal-button" href="/articles/@featured.Slug">بخوانید و ایده بگیرید <span aria-hidden="true">↗</span></a></div>
+            </article>
+        }
+        <section class="journal-library" aria-labelledby="journal-library-title">
+            <div class="journal-section-heading"><div><span class="journal-eyebrow">یاد بگیرید، انتخاب کنید، بسازید</span><h2 id="journal-library-title">@(filtered ? "نتیجه جستجوی شما" : "در مجله بخوانید")</h2></div></div>
+            @if (filtered) { <div class="journal-results"><p>@if (!string.IsNullOrEmpty(Model.Query)) { <span>جستجو برای «@Model.Query»</span> }</p><a href="/articles">پاک کردن فیلترها <span aria-hidden="true">×</span></a></div> }
+            <div class="article-grid">@foreach (var article in Model.Articles) { <partial name="_Card" model="article" /> }</div>
+            @if (Model.Articles.Count == 0) { <div class="journal-empty"><span aria-hidden="true">✦</span><h3>هنوز مطلبی اینجا پیدا نکردیم</h3><p>عبارت دیگری را جستجو کنید یا سری به همهٔ مطالب مجله بزنید.</p><a href="/articles" class="journal-button">مشاهده همه مطالب <span aria-hidden="true">←</span></a></div> }
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="صفحه‌بندی مقالات" class="article-pagination">
+                    @if (Model.Page > 1) { <a href="@Url.Action("Index", new { q = Model.Query, page = Model.Page - 1 })" aria-label="صفحه قبل">→</a> }
+                    @for (var page = Math.Max(1, Model.Page - 2); page <= Math.Min(Model.TotalPages, Model.Page + 2); page++) { <a class="@(page == Model.Page ? "is-active" : "")" aria-label="صفحه @(page)" aria-current="@(page == Model.Page ? "page" : null)" href="@Url.Action("Index", new { q = Model.Query, page })">@(page)</a> }
+                    @if (Model.Page < Model.TotalPages) { <a href="@Url.Action("Index", new { q = Model.Query, page = Model.Page + 1 })" aria-label="صفحه بعد">←</a> }
+                </nav>
+            }
+        </section>
+        <section class="journal-shop"><div><span class="journal-eyebrow">از ایده تا ساختن</span><h2>وسایلش را پیدا کنید، داستانش را بسازید.</h2><p>هر پروژهٔ زیبا با انتخاب ابزار مناسب شروع می‌شود.</p></div><a href="/shop" class="journal-button">دیدن لوازم خرازی <span aria-hidden="true">←</span></a><span class="journal-shop-decoration" aria-hidden="true">✳</span></section>
     </div>
 </section>

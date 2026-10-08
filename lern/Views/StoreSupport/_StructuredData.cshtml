@@ -1,0 +1,18 @@
+@using System.Text.Json
+@using lern.Infrastructure
+@inject SeoCatalog SupportSeo
+@{
+    var origin = SupportSeo.Origin(Context.Request);
+    var pageUrl = ViewData["CanonicalUrl"]?.ToString() ?? origin + Context.Request.Path;
+    var graph = new List<object>
+    {
+        new Dictionary<string, object?> { ["@type"] = "Store", ["@id"] = origin + "/#store", ["name"] = "خرازی کوهستانی", ["url"] = origin + "/", ["logo"] = origin + "/assets/images/mountainous-logo-transparent.png", ["description"] = "فروش عمده و خرده لوازم خیاطی، خرج کار لباس و یراق‌آلات", ["telephone"] = StoreSupportContent.Contacts.Select(x => x.Phone).ToArray(), ["address"] = new Dictionary<string, object> { ["@type"] = "PostalAddress", ["streetAddress"] = StoreSupportContent.Address, ["addressLocality"] = "تهران", ["addressCountry"] = "IR" } },
+        new Dictionary<string, object?> { ["@type"] = Context.Request.Path == "/about" ? "AboutPage" : Context.Request.Path == "/contact" ? "ContactPage" : "WebPage", ["@id"] = pageUrl + "#page", ["url"] = pageUrl, ["name"] = ViewData["Title"], ["description"] = ViewData["MetaDescription"], ["inLanguage"] = "fa-IR", ["about"] = new Dictionary<string, string> { ["@id"] = origin + "/#store" } },
+        new Dictionary<string, object> { ["@type"] = "BreadcrumbList", ["itemListElement"] = new object[] { new Dictionary<string, object> { ["@type"] = "ListItem", ["position"] = 1, ["name"] = "صفحه اصلی", ["item"] = origin + "/" }, new Dictionary<string, object?> { ["@type"] = "ListItem", ["position"] = 2, ["name"] = ViewData["SupportPageTitle"], ["item"] = pageUrl } } }
+    };
+    if (Context.Request.Path == "/faq")
+    {
+        graph.Add(new Dictionary<string, object> { ["@type"] = "FAQPage", ["mainEntity"] = StoreSupportContent.Questions.Select(x => new Dictionary<string, object> { ["@type"] = "Question", ["name"] = x.Question, ["acceptedAnswer"] = new Dictionary<string, string> { ["@type"] = "Answer", ["text"] = x.Answer } }).ToArray() });
+    }
+}
+<script type="application/ld+json">@Html.Raw(JsonSerializer.Serialize(new Dictionary<string, object> { ["@context"] = "https://schema.org", ["@graph"] = graph }))</script>

@@ -1209,6 +1209,7 @@ function initializeLiveSearch() {
     if (!input || !results) return;
     let timer;
     let request;
+    const canSearch = (value) => value.length >= 2 || /^[0-9۰-۹٠-٩]$/.test(value);
     const hide = () => { results.classList.add('hidden'); results.replaceChildren(); };
     const row = (product) => {
         const link = document.createElement('a');
@@ -1226,7 +1227,7 @@ function initializeLiveSearch() {
     };
     const search = async () => {
         const q = input.value.trim();
-        if (q.length < 2) { hide(); return; }
+        if (!canSearch(q)) { hide(); return; }
         request?.abort();
         request = new AbortController();
         const current = request;
@@ -1257,10 +1258,10 @@ function initializeLiveSearch() {
     input.addEventListener('input', () => {
         clearTimeout(timer);
         request?.abort();
-        if (input.value.trim().length < 2) { hide(); return; }
+        if (!canSearch(input.value.trim())) { hide(); return; }
         timer = setTimeout(search, 300);
     });
-    input.addEventListener('focus', () => { if (input.value.trim().length >= 2) search(); });
+    input.addEventListener('focus', () => { if (canSearch(input.value.trim())) search(); });
     input.addEventListener('keydown', event => { if (event.key === 'Escape') hide(); });
     document.addEventListener('click', event => {
         if (!input.parentElement.parentElement.contains(event.target)) hide();

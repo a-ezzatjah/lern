@@ -39,6 +39,17 @@ public class StoreProductController : Microsoft.AspNetCore.Mvc.Controller
         }
 
         var relatedProducts = await _products.GetRelatedProductCardsAsync(id, take: 10);
+        var limitedVariants = product.ProductVariants.Where(x => x.MaxPurchaseQuantityPerUser.HasValue).ToList();
+        var accountKey = lern.Infrastructure.PurchaseLimitPolicy.AccountKey(User);
+        var limitedIds = limitedVariants.Select(x => x.Id).ToArray();
+        var purchased = accountKey is null || limitedIds.Length == 0 ? new Dictionary<int, long>() :
+            await _db.OrderItems.AsNoTracking().Where(x => limitedIds.Contains(x.ProductVariantId) &&
+                x.Order.CustomerKey == accountKey && x.Order.Status != OrderStatus.Cancelled)
+                .GroupBy(x => x.ProductVariantId).Select(g => new { Id = g.Key, Quantity = g.Sum(x => (long)x.Quantity) })
+                .ToDictionaryAsync(x => x.Id, x => x.Quantity);
+        foreach (var variant in limitedVariants)
+            variant.RemainingPurchaseQuantity = accountKey is null ? 0 :
+                (int)Math.Max(0L, (long)variant.MaxPurchaseQuantityPerUser!.Value - purchased.GetValueOrDefault(variant.Id));
         ViewData["Title"] = product.SeoData?.MetaTitle ?? product.Name;
         ViewData["MetaDescription"] = product.SeoData?.MetaDescription ?? product.ShortDescription;
         ViewData["MetaKeywords"] = product.SeoData?.MetaKeywords;

@@ -8,6 +8,7 @@ namespace lern.Controller;
 [ApiController, Route("api/address")]
 public class AddressApiController : ControllerBase
 {
+    public const int MaxAddresses = 10;
     private readonly ShopDbContext _db;
     public AddressApiController(ShopDbContext db) => _db = db;
 
@@ -35,15 +36,22 @@ public class AddressApiController : ControllerBase
         var key = EnsureCustomerKey();
         var values = new { Title = request.Title.Trim(), Province = request.Province.Trim(), City = request.City.Trim(), Details = request.Details.Trim(), PostalCode = request.PostalCode.Trim(), Phone = request.Phone.Trim(), ReceiverName = request.ReceiverName.Trim(), request.IsDefault };
         await EnsureAddressTableAsync();
+        await using var transaction = await _db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
         var requestedId = int.TryParse(Request.Query["id"], out var id) ? id : 0;
         var address = await _db.Addresses.Where(x => x.CustomerKey == key && (requestedId == 0 || x.Id == requestedId)).OrderByDescending(x => x.IsDefault).ThenByDescending(x => x.UpdatedAt).FirstOrDefaultAsync();
         if (requestedId != 0 && address is null) return NotFound();
-        if (address is null) { address = new Address { CustomerKey = key }; _db.Addresses.Add(address); }
+        if (address is null)
+        {
+            if (await _db.Addresses.CountAsync(x => x.CustomerKey == key) >= MaxAddresses)
+                return BadRequest("حداکثر ۱۰ آدرس می‌توانید ذخیره کنید. برای افزودن آدرس جدید، یکی از آدرس‌های قبلی را حذف کنید.");
+            address = new Address { CustomerKey = key }; _db.Addresses.Add(address);
+        }
         if (request.IsDefault) await _db.Addresses.Where(x => x.CustomerKey == key && x.Id != address.Id).ExecuteUpdateAsync(s => s.SetProperty(x => x.IsDefault, false));
         address.Title = values.Title; address.Province = values.Province; address.City = values.City; address.Details = values.Details;
         address.PostalCode = values.PostalCode; address.Phone = values.Phone; address.ReceiverName = values.ReceiverName;
         address.IsDefault = values.IsDefault; address.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
         return Ok(ToResponse(address));
     }
 
@@ -53,11 +61,14 @@ public class AddressApiController : ControllerBase
         if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.Province) || string.IsNullOrWhiteSpace(request.City) || string.IsNullOrWhiteSpace(request.Details) || string.IsNullOrWhiteSpace(request.PostalCode) || string.IsNullOrWhiteSpace(request.Phone) || string.IsNullOrWhiteSpace(request.ReceiverName)) return BadRequest("لطفاً همه فیلدهای الزامی را تکمیل کنید.");
         if (request.PostalCode.Length != 10 || !request.PostalCode.All(char.IsDigit)) return BadRequest("کد پستی باید ۱۰ رقم باشد.");
         await EnsureAddressTableAsync(); var key = EnsureCustomerKey();
-        if (await _db.Addresses.CountAsync(x => x.CustomerKey == key) >= 3)
-            return BadRequest("شما نمی‌توانید بیشتر از سه آدرس ذخیره کنید.");
+        await using var transaction = await _db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+        if (await _db.Addresses.CountAsync(x => x.CustomerKey == key) >= MaxAddresses)
+            return BadRequest("حداکثر ۱۰ آدرس می‌توانید ذخیره کنید. برای افزودن آدرس جدید، یکی از آدرس‌های قبلی را حذف کنید.");
         if (request.IsDefault) await _db.Addresses.Where(x => x.CustomerKey == key).ExecuteUpdateAsync(s => s.SetProperty(x => x.IsDefault, false));
         var address = new Address { CustomerKey = key, Title = request.Title.Trim(), Province = request.Province.Trim(), City = request.City.Trim(), Details = request.Details.Trim(), PostalCode = request.PostalCode.Trim(), Phone = request.Phone.Trim(), ReceiverName = request.ReceiverName.Trim(), IsDefault = request.IsDefault, UpdatedAt = DateTime.UtcNow };
-        _db.Addresses.Add(address); await _db.SaveChangesAsync(); return Ok(ToResponse(address));
+        _db.Addresses.Add(address); await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
+        return Ok(ToResponse(address));
     }
 
     [HttpGet("list")]

@@ -15,6 +15,15 @@ public class ArticleListViewModel
     public int TotalPages { get; set; }
 }
 
+public class AdminArticleListViewModel
+{
+    public List<Article> Articles { get; set; } = [];
+    public string? Query { get; set; }
+    public int Page { get; set; } = 1;
+    public int TotalPages { get; set; }
+    public int TotalCount { get; set; }
+}
+
 public class ArticleDetailsViewModel
 {
     public Article Article { get; set; } = null!;
