@@ -9,5 +9,6 @@ public sealed class AccountCommentEditViewModel
     public string Body { get; set; } = "";
     public int? Score { get; set; }
     public bool IsApproved { get; init; }
+    public bool IsBlocked { get; init; }
     public string? Error { get; set; }
 }

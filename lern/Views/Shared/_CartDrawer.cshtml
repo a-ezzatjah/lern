@@ -1,0 +1,44 @@
+    <!-- ================= start cart offcanvas ================= -->
+    <!-- Offcanvas Cart -->
+    <div id="offcanvas-left"
+         class="offcanvas invisible dark:bg-zinc-900 dark:text-white fixed top-0 end-0 sm:w-100 w-[80%] h-full bg-white shadow-lg transform -translate-x-full transition-transform opacity-0 z-50"
+         role="dialog"
+         aria-labelledby="cart-title"
+         aria-modal="true">
+        <!-- Header -->
+        <header class="border-b p-3 flex items-center justify-between border-gray-400">
+            <h2 id="cart-title" class="font-bold text-base">سبد خرید شما</h2>
+            <button data-cart-close
+                    class="cursor-pointer"
+                    aria-label="بستن سبد خرید">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="size-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+        <main id="cart-drawer-items" class="relative space-y-4 divide-y divide-gray-200 p-3 overflow-y-scroll h-full pb-36"></main>
+        <!-- Footer -->
+        <footer class="p-2 absolute bottom-0 start-0 end-0 bg-white dark:border-0  dark:bg-zinc-900 border border-gray-400">
+            <div class="flex items-center justify-between">
+                <div class="space-y-2">
+                    <span class="inline-block text-lg">جمع کل</span>
+                    <h3 id="cart-drawer-total" class="font-bold text-xl" itemprop="totalPrice" content="0">۰ تومان</h3>
+                </div>
+                <div class="text-end">
+                    <a href="/cart"
+                       class="bg-primary-grad hover:bg-primary-600 text-white py-2 px-4 rounded-lg"
+                       role="button"
+                       aria-label="تکمیل فرایند خرید">
+                        تکمیل خرید
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- Overlay -->
+    <div class="overlay transition fixed inset-0 z-40 bg-black/70 hidden"
+         data-cart-close
+         role="presentation"
+         aria-hidden="true"></div>
+    <!-- ================= end cart offcanvas ================= -->

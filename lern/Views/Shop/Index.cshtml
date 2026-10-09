@@ -1,14 +1,31 @@
 @model lern.Models.ShopViewModel
 <section class="container category-results shop-page" id="shop-page">
     <partial name="~/Views/Shop/_Breadcrumb.cshtml" model="Model" />
+    <div class="shop-mobile-toolbar" aria-label="فیلترهای محصولات">
+        <button type="button" class="shop-filter-arrow" data-scroll="right" aria-label="نمایش دکمه‌های سمت راست" hidden>›</button>
+        <div class="shop-filter-track">
+            <button type="button" data-open-filter="category" aria-haspopup="dialog" aria-controls="shop-filter-drawer">دسته‌بندی</button>
+            <button type="button" data-open-filter="search" aria-haspopup="dialog" aria-controls="shop-filter-drawer">جستجو</button>
+            <button type="button" data-open-filter="color" aria-haspopup="dialog" aria-controls="shop-filter-drawer">رنگ</button>
+            <button type="button" data-open-filter="price" aria-haspopup="dialog" aria-controls="shop-filter-drawer">محدوده قیمت</button>
+            <button type="button" data-open-filter="sort" aria-haspopup="dialog" aria-controls="shop-filter-drawer">مرتب‌سازی</button>
+            <button type="button" id="shop-available-toggle" aria-pressed="@(Model.AvailableOnly ? "true" : "false")">کالای موجود</button>
+        </div>
+        <button type="button" class="shop-filter-arrow" data-scroll="left" aria-label="نمایش دکمه‌های سمت چپ" hidden>‹</button>
+    </div>
+    <dialog id="shop-filter-drawer" aria-labelledby="shop-drawer-title">
+        <div class="shop-drawer-header"><h2 id="shop-drawer-title">فیلتر محصولات</h2><button type="button" data-close-filter aria-label="بستن فیلتر">×</button></div>
+    </dialog>
     <div class="shop-layout">
         <aside class="shop-filters" aria-label="فیلترهای محصولات">
             <form id="shop-filter-form" method="get" action="/shop">
-                <input type="hidden" name="sort" value="@Model.Sort">
                 <input type="hidden" name="discounted" value="@(Model.DiscountedOnly ? "true" : "")">
                 <h2>فیلتر محصولات</h2>
+                <div data-filter-section="search">
                 <label for="shop-query">جستجو در محصولات</label>
                 <input id="shop-query" name="q" type="search" value="@Model.Query" maxlength="100" placeholder="نام محصول را بنویسید">
+                </div>
+                <div data-filter-section="category">
                 <div class="shop-filter-heading">دسته‌بندی‌ها <span>انتخاب چندگانه</span></div>
                 <div class="shop-category-tree">
                     @foreach (var root in Model.Categories.Where(c => !c.ParentId.HasValue || Model.Categories.All(parent => parent.Id != c.ParentId)))
@@ -16,10 +33,27 @@
                         <partial name="~/Views/Shop/_CategoryNode.cshtml" model="@(new lern.Models.ShopCategoryNodeViewModel(root, Model.Categories, Model.SelectedCategories, (IReadOnlySet<int>)ViewData["ExpandedCategories"]!))" />
                     }
                 </div>
+                </div>
+                <div data-filter-section="price">
                 <div class="shop-filter-heading">بازه قیمت <span>تومان</span></div>
                 <div class="shop-price-range">
                     <label for="shop-min-price">از<input id="shop-min-price" name="minPrice" type="number" min="0" step="1000" value="@(Model.MinPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" placeholder="حداقل"></label>
                     <label for="shop-max-price">تا<input id="shop-max-price" name="maxPrice" type="number" min="0" step="1000" value="@(Model.MaxPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture))" placeholder="حداکثر"></label>
+                </div>
+                </div>
+                <div data-filter-section="color">
+                    <div class="shop-filter-heading">رنگ <span>انتخاب چندگانه</span></div>
+                    <label class="shop-color-search-label" for="shop-color-search">جستجوی رنگ</label>
+                    <input id="shop-color-search" type="search" placeholder="نام رنگ را جستجو کنید" autocomplete="off">
+                    <partial name="~/Views/Shop/_Colors.cshtml" model="Model" />
+                </div>
+                <div data-filter-section="sort" class="shop-mobile-sort">
+                    <div class="shop-sort-choices" role="radiogroup" aria-label="مرتب‌سازی محصولات">
+                        @foreach (var option in new[] { (Value: "bestselling", Label: "پرفروش‌ترین"), (Value: "popular", Label: "محبوب‌ترین"), (Value: "newest", Label: "جدیدترین"), (Value: "price_desc", Label: "گران‌ترین"), (Value: "price_asc", Label: "ارزان‌ترین") })
+                        {
+                            <label class="shop-sort-choice"><input type="radio" name="sort" value="@option.Value" checked="@(Model.Sort == option.Value)"><span>@option.Label</span><span class="shop-sort-choice-mark" aria-hidden="true">✓</span></label>
+                        }
+                    </div>
                 </div>
                 <label class="shop-check"><input name="available" type="checkbox" value="true" checked="@Model.AvailableOnly"> فقط کالاهای موجود</label>
                 <button type="submit">اعمال فیلترها</button>

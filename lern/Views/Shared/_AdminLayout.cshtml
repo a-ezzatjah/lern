@@ -60,6 +60,8 @@
                 <a class="admin-nav-link" href="/Admin/Seo"><span class="admin-nav-icon"><svg><use href="#admin-i-grid"/></svg></span><span>نقشه سایت و ایندکس</span></a>
                 <a class="admin-nav-link" href="@Url.Action("Users", "Admin")"><span class="admin-nav-icon"><svg><use href="#admin-i-users"/></svg></span><span>کاربران</span></a>
                 <a class="admin-nav-link" href="@Url.Action("Index", "AdminReports")"><span class="admin-nav-icon"><svg><use href="#admin-i-chart"/></svg></span><span>گزارش‌ها</span></a>
+                <a class="admin-nav-link" href="/Admin/Complaints" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Complaints") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-log"/></svg></span><span>شکایت‌ها و درخواست‌های رسیدگی</span></a>
+                <a class="admin-nav-link" href="/Admin/Comments" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Comments") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-log"/></svg></span><span>مدیریت نظرات</span></a>
                 <details class="admin-settings-menu" @(Context.Request.Path.StartsWithSegments("/Admin/Settings") ? "open" : "")>
                     <summary class="admin-nav-link"><span class="admin-nav-icon"><svg><use href="#admin-i-settings"/></svg></span><span>تنظیمات</span><span class="admin-settings-chevron" aria-hidden="true">⌄</span></summary>
                     <div class="admin-settings-submenu">
@@ -67,7 +69,6 @@
                         <a href="/Admin/Settings/category-seo" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/category-seo") ? "page" : null)"><span class="admin-nav-icon" aria-hidden="true"><svg><use href="#admin-i-log"/></svg></span>توضیحات سئوی دسته‌بندی</a>
                         <a href="@Url.Action("CategoryImages", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/category-images") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-box"/></svg></span>تصاویر دسته‌های اصلی</a>
                         <a href="@Url.Action("Inbox", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/inbox") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-wallet"/></svg></span>پیام‌ها و اعلان‌ها</a>
-                        <a href="/Admin/Settings/complaints" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/complaints") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-log"/></svg></span>شکایت‌ها و درخواست‌های رسیدگی</a>
                     </div>
                 </details>
                 <details class="admin-settings-group" open="@(Context.Request.Path.StartsWithSegments("/Admin/Articles"))">

@@ -1,3 +1,4 @@
+using lern.Infrastructure;
 using Entities;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,8 @@ public class AddressApiController : ControllerBase
 {
     public const int MaxAddresses = 10;
     private readonly ShopDbContext _db;
-    public AddressApiController(ShopDbContext db) => _db = db;
+    private readonly CustomerSession _session;
+    public AddressApiController(ShopDbContext db, CustomerSession session) { _db = db; _session = session; }
 
     [HttpGet]
     public async Task<IActionResult> Get(int? id)
@@ -124,17 +126,7 @@ BEGIN
     CREATE INDEX [IX_Addresses_CustomerKey_Title] ON [Addresses] ([CustomerKey], [Title]);
 END");
 
-    private string EnsureCustomerKey()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (User.Identity?.IsAuthenticated == true && !string.IsNullOrWhiteSpace(userId))
-            return $"user-{userId}";
-        var key = Request.Cookies["customer-key"];
-        if (!string.IsNullOrWhiteSpace(key)) return key;
-        key = Guid.NewGuid().ToString("N");
-        Response.Cookies.Append("customer-key", key, new CookieOptions { HttpOnly = true, IsEssential = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddYears(1) });
-        return key;
-    }
+    private string EnsureCustomerKey() => _session.GetOrCreate(HttpContext);
 }
 
 public record AddressRequest(string Title, string Province, string City, string Details, string PostalCode, string Phone, string ReceiverName, bool IsDefault);

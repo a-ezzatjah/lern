@@ -1,0 +1,35 @@
+<link rel="stylesheet" href="~/assets/css/category-menu.css" asp-append-version="true">
+@{
+    var path = Context.Request.Path;
+    var homeActive = path == "/";
+    var cartActive = path.StartsWithSegments("/cart") || path.StartsWithSegments("/checkout");
+    var accountActive = path.StartsWithSegments("/account") || path.StartsWithSegments("/login") || path.StartsWithSegments("/register") || path.StartsWithSegments("/favorites");
+}
+<link rel="stylesheet" href="~/assets/css/mobile-bottom-nav.css" asp-append-version="true" />
+<nav class="mobile-bottom-nav" aria-label="ناوبری پایین موبایل">
+    <a href="/" aria-current="@(homeActive ? "page" : null)">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9" /></svg>
+        <span>خانه</span>
+    </a>
+    <button type="button" data-cart-drawer-open aria-controls="offcanvas-left" aria-haspopup="dialog" aria-current="@(cartActive ? "page" : null)">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12l2 14H4L6 7Zm3 0V6a3 3 0 0 1 6 0v1" /></svg>
+        <span>سبد خرید</span>
+    </button>
+    <a href="/account" aria-current="@(accountActive ? "page" : null)">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21a8 8 0 0 1 16 0H4Z" /></svg>
+        <span>پنل کاربری</span>
+    </a>
+    <button type="button" data-mobile-menu-open aria-controls="mobile-site-menu" aria-haspopup="dialog" aria-expanded="false">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        <span>منو</span>
+    </button>
+    <button type="button" data-mobile-scroll-top>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m5 15 7-7 7 7" /></svg>
+        <span>رفتن به بالا</span>
+    </button>
+</nav>
+<script src="~/assets/js/mobile-bottom-nav.js" asp-append-version="true" defer></script>
+
+<partial name="_MobileSiteMenu" />
+<partial name="_CartDrawer" />
+<script src="~/assets/js/cart-store.js" asp-append-version="true" defer></script>

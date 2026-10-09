@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Cryptography;
 using Entities;
 using lern.Models;
@@ -8,6 +9,7 @@ using DTO;
 
 namespace lern.Controller;
 
+[Authorize(Roles = "Admin")]
 [Route("Admin")]
 public class AdminController : Microsoft.AspNetCore.Mvc.Controller
 {
@@ -232,6 +234,9 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         if (await _db.Users.AnyAsync(x => x.Id != id && x.PhoneNumber == model.PhoneNumber)) ModelState.AddModelError(nameof(model.PhoneNumber), "کاربری با این شماره موبایل وجود دارد.");
         if (model.Email is not null && await _db.Users.AnyAsync(x => x.Id != id && x.Email == model.Email)) ModelState.AddModelError(nameof(model.Email), "کاربری با این ایمیل وجود دارد.");
         if (model.Avatar is { Length: > 0 } && !IsValidAvatar(model.Avatar)) ModelState.AddModelError(nameof(model.Avatar), "تصویر باید JPG، PNG یا WEBP و حداکثر ۵ مگابایت باشد.");
+        if (user.Role == "Admin" && user.IsActive && (model.Role != "Admin" || !model.IsActive)
+            && !await _db.Users.AnyAsync(x => x.Id != id && x.Role == "Admin" && x.IsActive))
+            ModelState.AddModelError(nameof(model.Role), "آخرین مدیر فعال را نمی‌توان غیرفعال کرد یا نقش او را تغییر داد.");
         if (!ModelState.IsValid) return View("Users/Edit", model);
 
         user.FirstName = model.FirstName.Trim(); user.LastName = model.LastName.Trim();
@@ -255,6 +260,8 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
     {
         var user = await _db.Users.SingleOrDefaultAsync(x => x.Id == id);
         if (user is null) return NotFound(new { success = false, message = "کاربر پیدا نشد." });
+        if (user.Role == "Admin" && user.IsActive && !await _db.Users.AnyAsync(x => x.Id != id && x.Role == "Admin" && x.IsActive))
+            return BadRequest(new { success = false, message = "آخرین مدیر فعال قابل حذف نیست." });
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();
         return Json(new { success = true, message = "کاربر با موفقیت حذف شد." });

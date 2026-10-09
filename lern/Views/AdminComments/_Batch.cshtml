@@ -1,0 +1,30 @@
+@model lern.Models.AdminCommentsViewModel
+@using System.Globalization
+@{ var calendar = new PersianCalendar();
+    string DateLabel(DateTime date) { var local = date.ToLocalTime(); return $"{calendar.GetYear(local):0000}/{calendar.GetMonth(local):00}/{calendar.GetDayOfMonth(local):00}"; }
+}
+<div data-comment-batch>
+    @if (Model.Comments.Count == 0) { <p class="moderation-empty">نظری با این شرایط پیدا نشد.</p> }
+    @foreach (var comment in Model.Comments)
+    {
+        var state = comment.IsBlocked ? "blocked" : comment.IsApproved ? "approved" : "pending";
+        <article class="moderation-comment" data-comment-id="@comment.Id">
+            <header><div><h2>@comment.AuthorName</h2><a href="/product/@comment.ProductId">@comment.Product.Name</a></div><span class="comment-status comment-status-@state">@(comment.IsBlocked ? "مسدودشده" : comment.IsApproved ? "منتشرشده" : "در حال بررسی")</span></header>
+            <time datetime="@comment.CreatedAt.ToString("O")">ثبت در @DateLabel(comment.CreatedAt)</time>
+            @if (!string.IsNullOrWhiteSpace(comment.Title)) { <h3>@comment.Title</h3> }
+            <p class="moderation-body">@comment.Body</p>
+            <form asp-action="Moderate" asp-route-id="@comment.Id" method="post" class="moderation-actions">
+                <input type="hidden" name="updatedAt" value="@comment.UpdatedAt.ToString("O")" />
+                <input type="hidden" name="status" value="@Model.Status" /><input type="hidden" name="q" value="@Model.Query" /><input type="hidden" name="page" value="@Model.Page" />
+                @if (state != "approved") { <button type="submit" name="decision" value="approved" class="moderation-approve">تأیید و انتشار</button> }
+                @if (state != "blocked") { <button type="submit" name="decision" value="blocked" class="moderation-block">مسدود کردن</button> }
+                @if (state != "pending") { <button type="submit" name="decision" value="pending" class="moderation-pending">بازگشت به بررسی</button> }
+            </form>
+        </article>
+    }
+    <nav class="moderation-pagination" data-comment-pagination aria-label="صفحات نظرات">
+        @if (Model.Page > 1) { <a asp-action="Index" asp-route-status="@Model.Status" asp-route-q="@Model.Query" asp-route-page="@(Model.Page - 1)">قبلی</a> }
+        <span>صفحه @Model.Page از @Model.TotalPages</span>
+        @if (Model.Page < Model.TotalPages) { <a data-comments-more asp-action="Index" asp-route-status="@Model.Status" asp-route-q="@Model.Query" asp-route-page="@(Model.Page + 1)">نمایش ۱۰ نظر بعدی</a> }
+    </nav>
+</div>

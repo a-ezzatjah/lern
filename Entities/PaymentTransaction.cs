@@ -11,5 +11,7 @@ public class PaymentTransaction
     public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
     public string? Gateway { get; set; }
     public string? Reference { get; set; }
+    public string? Authority { get; set; }
+    public DateTime? VerifiedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -55,6 +55,9 @@ public class StoreProductController : Microsoft.AspNetCore.Mvc.Controller
         ViewData["MetaKeywords"] = product.SeoData?.MetaKeywords;
         ViewData["Robots"] = $"{(product.SeoData?.IndexPage ?? true ? "index" : "noindex")}, {(product.SeoData?.FollowPage ?? true ? "follow" : "nofollow")}";
         ViewData["CanonicalUrl"] = product.SeoData?.CanonicalUrl;
-        return View(StoreProductDetailsViewModel.FromProduct(product, relatedProducts));
+        var categoryCatalog = await _db.Categories.AsNoTracking()
+            .Select(c => new Category { Id = c.Id, Name = c.Name, Slug = c.Slug, ParentId = c.ParentId })
+            .ToListAsync();
+        return View(StoreProductDetailsViewModel.FromProduct(product, relatedProducts, categoryCatalog));
     }
 }

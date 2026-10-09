@@ -1,0 +1,13 @@
+@model lern.Models.ShopViewModel
+<div id="shop-color-options" class="shop-color-options">
+    @foreach (var color in Model.Colors)
+    {
+        var validHex = System.Text.RegularExpressions.Regex.IsMatch(color.HexCode ?? "", @"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$");
+        <label class="shop-color-choice" data-color-name="@color.Name">
+            <input type="checkbox" name="color" value="@color.Name" checked="@Model.SelectedColors.Contains(color.Name)">
+            <span class="shop-color-swatch @(validHex ? "" : "is-unknown")" style="@(validHex ? $"--swatch-color: {color.HexCode}" : null)" aria-hidden="true"></span>
+            <span>@color.Name</span>
+        </label>
+    }
+    <p class="shop-color-empty" hidden="@(Model.Colors.Count > 0)">رنگی برای نمایش وجود ندارد.</p>
+</div>

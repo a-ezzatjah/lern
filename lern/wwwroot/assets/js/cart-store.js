@@ -224,6 +224,12 @@
 
     const openDrawer = () => {
         if (typeof window.toggleOffcanvas === 'function') window.toggleOffcanvas('offcanvas-left');
+        else {
+            const drawer = document.getElementById('offcanvas-left');
+            drawer.classList.remove('invisible', '-translate-x-full', 'opacity-0');
+            drawer.classList.add('visible', 'opacity-100');
+            document.querySelector('.overlay')?.classList.remove('hidden');
+        }
     };
 
     const refresh = async ({ open = false } = {}) => {
@@ -246,10 +252,17 @@
         const pageItems = document.getElementById('cart-page-items');
         pageItemTemplate = pageItems?.firstElementChild?.cloneNode(true);
         pageItems?.replaceChildren();
-        document.getElementById('cart-drawer-button')?.addEventListener('click', async () => {
-            await refresh();
+        document.querySelectorAll('#cart-drawer-button, [data-cart-drawer-open]').forEach(button => button.addEventListener('click', () => {
             openDrawer();
-        });
+            refresh();
+        }));
+        document.querySelectorAll('[data-cart-close]').forEach(button => button.addEventListener('click', () => {
+            if (typeof window.closeOffcanvas === 'function') window.closeOffcanvas();
+            else {
+                document.getElementById('offcanvas-left')?.classList.add('invisible', '-translate-x-full', 'opacity-0');
+                document.querySelector('.overlay')?.classList.add('hidden');
+            }
+        }));
         refresh();
     });
 })();

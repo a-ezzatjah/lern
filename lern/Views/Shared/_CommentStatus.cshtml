@@ -1,0 +1,2 @@
+@model string
+<span class="comment-status comment-status-@Model">@(Model == "blocked" ? "مسدودشده" : Model == "approved" ? "منتشرشده توسط مدیر" : "در حال بررسی")</span>

@@ -19,6 +19,7 @@ public static class CategoryCatalogSeeder
 
         var roots = new[]
         {
+            new CatalogNode("کش", new CatalogNode("کش قیطان"), new CatalogNode("کش ایرانی"), new CatalogNode("کش خارجی")),
             new CatalogNode("نخ",
                 new CatalogNode("دوک نخ خیاطی", new CatalogNode("دوک نخ خیاطی سفید و مشکی"), new CatalogNode("نخ پلی استر رنگی"), new CatalogNode("نخ لی رنگی")),
                 new CatalogNode("ماسوره نخ خیاطی", new CatalogNode("ماسوره نخ ۴۰۰ یارد"), new CatalogNode("ماسوره نخ ۴۰۰ یاردی رنگی"), new CatalogNode("ماسوره نخ طلقی"), new CatalogNode("ماسوره نخ لی"), new CatalogNode("ماسوره نخ دریما"), new CatalogNode("قرقره نخ ۱۰"), new CatalogNode("ماسوره نخ نایلون")),
@@ -88,7 +89,13 @@ public static class CategoryCatalogSeeder
                 category = allCategories.FirstOrDefault(x => x.Name == node.Name);
                 if (category is null)
                 {
-                    category = new Category { Name = node.Name, Slug = $"catalog-{++position:D4}", ParentId = parentId, SortOrder = position };
+                    var slug = node.Name switch
+                    {
+                        "کش" => "elastic", "کش قیطان" => "elastic-qizan",
+                        "کش ایرانی" => "elastic-iranian", "کش خارجی" => "elastic-imported",
+                        _ => $"catalog-{++position:D4}"
+                    };
+                    category = new Category { Name = node.Name, Slug = slug, ParentId = parentId, SortOrder = position };
                     db.Categories.Add(category);
                     await db.SaveChangesAsync();
                     allCategories.Add(category);

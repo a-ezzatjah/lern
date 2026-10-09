@@ -269,7 +269,8 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
         var key = $"user-{User.FindFirstValue(ClaimTypes.NameIdentifier)}";
         var query = _db.ProductComments.AsNoTracking().Where(x => x.CustomerKey == key);
         if (status == "approved") query = query.Where(x => x.IsApproved);
-        else if (status == "pending") query = query.Where(x => !x.IsApproved);
+        else if (status == "pending") query = query.Where(x => !x.IsApproved && !x.IsBlocked);
+        else if (status == "blocked") query = query.Where(x => x.IsBlocked);
         else status = null;
         if (rating is >= 1 and <= 5)
             query = query.Where(x => _db.ProductRatings.Any(r => r.ProductId == x.ProductId && r.CustomerKey == key && r.Score == rating));
@@ -299,7 +300,7 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
         {
             Comments = await query.Skip((page - 1) * pageSize).Take(pageSize)
                 .Select(x => new AccountCommentRow(x.Id, x.ProductId, x.Product.Name, x.AuthorName,
-                    x.Title, x.Body, x.IsApproved, x.CreatedAt,
+                    x.Title, x.Body, x.IsApproved, x.IsBlocked, x.CreatedAt,
                     _db.ProductRatings.Where(r => r.ProductId == x.ProductId && r.CustomerKey == key)
                         .Select(r => (int?)r.Score).FirstOrDefault())).ToListAsync(),
             Status = status, Rating = rating, Period = period, Sort = sort, Page = page, TotalCount = total
@@ -314,7 +315,7 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
         var key = $"user-{User.FindFirstValue(ClaimTypes.NameIdentifier)}";
         var comments = await _db.ProductComments.AsNoTracking().Where(x => x.CustomerKey == key)
             .OrderByDescending(x => x.CreatedAt).Select(x => new AccountCommentRow(x.Id, x.ProductId,
-                x.Product.Name, x.AuthorName, x.Title, x.Body, x.IsApproved, x.CreatedAt, null)).ToListAsync();
+                x.Product.Name, x.AuthorName, x.Title, x.Body, x.IsApproved, x.IsBlocked, x.CreatedAt, null)).ToListAsync();
         return View(comments);
     }
 
@@ -342,7 +343,7 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
             .Select(x => new AccountCommentEditViewModel
             {
                 Id = x.Id, ProductId = x.ProductId, ProductName = x.Product.Name,
-                Title = x.Title, Body = x.Body, IsApproved = x.IsApproved,
+                Title = x.Title, Body = x.Body, IsApproved = x.IsApproved, IsBlocked = x.IsBlocked,
                 Score = _db.ProductRatings.Where(r => r.ProductId == x.ProductId && r.CustomerKey == key)
                     .Select(r => (int?)r.Score).FirstOrDefault()
             }).SingleOrDefaultAsync();
@@ -362,7 +363,7 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
         var model = new AccountCommentEditViewModel
         {
             Id = id, ProductId = comment.ProductId, ProductName = comment.Product.Name,
-            Title = title?.Trim(), Body = body?.Trim() ?? "", Score = score, IsApproved = comment.IsApproved
+            Title = title?.Trim(), Body = body?.Trim() ?? "", Score = score, IsApproved = comment.IsApproved, IsBlocked = comment.IsBlocked
         };
         if (model.Body.Length is < 1 or > 2000 || model.Title?.Length > 150 || score is < 1 or > 5)
         {
@@ -371,6 +372,8 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
         }
         comment.Title = string.IsNullOrWhiteSpace(model.Title) ? null : model.Title;
         comment.Body = model.Body;
+        comment.IsApproved = false;
+        comment.IsBlocked = false;
         comment.UpdatedAt = DateTime.UtcNow;
         if (score.HasValue)
         {

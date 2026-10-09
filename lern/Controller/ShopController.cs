@@ -12,7 +12,8 @@ public sealed class ShopController(ShopDbContext db, IProductService products) :
     [HttpGet("")]
     public async Task<IActionResult> Index(string? q, [FromQuery(Name = "category")] int[]? categories,
         bool available = false, string sort = "newest", decimal? minPrice = null, decimal? maxPrice = null,
-        int offset = 0, int take = 6, bool append = false, bool discounted = false)
+        int offset = 0, int take = 6, bool append = false, bool discounted = false,
+        [FromQuery(Name = "color")] string[]? colors = null)
     {
         q = q?.Trim();
         if (q?.Length > 100) q = q[..100];
@@ -44,7 +45,8 @@ public sealed class ShopController(ShopDbContext db, IProductService products) :
         maxPrice = maxPrice.HasValue && maxPrice >= 0 ? maxPrice : null;
         take = append ? Math.Clamp(take, 1, 3) : 6;
         offset = append ? Math.Max(0, offset) : 0;
-        var result = await products.GetShopProductCardsAsync(q, selected.ToArray(), available, sort, minPrice, maxPrice, offset, take, discounted);
+        var result = await products.GetShopProductCardsAsync(q, selected.ToArray(), available, sort, minPrice, maxPrice, offset, take, discounted,
+            (colors ?? []).Where(c => !string.IsNullOrWhiteSpace(c) && c.Length <= 50).Distinct().Take(50).ToArray());
         ViewData["Title"] = string.IsNullOrWhiteSpace(q) ? (discounted ? "محصولات تخفیف‌دار" : "محصولات") : $"نتایج جستجوی {q}";
         if (selected.Count == 1)
         {
@@ -56,7 +58,8 @@ public sealed class ShopController(ShopDbContext db, IProductService products) :
             ViewData["CanonicalUrl"] = category.Seo?.CanonicalUrl;
             ViewData["Robots"] = $"{(category.Seo?.IndexPage ?? true ? "index" : "noindex")}, {(category.Seo?.FollowPage ?? true ? "follow" : "nofollow")}";
         }
-        var model = new ShopViewModel(result, allCategories, trail, q ?? "", selected, available, sort, minPrice, maxPrice, discounted);
+        var model = new ShopViewModel(result, allCategories, trail, q ?? "", selected, available, sort, minPrice, maxPrice, discounted)
+        { Colors = result.Colors, SelectedColors = result.SelectedColors };
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             return append ? PartialView("~/Views/Shop/_Cards.cshtml", result.Items)
                 : PartialView("~/Views/Shop/_Ajax.cshtml", model);

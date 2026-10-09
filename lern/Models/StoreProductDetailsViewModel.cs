@@ -12,6 +12,7 @@ public class StoreProductDetailsViewModel
     public string? Description { get; init; }
     public List<ProductGalleryImageViewModel> Gallery { get; init; } = new();
     public List<ProductCategoryViewModel> Categories { get; init; } = new();
+    public List<ProductCategoryViewModel> Breadcrumbs { get; init; } = new();
     public List<ProductOptionViewModel> Options { get; init; } = new();
     public List<ProductCardDto> RelatedProducts { get; init; } = new();
     public ProductVariantOptionViewModel? SelectedVariant { get; init; }
@@ -21,7 +22,8 @@ public class StoreProductDetailsViewModel
 
     public static StoreProductDetailsViewModel FromProduct(
         ProductPageViewModel product,
-        IEnumerable<ProductCardDto>? relatedProducts = null)
+        IEnumerable<ProductCardDto>? relatedProducts = null,
+        IEnumerable<Entities.Category>? categoryCatalog = null)
     {
         var variants = product.ProductVariants
             .GroupBy(x => x.Id)
@@ -92,13 +94,36 @@ public class StoreProductDetailsViewModel
                 .ToList(),
             Categories = product.Categories.Select(x => new ProductCategoryViewModel
             {
+                Id = x.Id,
                 Name = x.Name,
                 Slug = x.Slug
             }).ToList(),
+            Breadcrumbs = BuildCategoryTrail(product.Categories.Select(c => c.Id), categoryCatalog ?? []),
             Options = options.Where(x => x.Choices.Count > 0).ToList(),
             RelatedProducts = relatedProducts?.Take(10).ToList() ?? new List<ProductCardDto>(),
             SelectedVariant = selectedVariant
         };
+    }
+
+    public static List<ProductCategoryViewModel> BuildCategoryTrail(IEnumerable<int> categoryIds,
+        IEnumerable<Entities.Category> categories)
+    {
+        var byId = categories.ToDictionary(c => c.Id);
+        return categoryIds.Distinct().Select(id =>
+        {
+            var trail = new List<ProductCategoryViewModel>();
+            var visited = new HashSet<int>();
+            while (visited.Add(id) && byId.TryGetValue(id, out var category))
+            {
+                trail.Insert(0, new ProductCategoryViewModel { Id = category.Id, Name = category.Name, Slug = category.Slug });
+                if (!category.ParentId.HasValue) break;
+                id = category.ParentId.Value;
+            }
+            return trail;
+        }).OrderByDescending(trail => trail.Count)
+          .ThenBy(trail => trail.LastOrDefault()?.Name, StringComparer.Ordinal)
+          .ThenBy(trail => trail.LastOrDefault()?.Id)
+          .FirstOrDefault() ?? [];
     }
 
     private static ProductVariantOptionViewModel CreateVariantOption(
@@ -145,6 +170,8 @@ public class ProductGalleryImageViewModel
 
 public class ProductCategoryViewModel
 {
+    public int Id { get; init; }
+    public string Url => $"/shop?category={Id}";
     public string Name { get; init; } = string.Empty;
     public string Slug { get; init; } = string.Empty;
 }

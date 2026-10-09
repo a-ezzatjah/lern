@@ -76,7 +76,7 @@ public sealed class ProductRatingController : ControllerBase
             AuthorName = $"{user.FirstName} {user.LastName}".Trim(),
             Title = string.IsNullOrWhiteSpace(title) ? null : title,
             Body = body,
-            IsApproved = true,
+            IsApproved = false,
             CreatedAt = now,
             UpdatedAt = now
         };
@@ -93,7 +93,7 @@ public sealed class ProductRatingController : ControllerBase
         }
 
         await _db.SaveChangesAsync();
-        return Ok(new { comment.Id, comment.IsApproved, message = "دیدگاه شما با موفقیت ثبت شد." });
+        return Ok(new { comment.Id, comment.IsApproved, message = "دیدگاه شما ثبت شد و پس از تأیید مدیر منتشر می‌شود." });
     }
 
     [AllowAnonymous]
@@ -107,7 +107,7 @@ public sealed class ProductRatingController : ControllerBase
             return NotFound();
 
         var query = _db.ProductComments.AsNoTracking()
-            .Where(x => x.ProductId == productId && x.IsApproved)
+            .Where(x => x.ProductId == productId && x.IsApproved && !x.IsBlocked)
             .OrderByDescending(x => x.CreatedAt);
 
         var totalCount = await query.CountAsync();
@@ -161,6 +161,8 @@ public sealed class ProductRatingController : ControllerBase
 
         comment.Title = string.IsNullOrWhiteSpace(title) ? null : title;
         comment.Body = body;
+        comment.IsApproved = false;
+        comment.IsBlocked = false;
         comment.UpdatedAt = DateTime.UtcNow;
 
         if (request.Score.HasValue)
@@ -176,7 +178,7 @@ public sealed class ProductRatingController : ControllerBase
         }
 
         await _db.SaveChangesAsync();
-        return Ok(new { message = "دیدگاه شما ویرایش شد." });
+        return Ok(new { message = "دیدگاه شما ویرایش شد و برای بررسی دوباره ارسال شد." });
     }
 
     [Authorize]
@@ -205,6 +207,7 @@ public sealed class ProductRatingController : ControllerBase
             return NotFound();
 
         comment.IsApproved = request.IsApproved;
+        comment.IsBlocked = !request.IsApproved;
         comment.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
         return Ok(new { comment.Id, comment.IsApproved });

@@ -42,17 +42,19 @@
     </section>
 </div>
 <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+    <partial name="_OrderShipping" model="order" />
     <section class="order-card rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800">
-        <h2 class="mb-4 text-lg font-semibold dark:text-white">آدرس صورتحساب</h2><p class="text-sm text-gray-600 dark:text-gray-400">آدرس صورتحساب برای این سفارش ثبت نشده است.</p>
-    </section>
-    <section class="order-card rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800">
-        <h2 class="mb-4 text-lg font-semibold dark:text-white">آدرس فعلی مشتری</h2>
-        @if (Model.CurrentAddress is { } address)
-        {
-            <address class="space-y-2 text-sm not-italic text-gray-600 dark:text-gray-300"><p>@address.Province، @address.City، @address.Details</p><p>گیرنده: @address.ReceiverName</p><p>کد پستی: <bdi>@address.PostalCode</bdi></p></address>
-            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">این آدرس از پروفایل فعلی مشتری خوانده شده و آدرس زمان ثبت سفارش نیست.</p>
-        }
-        else { <p class="text-sm text-gray-600 dark:text-gray-400">آدرسی برای این مشتری ثبت نشده است.</p> }
+        <h2 class="mb-4 text-lg font-semibold dark:text-white">مدیریت ارسال</h2>
+        @if (TempData["ShippingSaved"] is string saved) { <p role="status" class="mb-3 text-green-700">@saved</p> }
+        <form method="post" action="/Admin/Orders/@order.Id/shipping" class="space-y-4">
+            @Html.AntiForgeryToken()
+            <label class="block">روش ارسال<select required name="method" class="mt-2 block w-full rounded-lg border p-2 dark:bg-gray-700"><option value="" disabled selected="@(order.ShippingMethod is null or "regional")">انتخاب روش ارسال</option><option value="courier" selected="@(order.ShippingMethod == "courier")">پیک</option><option value="freight" selected="@(order.ShippingMethod == "freight")">باربری</option><option value="other" selected="@(order.ShippingMethod == "other")">روش‌های ارسال دیگر</option></select></label>
+            <label class="block">شرکت یا سرویس ارسال<input name="carrier" value="@order.ShippingCarrier" maxlength="100" class="mt-2 block w-full rounded-lg border p-2 dark:bg-gray-700" placeholder="نام باربری، شرکت پستی یا آمادست" /></label>
+            <label class="block">کد پیگیری<input name="trackingCode" value="@order.ShippingTrackingCode" maxlength="100" class="mt-2 block w-full rounded-lg border p-2 dark:bg-gray-700" /></label>
+            <p class="text-sm text-gray-500">کرایهٔ سفارش‌های جدید هنگام تحویل دریافت می‌شود.</p>
+            <button class="rounded-lg bg-primary px-4 py-2 text-white">ذخیره اطلاعات ارسال</button>
+            <a href="https://amadast.com/" target="_blank" rel="noopener noreferrer" class="mx-3 text-primary">ورود به آمادست</a>
+        </form>
     </section>
 </div>
 <section class="order-card mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800">
@@ -83,7 +85,8 @@
         <h2 class="mb-4 text-lg font-semibold dark:text-white">جمع کل</h2>
         <dl class="space-y-4 text-sm">
             <div class="flex justify-between gap-3"><dt class="text-gray-600 dark:text-gray-400">جمع اقلام:</dt><dd class="dark:text-white">@order.Subtotal.ToString("N0") تومان</dd></div>
-            <div class="flex justify-between gap-3"><dt class="text-gray-600 dark:text-gray-400">هزینه ارسال و سایر هزینه‌ها:</dt><dd class="dark:text-white">@((order.Total - order.Subtotal).ToString("N0")) تومان</dd></div>
+            <div class="flex justify-between gap-3"><dt class="text-gray-600 dark:text-gray-400">تخفیف کد:</dt><dd class="dark:text-white">@order.CouponDiscount.ToString("N0") تومان</dd></div>
+            <div class="flex justify-between gap-3"><dt class="text-gray-600 dark:text-gray-400">هزینه ارسال:</dt><dd class="dark:text-white">@(order.ShippingPayOnDelivery ? "پرداخت هنگام تحویل" : (order.Total - order.Subtotal + order.CouponDiscount).ToString("N0") + " تومان")</dd></div>
             <div class="flex justify-between gap-3 border-t pt-4 text-lg font-bold dark:border-gray-700"><dt class="dark:text-white">مجموع کل:</dt><dd class="text-primary">@order.Total.ToString("N0") تومان</dd></div>
         </dl>
     </section>

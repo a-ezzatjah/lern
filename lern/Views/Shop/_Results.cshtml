@@ -8,6 +8,7 @@
         var parts = new List<string> { $"sort={sort}" };
         if (!string.IsNullOrWhiteSpace(Model.Query)) parts.Add($"q={Uri.EscapeDataString(Model.Query)}");
         parts.AddRange(Model.SelectedCategories.OrderBy(id => id).Select(id => $"category={id}"));
+        parts.AddRange(Model.SelectedColors.OrderBy(color => color).Select(color => $"color={Uri.EscapeDataString(color)}"));
         if (Model.AvailableOnly) parts.Add("available=true");
         if (Model.DiscountedOnly) parts.Add("discounted=true");
         if (Model.MinPrice.HasValue) parts.Add($"minPrice={Model.MinPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");

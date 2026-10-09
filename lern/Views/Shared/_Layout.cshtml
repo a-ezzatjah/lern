@@ -31,12 +31,11 @@
     <link rel="stylesheet" href="~/assets/js/plugin/swiper/swiper-bundle.min.css">
     <link rel="stylesheet" href="~/assets/css/app.css" asp-append-version="true">
     <link rel="stylesheet" href="~/assets/css/rich-editor.css" asp-append-version="true">
-    <link rel="stylesheet" href="~/assets/css/category-menu.css" asp-append-version="true">
     <link rel="stylesheet" href="~/assets/css/store-support.css" asp-append-version="true">
     <link rel="preload" href="~/assets/fonts/payda/PeydaWebFaNum-Medium.woff2" as="font" type="font/woff2" crossorigin>
     @await RenderSectionAsync("Head", required: false)
 </head>
-<body class="bg-light dark:bg-zinc-900 text-text-primary-light dark:text-text-primary-dark transition-colors duration-200">
+<body class="has-mobile-bottom-nav bg-light dark:bg-zinc-900 text-text-primary-light dark:text-text-primary-dark transition-colors duration-200">
 
     @* ۲. بخش Header و Navbar را از index.html کپی کن و اینجا بگذار *@
 
@@ -225,50 +224,6 @@
     </main>
 
     <partial name="_StoreFooter" />
-    <!-- ================= start cart offcanvas ================= -->
-    <!-- Offcanvas Cart -->
-    <div id="offcanvas-left"
-         class="offcanvas invisible dark:bg-zinc-900 dark:text-white fixed top-0 end-0 sm:w-100 w-[80%] h-full bg-white shadow-lg transform -translate-x-full transition-transform opacity-0 z-50"
-         role="dialog"
-         aria-labelledby="cart-title"
-         aria-modal="true">
-        <!-- Header -->
-        <header class="border-b p-3 flex items-center justify-between border-gray-400">
-            <h2 id="cart-title" class="font-bold text-base">سبد خرید شما</h2>
-            <button onclick="closeOffcanvas()"
-                    class="cursor-pointer"
-                    aria-label="بستن سبد خرید">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="size-8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </header>
-        <main id="cart-drawer-items" class="relative space-y-4 divide-y divide-gray-200 p-3 overflow-y-scroll h-full pb-36"></main>
-        <!-- Footer -->
-        <footer class="p-2 absolute bottom-0 start-0 end-0 bg-white dark:border-0  dark:bg-zinc-900 border border-gray-400">
-            <div class="flex items-center justify-between">
-                <div class="space-y-2">
-                    <span class="inline-block text-lg">جمع کل</span>
-                    <h3 id="cart-drawer-total" class="font-bold text-xl" itemprop="totalPrice" content="0">۰ تومان</h3>
-                </div>
-                <div class="text-end">
-                    <a href="/cart"
-                       class="bg-primary-grad hover:bg-primary-600 text-white py-2 px-4 rounded-lg"
-                       role="button"
-                       aria-label="تکمیل فرایند خرید">
-                        تکمیل خرید
-                    </a>
-                </div>
-            </div>
-        </footer>
-    </div>
-    <!-- Overlay -->
-    <div class="overlay transition fixed inset-0 z-40 bg-black/70 hidden"
-         onclick="closeOffcanvas()"
-         role="presentation"
-         aria-hidden="true"></div>
-    <!-- ================= end cart offcanvas ================= -->
     <!-- ================= start responsive menu offcanvas ================= -->
     <div id="offcanvas-right"
          class="offcanvas invisible overflow-y-scroll fixed top-0 start-0 sm:w-100 w-[80%] h-full bg-white dark:bg-zinc-900 shadow-lg transform -translate-x-full transition-transform opacity-0 z-50"
@@ -294,40 +249,7 @@
          role="presentation"
          aria-hidden="true"></div>
     <!-- ================= end responsive menu offcanvas ================= -->
-    <!-- ================= start nav mobile menu ================= -->
-    <nav class="fixed shadow-xl border-t-zinc-300 dark:border-0 bottom-0 z-20 lg:hidden end-0 start-0 dark:bg-gray-800 dark:text-white bg-white border-t border-gray-200">
-        <div class="flex justify-around items-center flex-row-reverse py-3 px-4">
-            <!-- Home -->
-            <a href="/" class="flex flex-col items-center text-primary space-y-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-primary">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                </svg>
-                <span class="text-xs font-bold">خانه</span>
-            </a>
-            <!-- cart -->
-            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-gray-700 space-y-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                </svg>
-                <span class="text-xs dark:text-white">سبد خرید</span>
-            </a>
-            <!-- Profile -->
-            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-gray-700 space-y-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                </svg>
-                <span class="text-xs dark:text-white">پنل کاربری</span>
-            </a>
-            <!-- Top -->
-            <a href="#" class="flex flex-col items-center text-gray-500 hover:text-gray-700 space-y-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 dark:text-white">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-                </svg>
-                <span class="text-xs dark:text-white">رفتن به بالا</span>
-            </a>
-        </div>
-    </nav>
-    <!-- ================= end nav mobile menu ================= -->
+
 
     @* شروع اسکریپت *@
     <script src="~/assets/js/plugin/story-player/story-player.js" asp-append-version="true"></script>
@@ -335,7 +257,6 @@
     <script src="~/assets/js/dependencies/swiper-script.js" asp-append-version="true"></script>
     <script src="~/assets/js/dependencies/app.js" asp-append-version="true"></script>
     <script src="~/assets/js/category-menu.js" asp-append-version="true"></script>
-    <script src="~/assets/js/cart-store.js" asp-append-version="true"></script>
 
     <!-- initial story api -->
     <script>
@@ -453,5 +374,6 @@
     <script src="~/assets/js/store-support.js" asp-append-version="true" defer></script>
     @await RenderSectionAsync("Scripts", required: false)
 <partial name="_FavoriteAssets" />
+<partial name="_MobileBottomNav" />
 </body>
 </html>

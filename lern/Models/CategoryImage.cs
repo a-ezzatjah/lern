@@ -17,7 +17,7 @@ public static class CategoryImage
             "catalog-0127" => "sewing-tools",
             "catalog-0164" => "machine-tools",
             "catalog-0186" => "beads",
-            "catalog-extra-000" => "elastic",
+            "catalog-extra-000" or "elastic" or "elastic-qizan" or "elastic-iranian" or "elastic-imported" => "elastic",
             "catalog-extra-020" => "curtain",
             "catalog-extra-026" => "yarn",
             "catalog-extra-046" => "ribbon",

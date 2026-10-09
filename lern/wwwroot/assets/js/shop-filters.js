@@ -5,6 +5,86 @@
     const status = document.getElementById('shop-filter-status');
     if (!page || !form || !results || !status) return;
 
+    const mobile = matchMedia('(max-width: 60rem)');
+    const drawer = document.getElementById('shop-filter-drawer');
+    const sidebar = page.querySelector('.shop-filters');
+    const sidebarHome = sidebar.parentElement;
+    const track = page.querySelector('.shop-filter-track');
+    const availableToggle = document.getElementById('shop-available-toggle');
+    const colorSearch = document.getElementById('shop-color-search');
+    const normalizeColor = value => value.normalize('NFKC').replace(/ي/g, 'ی').replace(/ك/g, 'ک').replace(/[\s\u200c]/g, '').toLocaleLowerCase('fa');
+    const filterColors = () => {
+        const query = normalizeColor(colorSearch.value);
+        const options = form.querySelectorAll('[data-color-name]');
+        let visible = 0;
+        options.forEach(option => {
+            option.hidden = !normalizeColor(option.dataset.colorName).includes(query);
+            if (!option.hidden) visible++;
+        });
+        const empty = form.querySelector('.shop-color-empty');
+        empty.hidden = visible > 0;
+        empty.textContent = options.length ? 'رنگی با این نام پیدا نشد.' : 'رنگی برای نمایش وجود ندارد.';
+    };
+    colorSearch.addEventListener('input', filterColors);
+    let opener = null;
+    let previousOverflow = '';
+    const closeDrawer = () => { if (drawer.open) drawer.close(); };
+    drawer.addEventListener('close', () => {
+        document.body.style.overflow = previousOverflow;
+        if (mobile.matches) opener?.focus();
+    });
+    drawer.querySelector('[data-close-filter]').addEventListener('click', closeDrawer);
+    drawer.addEventListener('click', event => {
+        if (event.target !== drawer) return;
+        const rect = drawer.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeDrawer();
+    });
+    const updateArrows = () => {
+        const overflowing = track.scrollWidth > track.clientWidth + 1;
+        page.querySelectorAll('[data-scroll]').forEach(button => {
+            button.hidden = !overflowing;
+            button.disabled = button.dataset.scroll === 'right' ? Math.abs(track.scrollLeft) < 2
+                : Math.abs(track.scrollLeft) >= track.scrollWidth - track.clientWidth - 2;
+        });
+    };
+    page.querySelectorAll('[data-scroll]').forEach(button => button.addEventListener('click', () => {
+        track.scrollBy({ left: (button.dataset.scroll === 'right' ? 1 : -1) * track.clientWidth * .7,
+            behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    }));
+    track.addEventListener('scroll', updateArrows, { passive: true });
+    new ResizeObserver(updateArrows).observe(track);
+    const syncMobile = () => {
+        availableToggle.setAttribute('aria-pressed', String(form.elements.available.checked));
+        const active = {
+            category: !!form.querySelector('input[name="category"]:checked'), color: !!form.querySelector('input[name="color"]:checked'), search: !!form.elements.q.value.trim(),
+            price: !!(form.elements.minPrice.value || form.elements.maxPrice.value), sort: form.elements.sort.value !== 'newest'
+        };
+        page.querySelectorAll('[data-open-filter]').forEach(button => button.classList.toggle('is-active', active[button.dataset.openFilter]));
+    };
+    const placeSidebar = () => {
+        closeDrawer();
+        if (mobile.matches) drawer.append(sidebar);
+        else sidebarHome.prepend(sidebar);
+        updateArrows();
+    };
+    mobile.addEventListener('change', placeSidebar);
+    page.classList.add('shop-mobile-ready');
+    placeSidebar();
+    syncMobile();
+    page.querySelectorAll('[data-open-filter]').forEach(button => button.addEventListener('click', () => {
+        if (!mobile.matches) return;
+        opener = button;
+        sidebar.querySelectorAll('[data-filter-section]').forEach(section => section.classList.toggle('is-visible', section.dataset.filterSection === button.dataset.openFilter));
+        document.getElementById('shop-drawer-title').textContent = button.textContent;
+        previousOverflow = document.body.style.overflow;
+        drawer.showModal();
+        document.body.style.overflow = 'hidden';
+        sidebar.querySelector('.is-visible input, .is-visible select')?.focus();
+    }));
+    availableToggle.addEventListener('click', () => {
+        form.elements.available.checked = !form.elements.available.checked;
+        form.elements.available.dispatchEvent(new Event('change', { bubbles: true }));
+    });
     let request = null;
     let appendRequest = null;
     let observer = null;
@@ -31,6 +111,8 @@
         form.elements.minPrice.value = params.get('minPrice') || '';
         form.elements.maxPrice.value = params.get('maxPrice') || '';
         form.elements.available.checked = params.get('available') === 'true';
+        const selectedColors = new Set(params.getAll('color'));
+        form.querySelectorAll('input[name="color"]').forEach(input => { input.checked = selectedColors.has(input.value); });
         const selected = new Set(params.getAll('category'));
         form.querySelectorAll('input[name="category"]').forEach(input => {
             input.checked = selected.has(input.value);
@@ -45,6 +127,7 @@
     };
 
     const stopLoading = () => {
+        syncMobile();
         results.removeAttribute('aria-busy');
         status.hidden = true;
     };
@@ -133,6 +216,20 @@
             if (!breadcrumb || !nextResults) throw new Error('نمایش محصولات انجام نشد.');
             page.querySelector('#shop-breadcrumb').replaceWith(breadcrumb);
             results.replaceChildren(...nextResults.childNodes);
+            const nextColors = template.content.querySelector('#shop-color-options');
+            if (nextColors) {
+                const previousColors = form.querySelector('#shop-color-options');
+                const focusedColor = previousColors.contains(document.activeElement) ? document.activeElement.value : null;
+                const scrollTop = previousColors.scrollTop;
+                previousColors.replaceWith(nextColors);
+                nextColors.scrollTop = scrollTop;
+                if (focusedColor) [...nextColors.querySelectorAll('input[name="color"]')]
+                    .find(input => input.value === focusedColor)?.focus({ preventScroll: true });
+                // Use the server's valid selections when a category/search removes a color.
+                url.searchParams.delete('color');
+                form.querySelectorAll('input[name="color"]:checked').forEach(input => url.searchParams.append('color', input.value));
+                filterColors();
+            }
             if (updateHistory && url.href !== location.href) history.pushState(null, '', url);
             syncForm(url);
             document.title = `${breadcrumb.textContent.trim()} - Kohestani`;
@@ -148,11 +245,13 @@
         }
     };
 
-    form.addEventListener('submit', event => { event.preventDefault(); clearTimeout(timer); load(formUrl()); });
+    form.addEventListener('submit', event => { event.preventDefault(); clearTimeout(timer); syncMobile(); load(formUrl()); closeDrawer(); });
     form.addEventListener('change', event => {
-        if (event.target.matches('input[type="checkbox"], input[type="number"]')) { clearTimeout(timer); load(formUrl()); }
+        syncMobile();
+        if (event.target.matches('input[type="checkbox"], input[type="number"], input[type="radio"]')) { clearTimeout(timer); load(formUrl()); }
     });
     form.elements.q.addEventListener('input', () => {
+        syncMobile();
         clearTimeout(timer);
         request?.abort();
         appendRequest?.abort();

@@ -1,0 +1,44 @@
+.comment-status { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap; }
+.comment-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.comment-status-approved { color: #166534; background: #dcfce7; border-color: #bbf7d0; }
+.comment-status-pending { color: #854d0e; background: #fef9c3; border-color: #fde68a; }
+.comment-status-blocked { color: #991b1b; background: #fee2e2; border-color: #fecaca; }
+.dark .comment-status-approved { color: #86efac; background: #143428; border-color: #285b40; }
+.dark .comment-status-pending { color: #fde047; background: #3b3018; border-color: #66532a; }
+.dark .comment-status-blocked { color: #fca5a5; background: #3e2025; border-color: #6b3038; }
+.moderation-page { padding: clamp(16px, 3vw, 30px); max-width: 1100px; margin-inline: auto; }
+.moderation-heading, .moderation-comment > header { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; }
+.moderation-heading h1 { font-size: 24px; font-weight: 700; }
+.moderation-heading p { font-size: 14px; color: #64748b; margin-top: 8px; line-height: 1.9; }
+.moderation-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-block: 24px; }
+.moderation-tabs a { display: flex; align-items: center; gap: 8px; border: 1px solid #dfe3ee; border-radius: 12px; padding: 10px 14px; font-size: 14px; }
+.moderation-tabs a[aria-current="page"] { color: #434ece; background: #eef0ff; border-color: #a5b4fc; }
+.moderation-tabs b { font-size: 12px; }
+.moderation-search label { display: block; font-size: 13px; margin-bottom: 8px; }
+.moderation-search > div { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.moderation-search input[type="search"] { flex: 1; min-width: 180px; background: transparent; border: 1px solid #cbd5e1; border-radius: 10px; padding: 11px 14px; }
+.moderation-search button { padding: 11px 20px; background: #434ece; color: white; border-radius: 10px; }
+.moderation-result-count { font-size: 13px; color: #64748b; margin-block: 20px 12px; }
+.moderation-comment { border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+.moderation-comment h2 { font-weight: 700; font-size: 16px; }
+.moderation-comment header a { color: #6366f1; display: inline-block; margin-top: 8px; font-size: 14px; }
+.moderation-comment time { display: block; color: #64748b; font-size: 12px; margin-block: 12px; }
+.moderation-comment h3 { font-weight: 600; margin-top: 16px; }
+.moderation-body { white-space: pre-line; overflow-wrap: anywhere; line-height: 2; margin-block: 10px 20px; }
+.moderation-actions { display: flex; gap: 10px; flex-wrap: wrap; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+.moderation-actions button { min-height: 44px; padding: 10px 16px; border: 1px solid; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.moderation-approve { background: #dcfce7; color: #166534; border-color: #86efac !important; }
+.moderation-block { background: #fee2e2; color: #991b1b; border-color: #fca5a5 !important; }
+.moderation-pending { background: #fef9c3; color: #854d0e; border-color: #fde047 !important; }
+.moderation-notice { border-radius: 12px; background: #eef0ff; color: #434ece; padding: 14px; margin-top: 20px; }
+.moderation-empty { text-align: center; padding: 40px 16px; color: #64748b; }
+.moderation-pagination { display: flex; justify-content: center; gap: 18px; align-items: center; font-size: 14px; margin-top: 24px; }
+.moderation-pagination a { padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: 10px; }
+.dark .moderation-comment, .dark .moderation-actions, .dark .moderation-tabs a, .dark .moderation-search input { border-color: #3f465c; }
+.dark .moderation-heading p, .dark .moderation-result-count, .dark .moderation-comment time, .dark .moderation-empty { color: #a1a1aa; }
+.dark .moderation-tabs a[aria-current="page"], .dark .moderation-notice { background: #31365e; color: #c7d2fe; }
+
+.moderation-pagination [data-comments-more] { background: #434ece; color: #fff; border-color: #434ece; font-weight: 600; }
+.moderation-pagination [aria-disabled="true"] { opacity: .6; cursor: wait; }
+.moderation-load-status { min-height: 24px; margin-top: 14px; text-align: center; font-size: 13px; color: #64748b; }
+.dark .moderation-load-status { color: #a1a1aa; }

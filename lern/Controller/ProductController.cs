@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceContract.DTO.DtoProduct;
 using ServiceContract.Interfaces;
@@ -29,6 +30,7 @@ namespace lern.Controller
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddAsync(ProductCreateDto model)
         {
@@ -37,6 +39,7 @@ namespace lern.Controller
             return Ok(result.Data);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}/edit")]
         public async Task<IActionResult> GetForUpdateAsync(int id)
         {
@@ -44,6 +47,7 @@ namespace lern.Controller
             return model == null ? NotFound() : Ok(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(int id, ProductUpdateDto model)
         {
@@ -57,6 +61,7 @@ namespace lern.Controller
             return Ok(result.Data);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {

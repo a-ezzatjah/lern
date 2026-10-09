@@ -30,9 +30,12 @@
     <link rel="stylesheet" href="/assets/js/plugin/swiper/swiper-bundle.min.css">
     <link rel="stylesheet" href="~/assets/css/app.css" asp-append-version="true">
     <link rel="preload" href="/assets/fonts/payda/PeydaWebFaNum-Medium.woff2" as="font" type="font/woff2" crossorigin>
+    <style>
+        @@media (max-width: 639px) { .account-recent-products { padding: .75rem; gap: .75rem; } }
+    </style>
     @await Html.PartialAsync("_AccountAvatarAssets")
 </head>
-<body class="account-shell bg-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark transition-colors duration-200">
+<body class="has-mobile-bottom-nav account-shell bg-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark transition-colors duration-200">
 
 <div class="flex h-screen overflow-hidden max-w-[1920px] mx-auto">
     <!-- sidebar -->
@@ -429,7 +432,7 @@
                             var dateLabel = $"{calendar.GetYear(local):0000}/{calendar.GetMonth(local):00}/{calendar.GetDayOfMonth(local):00}";
                             var statusLabel = order.Status switch
                             {
-                                Entities.OrderStatus.Pending => "در انتظار پرداخت",
+                                Entities.OrderStatus.PaymentReview => "نیازمند بررسی پرداخت", Entities.OrderStatus.Pending => "در انتظار پرداخت",
                                 Entities.OrderStatus.Paid => "پرداخت شده",
                                 Entities.OrderStatus.Processing => "در حال پردازش",
                                 Entities.OrderStatus.Shipped => "ارسال شده",
@@ -468,7 +471,7 @@
                 }
                 else
                 {
-                    <div class="p-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div class="account-recent-products p-6 grid grid-cols-2 xl:grid-cols-4 gap-6">
                         @foreach (var product in Model.RecentlyViewedProducts)
                         {
                             <partial name="_ProductCard" model="product" />
@@ -884,7 +887,7 @@
                         پیشخوان
                         <span class="ms-auto w-2 h-2 rounded-full bg-primary dark:bg-primary-dark"></span>
                     </a>
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                    <a href="/account/profile" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 me-2" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
                         </svg>
@@ -911,7 +914,7 @@
                         </svg>
                         علاقه‌مندی‌ها
                     </a>
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                    <a href="/contact" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 me-2" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
                         </svg>
@@ -1039,5 +1042,6 @@
 
 <partial name="_FavoriteAssets" />
 <script src="/assets/js/account-inbox.js" asp-append-version="true"></script>
+<partial name="_MobileBottomNav" />
 </body>
 </html>

@@ -3,9 +3,10 @@
     Layout = "_AccountLayout";
     ViewData["Title"] = "ویرایش نظر";
 }
+<link rel="stylesheet" href="~/assets/css/comment-moderation.css" asp-append-version="true" />
 <section class="w-full p-4 md:p-6">
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div><h1 class="text-2xl font-bold text-dark dark:text-light">ویرایش نظر</h1><p class="mt-1 text-sm text-gray-600 dark:text-gray-400">شما در حال ویرایش نظر خود برای محصول زیر هستید.</p></div>
+        <div><h1 class="text-2xl font-bold text-dark dark:text-light">ویرایش نظر</h1><p class="mt-1 text-sm text-gray-600 dark:text-gray-400">پس از ذخیرهٔ تغییرات، نظر شما برای بررسی دوباره به مدیر ارسال می‌شود.</p></div>
         <a asp-action="Comments" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-dark hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-light">بازگشت به نظرات</a>
     </div>
 
@@ -13,7 +14,7 @@
         <a asp-controller="StoreProduct" asp-action="Details" asp-route-id="@Model.ProductId" class="text-lg font-medium text-primary hover:underline dark:text-primary-dark">@Model.ProductName</a>
         <div class="mt-4 flex flex-wrap items-center gap-4 text-sm dark:text-white">
             <span>امتیاز فعلی: @(Model.Score.HasValue ? $"{Model.Score} از ۵" : "ثبت نشده")</span>
-            <span>وضعیت نظر: <span class="rounded-full px-2 py-1 @(Model.IsApproved ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200")">@(Model.IsApproved ? "تأیید شده" : "در انتظار تأیید")</span></span>
+            <span>وضعیت نظر: <partial name="_CommentStatus" model='@(Model.IsBlocked ? "blocked" : Model.IsApproved ? "approved" : "pending")' /></span>
         </div>
     </div>
 

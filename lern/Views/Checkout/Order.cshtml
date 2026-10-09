@@ -1,0 +1,22 @@
+@model Entities.Order
+@{ ViewData["Title"] = "سفارش من"; }
+<section class="container mx-auto space-y-6 px-4 py-8">
+    <div class="rounded-xl border bg-white p-6 dark:bg-gray-800 dark:text-white">
+        <h1 class="mb-4 text-xl font-bold">سفارش #@Model.Id</h1>
+        <p>وضعیت: @AdminOrderDisplay.Status(Model.Status)</p>
+        <p class="mt-3">مبلغ کالاها پس از تخفیف: @Model.Total.ToString("N0") تومان</p>
+        @if (Model.Status == Entities.OrderStatus.Pending)
+        {
+            <p class="mt-3">مبلغ کالاها هنوز پرداخت نشده است. رزرو موجودی تا @AdminOrderDisplay.LocalTime(Model.ReservationExpiresAt ?? Model.CreatedAt).ToString("HH:mm") اعتبار دارد.</p>
+            @if (ViewBag.PaymentAvailable == true) { <button id="order-pay" data-order="@Model.Id" class="mt-4 rounded-lg bg-primary px-4 py-2 text-white">پرداخت مبلغ کالاها</button> }
+            else { <p class="mt-3">درگاه پرداخت هنوز فعال نشده است.</p> }
+        }
+        <p id="payment-message" role="status" class="mt-3"></p>
+    </div>
+    <partial name="_OrderShipping" model="Model" />
+    <div class="rounded-xl border bg-white p-6 dark:bg-gray-800 dark:text-white">
+        @foreach (var item in Model.Items) { <p class="mb-3">@item.ProductName · تعداد @item.Quantity · @item.LineTotal.ToString("N0") تومان</p> }
+        <a href="/shop" class="text-primary">بازگشت به فروشگاه</a>
+    </div>
+</section>
+@section Scripts { <script src="~/assets/js/order-payment.js" asp-append-version="true" defer></script> }

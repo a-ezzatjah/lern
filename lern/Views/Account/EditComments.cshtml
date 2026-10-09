@@ -3,6 +3,7 @@
     Layout = "_AccountLayout";
     ViewData["Title"] = "ویرایش دیدگاه‌ها";
 }
+<link rel="stylesheet" href="~/assets/css/comment-moderation.css" asp-append-version="true" />
 <section class="w-full p-4 md:p-6">
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div><h1 class="text-2xl font-bold text-dark dark:text-light">ویرایش دیدگاه‌ها</h1><p class="mt-1 text-sm text-gray-600 dark:text-gray-400">دیدگاهی را برای ویرایش یا حذف انتخاب کنید.</p></div>
@@ -20,6 +21,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 p-5 last:border-0 dark:border-gray-700">
                     <div class="min-w-0"><p class="font-medium text-dark dark:text-light">@comment.ProductName</p><p class="mt-1 line-clamp-2 text-sm text-gray-500 dark:text-gray-400">@comment.Body</p></div>
                     <div class="flex shrink-0 flex-wrap items-center gap-2">
+                        <partial name="_CommentStatus" model='@(comment.IsBlocked ? "blocked" : comment.IsApproved ? "approved" : "pending")' />
                         <a asp-action="EditComment" asp-route-id="@comment.Id" class="rounded-lg bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90">ویرایش نظر</a>
                         <form asp-action="DeleteComment" asp-route-id="@comment.Id" method="post" onsubmit="return confirm('آیا از حذف این نظر مطمئن هستید؟');">
                             @Html.AntiForgeryToken()

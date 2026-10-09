@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace lern.Controller;
 
 [Authorize(Roles = "Admin")]
+[Route("Admin/Complaints")]
 [Route("Admin/Settings/complaints")]
 [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
 public sealed class AdminComplaintsController(ShopDbContext db) : Microsoft.AspNetCore.Mvc.Controller

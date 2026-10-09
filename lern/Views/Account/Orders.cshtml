@@ -8,7 +8,7 @@
     string DateLabel(DateTime date) { var local = date.ToLocalTime(); return $"{calendar.GetYear(local):0000}/{calendar.GetMonth(local):00}/{calendar.GetDayOfMonth(local):00}"; }
     string StatusLabel(OrderStatus status) => status switch
     {
-        OrderStatus.Pending => "در انتظار پرداخت", OrderStatus.Paid => "پرداخت شده",
+        OrderStatus.PaymentReview => "نیازمند بررسی پرداخت", OrderStatus.Pending => "در انتظار پرداخت", OrderStatus.Paid => "پرداخت شده",
         OrderStatus.Processing => "در حال پردازش", OrderStatus.Shipped => "ارسال شده",
         OrderStatus.Completed => "تحویل شده", OrderStatus.Cancelled => "لغو شده", _ => "نامشخص"
     };

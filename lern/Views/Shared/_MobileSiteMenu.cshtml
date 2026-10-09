@@ -1,0 +1,20 @@
+<dialog id="mobile-site-menu" aria-labelledby="mobile-site-menu-title" dir="rtl">
+    <header class="mobile-site-menu-header">
+        <button type="button" data-mobile-menu-back hidden aria-label="بازگشت به منو">→</button>
+        <h2 id="mobile-site-menu-title">منو</h2>
+        <button type="button" data-mobile-menu-close aria-label="بستن منو">×</button>
+    </header>
+    <nav data-mobile-menu-links aria-label="منوی سایت">
+        <a href="/">صفحه اصلی <span aria-hidden="true">←</span></a>
+        <a href="/shop">فروشگاه <span aria-hidden="true">←</span></a>
+        <button type="button" data-mobile-menu-categories aria-controls="mobile-site-menu-categories">دسته‌بندی‌ها <span aria-hidden="true">←</span></button>
+        <a href="/faq">سوالی دارید <span aria-hidden="true">←</span></a>
+        <a href="/account/orders">پیگیری سفارش <span aria-hidden="true">←</span></a>
+        <a href="/articles">بلاگ <span aria-hidden="true">←</span></a>
+        <a href="/about">درباره ما <span aria-hidden="true">←</span></a>
+        <a href="/contact">تماس با ما <span aria-hidden="true">←</span></a>
+    </nav>
+    <section id="mobile-site-menu-categories" aria-label="دسته‌بندی‌های فروشگاه" hidden>
+        @await Component.InvokeAsync("MegaMenu")
+    </section>
+</dialog>

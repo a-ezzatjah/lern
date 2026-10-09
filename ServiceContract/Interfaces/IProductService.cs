@@ -23,7 +23,7 @@ namespace ServiceContract.Interfaces
 
         public Task<List<ProductCardDto>> GetProductCardsAsync();
 
-        public Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? query, int[] categoryIds, bool availableOnly, string sort, decimal? minPrice, decimal? maxPrice, int offset, int take, bool discountedOnly = false);
+        public Task<ShopProductPageDto> GetShopProductCardsAsync(string? query, int[] categoryIds, bool availableOnly, string sort, decimal? minPrice, decimal? maxPrice, int offset, int take, bool discountedOnly = false, string[]? colors = null);
 
         public Task<PageResult<ProductCardDto>> GetCategoryProductCardsAsync(int categoryId, int page = 1);
 

@@ -9,7 +9,8 @@ namespace lern.Controller;
 public class CartController : ControllerBase
 {
     private readonly ShopDbContext _db;
-    public CartController(ShopDbContext db) => _db = db;
+    private readonly CustomerSession _session;
+    public CartController(ShopDbContext db, CustomerSession session) { _db = db; _session = session; }
     [HttpGet]
     public async Task<IActionResult> Get()
     {
@@ -126,17 +127,7 @@ public class CartController : ControllerBase
         if (item is null) return NotFound();
         _db.CartItems.Remove(item); await _db.SaveChangesAsync(); return NoContent();
     }
-    private string EnsureCustomerKey()
-    {
-        var accountKey = PurchaseLimitPolicy.AccountKey(User);
-        if (accountKey is not null) return accountKey;
-        var customerKey = Request.Cookies["customer-key"];
-        if (!string.IsNullOrWhiteSpace(customerKey)) return customerKey;
-
-        customerKey = Guid.NewGuid().ToString("N");
-        Response.Cookies.Append("customer-key", customerKey, new CookieOptions { HttpOnly = true, IsEssential = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddYears(1) });
-        return customerKey;
-    }
+    private string EnsureCustomerKey() => _session.GetOrCreate(HttpContext);
 }
 public record AddCartItemRequest(int ProductVariantId, int Quantity);
 public record UpdateCartItemRequest(int Quantity);

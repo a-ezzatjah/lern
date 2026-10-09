@@ -370,58 +370,13 @@
     ViewData["Title"] = Model.Name;
     var selectedVariant = Model.SelectedVariant;
     var hasAvailableVariant = Model.Options.SelectMany(x => x.Choices).Any(x => x.IsAvailable);
-    var categoryNames = Model.Categories.Select(x => x.Name).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+
 }
 
 <!-- ================= start content section ================= -->
 <section class="py-5" itemscope itemtype="https://schema.org/Product">
     <div class="container">
-        <!-- breadcrumb -->
-        <nav class="flex mt-2 mb-6" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse" itemscope
-                itemtype="https://schema.org/BreadcrumbList">
-                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                    <a href="/"
-                       class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
-                       itemprop="item">
-                        <svg class="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                             fill="currentColor" viewBox="0 0 20 20">
-                            <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
-                        </svg>
-                        <span itemprop="name">خانه</span>
-                    </a>
-                    <meta itemprop="position" content="1">
-                </li>
-                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                    <div class="flex items-center">
-                        <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="m1 9 4-4-4-4"/>
-                        </svg>
-                        <a href="/shop"
-                           class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
-                           itemprop="item">
-                            <span itemprop="name">فروشگاه</span>
-                        </a>
-                    </div>
-                    <meta itemprop="position" content="2">
-                </li>
-                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" aria-current="page">
-                    <div class="flex items-center">
-                        <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="m1 9 4-4-4-4"/>
-                        </svg>
-                        <span class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400" itemprop="name">
-                        گوشی موبایل اپل مدل iPhone 13 Pro Max دو سیم کارت
-                        </span>
-                    </div>
-                    <meta itemprop="position" content="3">
-                </li>
-            </ol>
-        </nav>
+        <partial name="~/Views/StoreProduct/_Breadcrumb.cshtml" model="Model" />
         <!-- main -->
         <div class="dark:bg-gray-800 dark:text-white bg-white rounded-lg drop-shadow-lg border-gray-300 border-1 px-4 pt-4">
             <h1 id="product-title" class="mb-4 border-b border-gray-200 pb-4 text-xl font-bold dark:border-gray-700" itemprop="name">@Model.Name</h1>
@@ -740,9 +695,21 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                           stroke-width="2" d="M20.25 12l-8.25 5.25L3.75 12"/>
                                                 </svg>
-                                                <span><strong>دسته‌بندی:</strong> @(categoryNames.Count > 0 ? string.Join("، ", categoryNames) : "لوازم خرازی")</span>
+                                                <span><strong>دسته‌بندی:</strong>
+                                                    @if (Model.Categories.Count == 0)
+                                                    {
+                                                        <span>بدون دسته‌بندی</span>
+                                                    }
+                                                    @foreach (var category in Model.Categories)
+                                                    {
+                                                        <a href="@category.Url" class="product-purchase-category">@category.Name</a>
+                                                    }
+                                                </span>
                                             </div>
-                                            <a href="/shop/categories" class="block text-gray-500 dark:text-zinc-400 text-xs">مشاهده محصولات بیشتر در این دسته‌بندی</a>
+                                            @if (Model.Breadcrumbs.LastOrDefault() is { } primaryCategory)
+                                            {
+                                                <a href="@primaryCategory.Url" class="block text-gray-500 dark:text-zinc-400 text-xs">محصولات بیشتر در @primaryCategory.Name</a>
+                                            }
                                         </div>
                                     </li>
                                     <li class="flex pb-2 items-start gap-2">

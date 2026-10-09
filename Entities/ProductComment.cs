@@ -13,6 +13,7 @@ public class ProductComment
     public string? Title { get; set; }
     public string Body { get; set; } = null!;
     public bool IsApproved { get; set; }
+    public bool IsBlocked { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

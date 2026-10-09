@@ -1,7 +1,7 @@
 namespace lern.Models;
 
 public sealed record AccountCommentRow(int Id, int ProductId, string ProductName, string AuthorName,
-    string? Title, string Body, bool IsApproved, DateTime CreatedAt, int? Score);
+    string? Title, string Body, bool IsApproved, bool IsBlocked, DateTime CreatedAt, int? Score);
 
 public sealed class AccountCommentsViewModel
 {

@@ -564,8 +564,8 @@ public async Task<List<ProductCardDto>> GetRelatedProductCardsAsync(int productI
 
 
 
-public async Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? search, int[] categoryIds, bool availableOnly,
-    string sort, decimal? minPrice, decimal? maxPrice, int offset, int take, bool discountedOnly = false)
+public async Task<ShopProductPageDto> GetShopProductCardsAsync(string? search, int[] categoryIds, bool availableOnly,
+    string sort, decimal? minPrice, decimal? maxPrice, int offset, int take, bool discountedOnly = false, string[]? colors = null)
 {
     take = Math.Clamp(take, 1, 10);
     offset = Math.Max(0, offset);
@@ -648,6 +648,22 @@ public async Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? s
     if (minPrice.HasValue) priced = priced.Where(p => p.Price >= minPrice.Value);
     if (maxPrice.HasValue) priced = priced.Where(p => p.Price <= maxPrice.Value);
 
+    // Build the color facet before applying its own selection, across all matching products.
+    var colorRows = await priced.SelectMany(p => p.Product.SaleOptions.SelectMany(o => o.SaleOptionColors))
+        .Where(c => c.Color != null && c.Color.Trim() != "" &&
+            (!availableOnly || c.ProductVariants.Any(v => v.StockQuantity > v.ReservedQuantity)))
+        .Select(c => new { Name = c.Color.Trim(), c.HexCode }).Distinct().ToListAsync();
+    var colorOptions = colorRows.GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+        .Select(group => new ShopColorDto(group.Key, group.Select(c => c.HexCode).OrderBy(hex => hex).FirstOrDefault(hex => !string.IsNullOrWhiteSpace(hex))))
+        .OrderBy(c => c.Name).ToList();
+    var colorNames = colorOptions.Select(c => c.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+    var selectedColors = (colors ?? []).Select(c => c.Trim()).Where(colorNames.Contains).ToHashSet(StringComparer.OrdinalIgnoreCase);
+    if (selectedColors.Count > 0)
+    {
+        var names = selectedColors.ToArray();
+        priced = priced.Where(p => p.Product.SaleOptions.Any(o => o.SaleOptionColors.Any(c =>
+            names.Contains(c.Color.Trim()) && (!availableOnly || c.ProductVariants.Any(v => v.StockQuantity > v.ReservedQuantity)))));
+    }
     var total = await priced.CountAsync();
     var availableFirst = priced.OrderByDescending(p => p.IsAvailable);
     var ordered = sort switch
@@ -667,8 +683,8 @@ public async Task<PageResult<ProductCardDto>> GetShopProductCardsAsync(string? s
         .Include(p => p.SaleOptions).ThenInclude(o => o.SaleOptionColors).ThenInclude(c => c.ProductVariants)
         .Include(p => p.ProductImages).AsSplitQuery().ToListAsync();
     var byId = products.ToDictionary(p => p.Id);
-    return new PageResult<ProductCardDto> { Items = pageIds.Select(id => CreateProductCard(byId[id])).ToList(),
-        TotalCount = total, Page = 1, PageSize = take };
+    return new ShopProductPageDto { Items = pageIds.Select(id => CreateProductCard(byId[id])).ToList(),
+        TotalCount = total, Page = 1, PageSize = take, Colors = colorOptions, SelectedColors = selectedColors };
 }
 public async Task<PageResult<ProductCardDto>> GetCategoryProductCardsAsync(int categoryId, int page = 1)
 {

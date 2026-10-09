@@ -18,6 +18,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddMemoryCache();
+builder.Services.AddStoreRequestSecurity(builder.Environment.IsDevelopment());
+builder.Services.AddDataProtection();
+builder.Services.AddScoped<CustomerSession>();
+builder.Services.AddScoped<OrderReservations>();
+builder.Services.AddScoped<OrderPayments>();
+builder.Services.AddScoped<IOrderPaymentGateway, UnavailablePaymentGateway>();
+builder.Services.AddHostedService<OrderReservationWorker>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductSaleOptionService, ProductSaleOptionService>();
@@ -25,6 +32,7 @@ builder.Services.AddScoped<IProductSaleOptionColorService, ProductSaleOptionColo
 builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IUserAuthService, UserAuthService>();
+builder.Services.AddScoped<StoreCookieEvents>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -32,37 +40,32 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/account/access-denied";
         options.Cookie.Name = "lern.auth";
         options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
         options.Cookie.Path = "/";
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.IsEssential = true;
         options.ExpireTimeSpan = TimeSpan.FromDays(14);
         options.SlidingExpiration = true;
-        options.Events.OnRedirectToLogin = context =>
-        {
-            if (context.Request.Path.StartsWithSegments("/api")) { context.Response.StatusCode = StatusCodes.Status401Unauthorized; return Task.CompletedTask; }
-            context.Response.Redirect(context.RedirectUri);
-            return Task.CompletedTask;
-        };
+        options.EventsType = typeof(StoreCookieEvents);
     });
 builder.Services.AddAuthorization();
 builder.Services.AddRateLimiter(options =>
 {
+    options.GlobalLimiter = StoreRequestSecurity.CreateAuthenticationLimiter();
     options.AddPolicy("complaints", context => RateLimitPartition.GetFixedWindowLimiter(
         context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions
         {
             PermitLimit = 5, Window = TimeSpan.FromMinutes(10), QueueLimit = 0, AutoReplenishment = true
         }));
-    options.OnRejected = async (context, cancellationToken) =>
-    {
-        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-        context.HttpContext.Response.Headers.RetryAfter = "600";
-        context.HttpContext.Response.ContentType = "text/plain; charset=utf-8";
-        await context.HttpContext.Response.WriteAsync("تعداد درخواست‌ها بیش از حد مجاز است. لطفاً ۱۰ دقیقه دیگر دوباره تلاش کنید یا با فروشگاه تماس بگیرید.", cancellationToken);
-    };
+    options.OnRejected = StoreRequestSecurity.RejectRateLimit;
 });
 builder.Services.AddScoped<SeoCatalog>();
 builder.Services.AddScoped<SeoResultFilter>();
-builder.Services.AddControllersWithViews(options => options.Filters.AddService<SeoResultFilter>());
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.AddService<SeoResultFilter>();
+    options.Filters.AddService<StoreWriteProtection>();
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(cfg =>
@@ -87,14 +90,38 @@ try
     await db.Database.MigrateAsync();
     await CategoryCatalogSeeder.SeedAsync(db);
     await ArticleSeeder.SeedAsync(db, app.Environment);
+    if (builder.Configuration.GetValue<bool>("InitialAdmin:Enabled"))
+    {
+        var phone = builder.Configuration["InitialAdmin:PhoneNumber"] ?? "";
+        app.Logger.LogWarning("{InitialAdminResult}", await InitialAdminSetup.PromoteAsync(db, phone));
+    }
 }
 catch (Exception ex)
 {
     app.Logger.LogWarning(ex, "اجرای migration های دیتابیس انجام نشد.");
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseStoreResponseSecurity();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler(error => error.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.Headers.CacheControl = "no-store";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            message = "خطایی رخ داد. لطفاً دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.",
+            requestId = context.TraceIdentifier
+        });
+    }));
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -105,4 +132,3 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-

@@ -1,0 +1,22 @@
+@model lern.Models.AdminCommentsViewModel
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "مدیریت نظرات"; }
+<link rel="stylesheet" href="~/assets/css/comment-moderation.css" asp-append-version="true" />
+<section class="admin-card moderation-page">
+    <header class="moderation-heading"><div><h1>مدیریت نظرات</h1><p>نظرهای جدید و ویرایش‌شده فقط پس از تأیید شما منتشر می‌شوند.</p></div><span class="comment-status comment-status-pending">@Model.PendingCount نظر در صف بررسی</span></header>
+    @if (TempData["CommentMessage"] is string message) { <p class="moderation-notice" role="status">@message</p> }
+    <nav class="moderation-tabs" aria-label="وضعیت نظرات">
+        <a asp-action="Index" asp-route-status="pending" asp-route-q="@Model.Query" aria-current="@(Model.Status == "pending" ? "page" : null)">در حال بررسی <b>@Model.PendingCount</b></a>
+        <a asp-action="Index" asp-route-status="approved" asp-route-q="@Model.Query" aria-current="@(Model.Status == "approved" ? "page" : null)">منتشرشده <b>@Model.ApprovedCount</b></a>
+        <a asp-action="Index" asp-route-status="blocked" asp-route-q="@Model.Query" aria-current="@(Model.Status == "blocked" ? "page" : null)">مسدودشده <b>@Model.BlockedCount</b></a>
+        <a asp-action="Index" asp-route-status="all" asp-route-q="@Model.Query" aria-current="@(Model.Status == "all" ? "page" : null)">همه نظرات</a>
+    </nav>
+    <form method="get" class="moderation-search" role="search">
+        <input type="hidden" name="status" value="@Model.Status" />
+        <label for="moderation-query">جست‌وجوی نظر</label>
+        <div><input id="moderation-query" type="search" name="q" value="@Model.Query" maxlength="100" placeholder="نام کاربر، محصول یا متن نظر" /><button type="submit">جست‌وجو</button>@if (!string.IsNullOrEmpty(Model.Query)) { <a asp-action="Index" asp-route-status="@Model.Status">پاک کردن</a> }</div>
+    </form>
+    <p class="moderation-result-count">@Model.TotalCount نظر</p>
+    <div data-comment-feed><partial name="_Batch" model="Model" /></div>
+    <p data-comment-load-status class="moderation-load-status" role="status" aria-live="polite"></p>
+</section>
+<script src="~/assets/js/admin-comments.js" asp-append-version="true" defer></script>

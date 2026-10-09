@@ -1,0 +1,21 @@
+@model lern.Models.StoreProductDetailsViewModel
+<nav class="product-category-breadcrumb" aria-label="مسیر صفحه محصول">
+    <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <a href="/" itemprop="item"><span itemprop="name">خانه</span></a><meta itemprop="position" content="1">
+        </li>
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <a href="/shop" itemprop="item"><span itemprop="name">فروشگاه</span></a><meta itemprop="position" content="2">
+        </li>
+        @for (var index = 0; index < Model.Breadcrumbs.Count; index++)
+        {
+            var category = Model.Breadcrumbs[index];
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <a href="@category.Url" itemprop="item"><span itemprop="name">@category.Name</span></a><meta itemprop="position" content="@(index + 3)">
+            </li>
+        }
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" aria-current="page">
+            <span itemprop="name">@Model.Name</span><meta itemprop="position" content="@(Model.Breadcrumbs.Count + 3)">
+        </li>
+    </ol>
+</nav>

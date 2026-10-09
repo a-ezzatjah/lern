@@ -64,6 +64,22 @@ public sealed class AdminOrdersController(ShopDbContext db) : Microsoft.AspNetCo
         });
     }
 
+    [HttpPost("{id:int}/shipping")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Shipping(int id, string method, string? carrier, string? trackingCode)
+    {
+        if (method is not ("courier" or "freight" or "other") || (carrier?.Length ?? 0) > 100 || (trackingCode?.Length ?? 0) > 100)
+            return BadRequest("اطلاعات ارسال معتبر نیست.");
+        var order = await db.Orders.SingleOrDefaultAsync(x => x.Id == id);
+        if (order is null) return NotFound();
+        order.ShippingMethod = method;
+        order.ShippingCarrier = carrier?.Trim();
+        order.ShippingTrackingCode = trackingCode?.Trim();
+        await db.SaveChangesAsync();
+        TempData["ShippingSaved"] = "اطلاعات ارسال ذخیره شد.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Details(int id)
     {
@@ -74,8 +90,6 @@ public sealed class AdminOrdersController(ShopDbContext db) : Microsoft.AspNetCo
             .AsSplitQuery().SingleOrDefaultAsync(x => x.Id == id);
         if (order is null) return NotFound();
 
-        var address = await db.Addresses.AsNoTracking().Where(x => x.CustomerKey == order.CustomerKey)
-            .OrderByDescending(x => x.IsDefault).ThenByDescending(x => x.UpdatedAt).FirstOrDefaultAsync();
         string? email = null;
         if (order.CustomerKey.StartsWith("user-", StringComparison.Ordinal) &&
             int.TryParse(order.CustomerKey.AsSpan("user-".Length), out var userId))
@@ -83,7 +97,7 @@ public sealed class AdminOrdersController(ShopDbContext db) : Microsoft.AspNetCo
 
         return View("~/Views/Admin/Orders/Details.cshtml", new AdminOrderDetailsViewModel
         {
-            Order = order, CurrentAddress = address, CustomerEmail = email
+            Order = order, CustomerEmail = email
         });
     }
 }

@@ -6,7 +6,11 @@ namespace lern.Models;
 
 public sealed record ShopViewModel(PageResult<ProductCardDto> Products, IReadOnlyList<Category> Categories,
     IReadOnlyList<Category> Breadcrumbs, string Query, IReadOnlySet<int> SelectedCategories,
-    bool AvailableOnly, string Sort, decimal? MinPrice, decimal? MaxPrice, bool DiscountedOnly = false);
+    bool AvailableOnly, string Sort, decimal? MinPrice, decimal? MaxPrice, bool DiscountedOnly = false)
+{
+    public IReadOnlyList<ShopColorDto> Colors { get; init; } = [];
+    public IReadOnlySet<string> SelectedColors { get; init; } = new HashSet<string>();
+}
 
 public sealed record ShopCategoryNodeViewModel(Category Category, IReadOnlyList<Category> Categories,
     IReadOnlySet<int> SelectedCategories, IReadOnlySet<int> ExpandedCategories, int Depth = 0);

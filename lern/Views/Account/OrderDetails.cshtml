@@ -9,7 +9,7 @@
     var dateLabel = $"{calendar.GetYear(date):0000}/{calendar.GetMonth(date):00}/{calendar.GetDayOfMonth(date):00}";
     var status = Model.Status switch
     {
-        OrderStatus.Pending => "در انتظار پرداخت", OrderStatus.Paid => "پرداخت شده",
+        OrderStatus.PaymentReview => "نیازمند بررسی پرداخت", OrderStatus.Pending => "در انتظار پرداخت", OrderStatus.Paid => "پرداخت شده",
         OrderStatus.Processing => "در حال پردازش", OrderStatus.Shipped => "ارسال شده",
         OrderStatus.Completed => "تحویل شده", OrderStatus.Cancelled => "لغو شده", _ => "نامشخص"
     };
@@ -26,6 +26,8 @@
             <thead class="bg-gray-50 text-gray-500 dark:bg-gray-800"><tr><th class="px-4 py-3 text-start">کالا</th><th class="px-4 py-3 text-start">تعداد</th><th class="px-4 py-3 text-start">قیمت واحد</th><th class="px-4 py-3 text-start">جمع</th></tr></thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">@foreach (var item in Model.Items) { <tr class="dark:text-white"><td class="px-4 py-3">@item.ProductName</td><td class="px-4 py-3">@item.Quantity</td><td class="px-4 py-3">@item.UnitPrice.ToString("N0") تومان</td><td class="px-4 py-3">@item.LineTotal.ToString("N0") تومان</td></tr> }</tbody>
         </table></div>
+        @if (Model.Status == OrderStatus.Pending && Model.ReservationExpiresAt.HasValue) { <a href="/orders/@Model.Id" class="mt-5 inline-block text-primary">مشاهده وضعیت و پرداخت سفارش</a> }
         <div class="mt-5 space-y-2 border-t pt-4 text-sm dark:border-gray-700 dark:text-white"><p>جمع کالاها: @Model.Subtotal.ToString("N0") تومان</p><p class="font-bold">مبلغ نهایی: @Model.Total.ToString("N0") تومان</p></div>
     </div>
+    <div class="mt-6"><partial name="_OrderShipping" model="Model" /></div>
 </section>

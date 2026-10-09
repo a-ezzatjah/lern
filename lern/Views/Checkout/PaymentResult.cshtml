@@ -1,0 +1,3 @@
+@model lern.Infrastructure.PaymentFlowResult
+@{ ViewData["Title"] = "نتیجهٔ پرداخت"; }
+<section class="container py-8"><div class="rounded-xl border bg-white p-6 dark:bg-gray-800 dark:text-white"><h1 class="mb-4 text-xl font-bold">نتیجهٔ پرداخت</h1><p>@Model.Message</p>@if (Model.OrderId.HasValue) { <a href="/orders/@Model.OrderId" class="mt-5 mx-3 inline-block text-primary">مشاهده سفارش</a> }<a href="/checkout" class="mt-5 inline-block text-primary">بازگشت به تکمیل سفارش</a></div></section>
