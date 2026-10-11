@@ -20,6 +20,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();
 builder.Services.AddStoreRequestSecurity(builder.Environment.IsDevelopment());
 builder.Services.AddDataProtection();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<SqlAuthenticationTicketStore>();
+builder.Services.AddSingleton<IPostConfigureOptions<CookieAuthenticationOptions>, StoreCookieConfiguration>();
+builder.Services.AddHostedService<AuthenticationSessionWorker>();
 builder.Services.AddScoped<CustomerSession>();
 builder.Services.AddScoped<OrderReservations>();
 builder.Services.AddScoped<OrderPayments>();
@@ -44,8 +48,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Path = "/";
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.IsEssential = true;
-        options.ExpireTimeSpan = TimeSpan.FromDays(14);
-        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = SqlAuthenticationTicketStore.AbsoluteTimeout;
+        options.SlidingExpiration = false;
         options.EventsType = typeof(StoreCookieEvents);
     });
 builder.Services.AddAuthorization();
@@ -81,24 +85,37 @@ builder.Services.AddValidatorsFromAssemblyContaining<ProductCreateDtoValidator>(
 
 var app = builder.Build();
 
-// اطمینان از ایجاد جدول آدرس هنگام اجرای برنامه (در محیط توسعه/استقرار اولیه).
-// در صورت در دسترس نبودن دیتابیس، اجرای برنامه متوقف نمی‌شود و خطا در لاگ ثبت می‌گردد.
-try
+// Schema changes are applied explicitly after review, not as a side effect of starting the site.
+if (builder.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup"))
 {
-    await using var scope = app.Services.CreateAsyncScope();
-    var db = scope.ServiceProvider.GetRequiredService<ShopDbContext>();
-    await db.Database.MigrateAsync();
-    await CategoryCatalogSeeder.SeedAsync(db);
-    await ArticleSeeder.SeedAsync(db, app.Environment);
-    if (builder.Configuration.GetValue<bool>("InitialAdmin:Enabled"))
+    try
     {
+        await using var scope = app.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<ShopDbContext>();
+        await db.Database.MigrateAsync();
+        await CategoryCatalogSeeder.SeedAsync(db);
+        await ArticleSeeder.SeedAsync(db, app.Environment);
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning(ex, "اجرای migration های دیتابیس انجام نشد.");
+    }
+}
+
+// Preserve the existing, explicitly enabled first-admin setup independently of schema updates.
+if (builder.Configuration.GetValue<bool>("InitialAdmin:Enabled"))
+{
+    try
+    {
+        await using var scope = app.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<ShopDbContext>();
         var phone = builder.Configuration["InitialAdmin:PhoneNumber"] ?? "";
         app.Logger.LogWarning("{InitialAdminResult}", await InitialAdminSetup.PromoteAsync(db, phone));
     }
-}
-catch (Exception ex)
-{
-    app.Logger.LogWarning(ex, "اجرای migration های دیتابیس انجام نشد.");
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning(ex, "Initial administrator setup failed.");
+    }
 }
 
 app.UseStoreResponseSecurity();

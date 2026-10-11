@@ -16,4 +16,9 @@ public class CustomerUser
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastLoginAt { get; set; }
+    public Guid AuthenticationVersion { get; set; } = Guid.NewGuid();
+    public int FailedLoginCount { get; set; }
+    public DateTime? FailureWindowStartedAt { get; set; }
+    public DateTime? LockoutUntil { get; set; }
+    public int LockoutLevel { get; set; }
 }

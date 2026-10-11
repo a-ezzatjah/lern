@@ -17,19 +17,13 @@ public sealed class StoreCookieEvents(ShopDbContext db) : CookieAuthenticationEv
             return;
         }
         var user = await db.Users.AsNoTracking().Where(x => x.Id == id && x.IsActive)
-            .Select(x => new { x.Role }).SingleOrDefaultAsync();
-        if (user is null)
+            .Select(x => new { x.Role, x.AuthenticationVersion }).SingleOrDefaultAsync();
+        if (user is null || !Guid.TryParse(context.Principal?.FindFirstValue(SqlAuthenticationTicketStore.VersionClaim), out var version) ||
+            user.AuthenticationVersion != version || context.Principal!.FindFirstValue(ClaimTypes.Role) != user.Role)
         {
             context.RejectPrincipal();
             await context.HttpContext.SignOutAsync();
             return;
-        }
-        if (context.Principal!.FindFirstValue(ClaimTypes.Role) != user.Role)
-        {
-            var identity = new ClaimsIdentity(context.Principal.Claims.Where(x => x.Type != ClaimTypes.Role), CookieAuthenticationDefaults.AuthenticationScheme);
-            identity.AddClaim(new Claim(ClaimTypes.Role, user.Role));
-            context.ReplacePrincipal(new ClaimsPrincipal(identity));
-            context.ShouldRenew = true;
         }
     }
 

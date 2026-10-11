@@ -141,6 +141,47 @@ namespace Entities.Migrations
                     b.ToTable("Articles");
                 });
 
+            modelBuilder.Entity("Entities.AuthenticationSession", b =>
+                {
+                    b.Property<string>("KeyHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid>("AuthenticationVersion")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastSeenAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("ProtectedTicket")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("KeyHash");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("LastSeenAt");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AuthenticationSessions");
+                });
+
             modelBuilder.Entity("Entities.CartItem", b =>
                 {
                     b.Property<int>("Id")
@@ -264,6 +305,10 @@ namespace Entities.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("AuthenticationVersion")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateOnly?>("BirthDate")
                         .HasColumnType("date");
 
@@ -273,6 +318,12 @@ namespace Entities.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("FailedLoginCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("FailureWindowStartedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -289,6 +340,12 @@ namespace Entities.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("LockoutLevel")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LockoutUntil")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("NationalCode")
                         .HasMaxLength(10)
@@ -1077,6 +1134,17 @@ namespace Entities.Migrations
                     b.HasIndex("IsReviewed", "CreatedAt");
 
                     b.ToTable("StoreComplaints");
+                });
+
+            modelBuilder.Entity("Entities.AuthenticationSession", b =>
+                {
+                    b.HasOne("Entities.CustomerUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Entities.CartItem", b =>

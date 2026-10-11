@@ -2,6 +2,8 @@ namespace ServiceContract.DTO.DtoUser;
 
 public sealed class UserProfileDto
 {
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Guid AuthenticationVersion { get; init; }
     public int Id { get; init; }
     public string PhoneNumber { get; init; } = null!;
     public string? Email { get; init; }

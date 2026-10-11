@@ -8,7 +8,7 @@ public sealed class ChangePasswordViewModel
     public string CurrentPassword { get; set; } = "";
 
     [Required(ErrorMessage = "رمز عبور جدید را وارد کنید.")]
-    [MinLength(8, ErrorMessage = "رمز عبور جدید باید حداقل ۸ کاراکتر باشد.")]
+    [MinLength(15, ErrorMessage = "رمز عبور جدید باید حداقل ۱۵ کاراکتر باشد.")]
     public string NewPassword { get; set; } = "";
 
     [Required(ErrorMessage = "تکرار رمز عبور جدید را وارد کنید.")]

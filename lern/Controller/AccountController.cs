@@ -142,8 +142,10 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
             ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "تغییر رمز عبور انجام نشد.");
             return View(model);
         }
-        TempData["PasswordChanged"] = "رمز عبور شما با موفقیت تغییر کرد.";
-        return RedirectToAction(nameof(ChangePassword));
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        Response.Cookies.Delete("customer-key");
+        TempData["AuthenticationMessage"] = "رمز عبور تغییر کرد و همه نشست‌های قبلی بسته شدند. با رمز جدید وارد شوید.";
+        return Redirect("/login");
     }
 
     [Authorize]
@@ -156,7 +158,21 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        Response.Cookies.Delete("customer-key");
         return Redirect("/");
+    }
+
+    [Authorize]
+    [HttpPost("/account/logout-all")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> LogoutAll()
+    {
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) return Forbid();
+        await _accountUsers.RevokeSessionsAsync(userId);
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        Response.Cookies.Delete("customer-key");
+        TempData["AuthenticationMessage"] = "از همه دستگاه‌ها خارج شدید.";
+        return Redirect("/login");
     }
 
     [Authorize]

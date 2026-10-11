@@ -29,6 +29,7 @@ namespace Entities
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<CustomerUser> Users { get; set; }
+        public DbSet<AuthenticationSession> AuthenticationSessions { get; set; }
         public DbSet<ProductRating> ProductRatings { get; set; }
         public DbSet<ProductComment> ProductComments { get; set; }
         public DbSet<ProductViewHistory> ProductViewHistories { get; set; }
@@ -42,9 +43,43 @@ namespace Entities
         public DbSet<SeoPage> SeoPages { get; set; }
         public DbSet<StoreComplaint> StoreComplaints { get; set; }
 
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            UpdateAuthenticationVersions();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            UpdateAuthenticationVersions();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void UpdateAuthenticationVersions()
+        {
+            ChangeTracker.DetectChanges();
+            foreach (var entry in ChangeTracker.Entries<CustomerUser>().Where(x => x.State == EntityState.Modified))
+            {
+                if (new[] { nameof(CustomerUser.PasswordHash), nameof(CustomerUser.PasswordSalt), nameof(CustomerUser.Role), nameof(CustomerUser.IsActive) }
+                    .Any(name => entry.Property(name).IsModified) && !entry.Property(x => x.AuthenticationVersion).IsModified)
+                    entry.Entity.AuthenticationVersion = Guid.NewGuid();
+            }
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<CustomerUser>().Property(x => x.AuthenticationVersion).IsConcurrencyToken();
+            modelBuilder.Entity<AuthenticationSession>(session =>
+            {
+                session.HasKey(x => x.KeyHash);
+                session.Property(x => x.KeyHash).HasMaxLength(64);
+                session.Property(x => x.Role).HasMaxLength(32).IsRequired();
+                session.HasIndex(x => x.UserId);
+                session.HasIndex(x => x.ExpiresAt);
+                session.HasIndex(x => x.LastSeenAt);
+                session.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            });
             modelBuilder.Entity<StoreComplaint>(complaint =>
             {
                 complaint.HasIndex(x => x.Reference).IsUnique();

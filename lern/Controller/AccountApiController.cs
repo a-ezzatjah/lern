@@ -17,12 +17,14 @@ public sealed class AccountApiController : ControllerBase
     private readonly IUserAuthService _users;
     private readonly ShopDbContext _db;
     private readonly IWebHostEnvironment _environment;
+    private readonly TimeProvider _clock;
 
-    public AccountApiController(IUserAuthService users, ShopDbContext db, IWebHostEnvironment environment)
+    public AccountApiController(IUserAuthService users, ShopDbContext db, IWebHostEnvironment environment, TimeProvider? clock = null)
     {
         _users = users;
         _db = db;
         _environment = environment;
+        _clock = clock ?? TimeProvider.System;
     }
 
     [HttpPost("register")]
@@ -48,6 +50,18 @@ public sealed class AccountApiController : ControllerBase
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        Response.Cookies.Delete("customer-key");
+        return Ok(new { success = true });
+    }
+
+    [Authorize]
+    [HttpPost("logout-all")]
+    public async Task<IActionResult> LogoutAll()
+    {
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) return Unauthorized();
+        await _users.RevokeSessionsAsync(userId);
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        Response.Cookies.Delete("customer-key");
         return Ok(new { success = true });
     }
 
@@ -181,31 +195,33 @@ public sealed class AccountApiController : ControllerBase
         }).ToArray());
     }
 
-    private Task SignInAsync(UserProfileDto user, bool isPersistent)
+    private async Task SignInAsync(UserProfileDto user, bool isPersistent)
     {
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.FullName),
             new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim(ClaimTypes.Role, user.Role),
+            new Claim(lern.Infrastructure.SqlAuthenticationTicketStore.VersionClaim, user.AuthenticationVersion.ToString())
         };
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
-        var customerKeyOptions = new CookieOptions { HttpOnly = true, IsEssential = true, SameSite = SameSiteMode.Lax, Path = "/" };
+        var customerKeyOptions = new CookieOptions { HttpOnly = true, IsEssential = true, SameSite = SameSiteMode.Lax, Secure = !_environment.IsDevelopment() || Request.IsHttps, Path = "/" };
         if (isPersistent)
         {
-            customerKeyOptions.Expires = DateTimeOffset.UtcNow.AddDays(14);
-            customerKeyOptions.MaxAge = TimeSpan.FromDays(14);
+            customerKeyOptions.Expires = _clock.GetUtcNow().Add(lern.Infrastructure.SqlAuthenticationTicketStore.AbsoluteTimeout);
+            customerKeyOptions.MaxAge = lern.Infrastructure.SqlAuthenticationTicketStore.AbsoluteTimeout;
         }
         Response.Cookies.Append("customer-key", $"user-{user.Id}", customerKeyOptions);
-        var now = DateTimeOffset.UtcNow;
-        return HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+        var now = _clock.GetUtcNow();
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
             new AuthenticationProperties
             {
                 IsPersistent = isPersistent,
-                AllowRefresh = isPersistent,
+                AllowRefresh = false,
                 IssuedUtc = now,
-                ExpiresUtc = isPersistent ? now.AddDays(14) : null
+                ExpiresUtc = now.Add(lern.Infrastructure.SqlAuthenticationTicketStore.AbsoluteTimeout)
             });
     }
 }

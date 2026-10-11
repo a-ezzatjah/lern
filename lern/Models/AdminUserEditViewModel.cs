@@ -22,7 +22,7 @@ public sealed class AdminUserEditViewModel
     [StringLength(256)]
     public string? Email { get; set; }
 
-    [MinLength(8, ErrorMessage = "رمز عبور جدید باید حداقل ۸ کاراکتر باشد.")]
+    [MinLength(15, ErrorMessage = "رمز عبور جدید باید حداقل ۱۵ کاراکتر باشد.")]
     [DataType(DataType.Password)]
     public string? Password { get; set; }
 

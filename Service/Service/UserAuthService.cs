@@ -1,105 +1,157 @@
-using System.Security.Cryptography;
+using System.Data;
 using Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
+using Service.Security;
 using ServiceContract.DTO.DtoCommit;
 using ServiceContract.DTO.DtoUser;
 using ServiceContract.Interfaces;
 
 namespace Service.Service;
 
-public sealed class UserAuthService : IUserAuthService
+public sealed class UserAuthService(ShopDbContext db, TimeProvider? time = null, ILogger<UserAuthService>? logger = null) : IUserAuthService
 {
-    private const int SaltSize = 16;
-    private const int HashSize = 32;
-    private const int Iterations = 100_000;
-    private readonly ShopDbContext _db;
-
-    public UserAuthService(ShopDbContext db) => _db = db;
+    private const string LoginError = "شماره موبایل یا رمز عبور نادرست است.";
+    private readonly TimeProvider clock = time ?? TimeProvider.System;
 
     public async Task<ServiceResponseDto<UserProfileDto>> RegisterAsync(RegisterUserDto model)
     {
         if (model is null) return ServiceResponseDto<UserProfileDto>.Fail("اطلاعات ثبت‌نام ارسال نشده است.");
-
         var phone = NormalizePhone(model.PhoneNumber);
         if (phone is null) return ServiceResponseDto<UserProfileDto>.Fail("شماره موبایل معتبر نیست.");
-        if (string.IsNullOrWhiteSpace(model.FirstName) || string.IsNullOrWhiteSpace(model.LastName)) return ServiceResponseDto<UserProfileDto>.Fail("نام و نام خانوادگی الزامی است.");
-        if (string.IsNullOrWhiteSpace(model.Password) || model.Password.Length < 8) return ServiceResponseDto<UserProfileDto>.Fail("رمز عبور باید حداقل ۸ کاراکتر باشد.");
-
-        if (await _db.Users.AnyAsync(x => x.PhoneNumber == phone)) return ServiceResponseDto<UserProfileDto>.Fail("کاربری با این شماره موبایل وجود دارد.");
-
-        var salt = RandomNumberGenerator.GetBytes(SaltSize);
-        var user = new CustomerUser
+        if (string.IsNullOrWhiteSpace(model.FirstName) || string.IsNullOrWhiteSpace(model.LastName) || model.FirstName.Trim().Length > 100 || model.LastName.Trim().Length > 100)
+            return ServiceResponseDto<UserProfileDto>.Fail("نام و نام خانوادگی الزامی و حداکثر ۱۰۰ کاراکتر هستند.");
+        if (StorePasswords.PolicyError(model.Password) is string error) return ServiceResponseDto<UserProfileDto>.Fail(error);
+        var email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim().ToLowerInvariant();
+        if (email is not null && (email.Length > 256 || !System.Net.Mail.MailAddress.TryCreate(email, out _)))
+            return ServiceResponseDto<UserProfileDto>.Fail("ایمیل معتبر نیست.");
+        if (await db.Users.AnyAsync(x => x.PhoneNumber == phone || (email != null && x.Email == email)))
+            return ServiceResponseDto<UserProfileDto>.Fail("ثبت‌نام با این اطلاعات انجام نشد؛ اطلاعات را بررسی کنید یا وارد حساب شوید.");
+        var user = new CustomerUser { PhoneNumber = phone, Email = email, FirstName = model.FirstName.Trim(), LastName = model.LastName.Trim(), CreatedAt = clock.GetUtcNow().UtcDateTime };
+        StorePasswords.Set(user, model.Password);
+        db.Users.Add(user);
+        try { await db.SaveChangesAsync(); }
+        catch (DbUpdateException)
         {
-            PhoneNumber = phone,
-            Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim().ToLowerInvariant(),
-            FirstName = model.FirstName.Trim(),
-            LastName = model.LastName.Trim(),
-            PasswordSalt = Convert.ToBase64String(salt),
-            PasswordHash = HashPassword(model.Password, salt)
-        };
-
-        _db.Users.Add(user);
-        await _db.SaveChangesAsync();
+            db.Entry(user).State = EntityState.Detached;
+            return ServiceResponseDto<UserProfileDto>.Fail("ثبت‌نام انجام نشد؛ لطفاً دوباره تلاش کنید.");
+        }
         return ServiceResponseDto<UserProfileDto>.Success(ToProfile(user));
     }
 
     public async Task<ServiceResponseDto<UserProfileDto>> LoginAsync(LoginUserDto model)
     {
-        if (model is null) return ServiceResponseDto<UserProfileDto>.Fail("اطلاعات ورود ارسال نشده است.");
-        var phone = NormalizePhone(model.PhoneNumber);
-        if (phone is null || string.IsNullOrEmpty(model.Password)) return ServiceResponseDto<UserProfileDto>.Fail("شماره موبایل یا رمز عبور نادرست است.");
-
-        var user = await _db.Users.SingleOrDefaultAsync(x => x.PhoneNumber == phone);
-        if (user is null || !user.IsActive || !VerifyPassword(model.Password, user.PasswordSalt, user.PasswordHash)) return ServiceResponseDto<UserProfileDto>.Fail("شماره موبایل یا رمز عبور نادرست است.");
-
-        user.LastLoginAt = DateTime.UtcNow;
-        await _db.SaveChangesAsync();
+        var phone = NormalizePhone(model?.PhoneNumber);
+        var password = model?.Password ?? "";
+        if (phone is null || string.IsNullOrEmpty(password))
+        {
+            StorePasswords.VerifyDummy(password);
+            return ServiceResponseDto<UserProfileDto>.Fail(LoginError);
+        }
+        await using var transaction = await BeginAuthenticationTransaction();
+        var user = await UserByPhone(phone).SingleOrDefaultAsync();
+        var now = clock.GetUtcNow().UtcDateTime;
+        if (user is null || !user.IsActive || user.LockoutUntil > now)
+        {
+            StorePasswords.VerifyDummy(password);
+            logger?.LogWarning("Authentication rejected; account={AccountId}", user?.Id);
+            return ServiceResponseDto<UserProfileDto>.Fail(LoginError);
+        }
+        var verification = StorePasswords.Verify(user, password);
+        if (verification == PasswordVerificationResult.Failed)
+        {
+            if (user.PasswordSalt != StorePasswords.CurrentFormat) StorePasswords.VerifyDummy(password);
+            if (user.FailureWindowStartedAt is null || now - user.FailureWindowStartedAt.Value >= TimeSpan.FromMinutes(15))
+            { user.FailedLoginCount = 0; user.FailureWindowStartedAt = now; }
+            user.FailedLoginCount++;
+            if (user.FailedLoginCount >= 5)
+            {
+                var delay = Math.Min(1440, 15 * (1 << Math.Min(user.LockoutLevel, 7)));
+                user.LockoutUntil = now.AddMinutes(delay);
+                user.LockoutLevel = Math.Min(user.LockoutLevel + 1, 8);
+                user.FailedLoginCount = 0;
+                user.FailureWindowStartedAt = null;
+                logger?.LogWarning("Authentication account locked; account={AccountId}", user.Id);
+            }
+            await db.SaveChangesAsync();
+            if (transaction is not null) await transaction.CommitAsync();
+            logger?.LogWarning("Authentication failed; account={AccountId}", user.Id);
+            return ServiceResponseDto<UserProfileDto>.Fail(LoginError);
+        }
+        if (verification == PasswordVerificationResult.SuccessRehashNeeded) StorePasswords.Set(user, password);
+        ResetFailures(user);
+        user.LastLoginAt = now;
+        try { await db.SaveChangesAsync(); }
+        catch (DbUpdateConcurrencyException) { return ServiceResponseDto<UserProfileDto>.Fail(LoginError); }
+        if (transaction is not null) await transaction.CommitAsync();
         return ServiceResponseDto<UserProfileDto>.Success(ToProfile(user));
     }
 
     public async Task<UserProfileDto?> GetProfileAsync(int userId)
     {
-        return await _db.Users.AsNoTracking().Where(x => x.Id == userId && x.IsActive)
-            .Select(x => new UserProfileDto { Id = x.Id, PhoneNumber = x.PhoneNumber, Email = x.Email, FirstName = x.FirstName, LastName = x.LastName, BirthDate = x.BirthDate, NationalCode = x.NationalCode, ProfileImageUrl = x.ProfileImageUrl, Role = x.Role, CreatedAt = x.CreatedAt })
-            .SingleOrDefaultAsync();
+        var user = await db.Users.AsNoTracking().SingleOrDefaultAsync(x => x.Id == userId && x.IsActive);
+        return user is null ? null : ToProfile(user);
     }
 
     public async Task<ServiceResponseDto<bool>> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
     {
-        var user = await _db.Users.SingleOrDefaultAsync(x => x.Id == userId && x.IsActive);
-        if (user is null || string.IsNullOrEmpty(currentPassword) ||
-            !VerifyPassword(currentPassword, user.PasswordSalt, user.PasswordHash))
+        await using var transaction = await BeginAuthenticationTransaction();
+        var user = await UserById(userId).SingleOrDefaultAsync();
+        if (user is null || !user.IsActive || StorePasswords.Verify(user, currentPassword) == PasswordVerificationResult.Failed)
             return ServiceResponseDto<bool>.Fail("رمز عبور فعلی نادرست است.");
-
-        if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 8)
-            return ServiceResponseDto<bool>.Fail("رمز عبور جدید باید حداقل ۸ کاراکتر باشد.");
-        if (VerifyPassword(newPassword, user.PasswordSalt, user.PasswordHash))
+        if (StorePasswords.PolicyError(newPassword) is string error) return ServiceResponseDto<bool>.Fail(error);
+        if (StorePasswords.Verify(user, newPassword) != PasswordVerificationResult.Failed)
             return ServiceResponseDto<bool>.Fail("رمز عبور جدید باید با رمز عبور فعلی متفاوت باشد.");
-
-        var salt = RandomNumberGenerator.GetBytes(SaltSize);
-        user.PasswordSalt = Convert.ToBase64String(salt);
-        user.PasswordHash = HashPassword(newPassword, salt);
-        await _db.SaveChangesAsync();
+        StorePasswords.Set(user, newPassword);
+        ResetFailures(user);
+        await db.SaveChangesAsync();
+        await db.AuthenticationSessions.Where(x => x.UserId == userId).ExecuteDeleteAsync();
+        if (transaction is not null) await transaction.CommitAsync();
+        logger?.LogInformation("Password changed and sessions revoked; account={AccountId}", userId);
         return ServiceResponseDto<bool>.Success(true);
     }
 
-    private static string? NormalizePhone(string? phone)
+    public async Task RevokeSessionsAsync(int userId)
     {
-        if (string.IsNullOrWhiteSpace(phone)) return null;
-        var value = new string(phone.Where(char.IsDigit).ToArray());
-        if (value.StartsWith("0098")) value = "0" + value[4..];
-        else if (value.StartsWith("98") && value.Length == 12) value = "0" + value[2..];
-        else if (value.Length == 10 && value.StartsWith('9')) value = "0" + value;
-        return value.Length == 11 && value.StartsWith("09") ? value : null;
+        await using var transaction = await BeginAuthenticationTransaction();
+        var user = await UserById(userId).SingleOrDefaultAsync();
+        if (user is null) return;
+        user.AuthenticationVersion = Guid.NewGuid();
+        await db.SaveChangesAsync();
+        await db.AuthenticationSessions.Where(x => x.UserId == userId).ExecuteDeleteAsync();
+        if (transaction is not null) await transaction.CommitAsync();
     }
 
-    private static string HashPassword(string password, byte[] salt) => Convert.ToBase64String(Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA256, HashSize));
+    private Task<IDbContextTransaction?> BeginAuthenticationTransaction() => db.Database.CurrentTransaction is not null
+        ? Task.FromResult<IDbContextTransaction?>(null) : Begin();
+    private async Task<IDbContextTransaction?> Begin() => await db.Database.BeginTransactionAsync(
+        db.Database.IsSqlServer() ? IsolationLevel.ReadCommitted : IsolationLevel.Serializable);
+    private IQueryable<CustomerUser> UserByPhone(string phone) => db.Database.IsSqlServer()
+        ? db.Users.FromSqlInterpolated($"SELECT * FROM [Users] WITH (UPDLOCK, ROWLOCK) WHERE [PhoneNumber] = {phone}")
+        : db.Users.Where(x => x.PhoneNumber == phone);
+    private IQueryable<CustomerUser> UserById(int id) => db.Database.IsSqlServer()
+        ? db.Users.FromSqlInterpolated($"SELECT * FROM [Users] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {id}")
+        : db.Users.Where(x => x.Id == id);
+    private static void ResetFailures(CustomerUser user)
+    { user.FailedLoginCount = 0; user.FailureWindowStartedAt = null; user.LockoutUntil = null; user.LockoutLevel = 0; }
 
-    private static bool VerifyPassword(string password, string salt, string hash)
+    private static string? NormalizePhone(string? input)
     {
-        try { return CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(hash), Convert.FromBase64String(HashPassword(password, Convert.FromBase64String(salt)))); }
-        catch (FormatException) { return false; }
+        if (string.IsNullOrWhiteSpace(input)) return null;
+        var phone = new string(input.Trim().Select(c => c switch
+        { >= '۰' and <= '۹' => (char)('0' + c - '۰'), >= '٠' and <= '٩' => (char)('0' + c - '٠'), _ => c }).ToArray());
+        if (phone.StartsWith("+98")) phone = "0" + phone[3..];
+        else if (phone.StartsWith("0098")) phone = "0" + phone[4..];
+        else if (phone.Length == 12 && phone.StartsWith("98")) phone = "0" + phone[2..];
+        else if (phone.Length == 10 && phone.StartsWith('9')) phone = "0" + phone;
+        return phone.Length == 11 && phone.StartsWith("09") && phone.All(char.IsAsciiDigit) ? phone : null;
     }
-
-    private static UserProfileDto ToProfile(CustomerUser user) => new() { Id = user.Id, PhoneNumber = user.PhoneNumber, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, BirthDate = user.BirthDate, NationalCode = user.NationalCode, ProfileImageUrl = user.ProfileImageUrl, Role = user.Role, CreatedAt = user.CreatedAt };
+    private static UserProfileDto ToProfile(CustomerUser user) => new()
+    {
+        Id = user.Id, PhoneNumber = user.PhoneNumber, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName,
+        BirthDate = user.BirthDate, NationalCode = user.NationalCode, ProfileImageUrl = user.ProfileImageUrl,
+        Role = user.Role, CreatedAt = user.CreatedAt, AuthenticationVersion = user.AuthenticationVersion
+    };
 }

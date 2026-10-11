@@ -9,4 +9,5 @@ public interface IUserAuthService
     Task<ServiceResponseDto<UserProfileDto>> LoginAsync(LoginUserDto model);
     Task<UserProfileDto?> GetProfileAsync(int userId);
     Task<ServiceResponseDto<bool>> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+    Task RevokeSessionsAsync(int userId);
 }

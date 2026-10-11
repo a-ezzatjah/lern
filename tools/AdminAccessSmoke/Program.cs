@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 void Check(bool condition, string message) { if (!condition) throw new Exception(message); Console.WriteLine("PASS " + message); }
 using var settings = JsonDocument.Parse(await File.ReadAllTextAsync("lern/appsettings.json"));
@@ -51,7 +52,12 @@ Check(!await db.Users.AnyAsync(x => x.Role == "Admin"), "failed setup never prom
 var principal = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, targetUser.Id.ToString()), new Claim(ClaimTypes.Role, "Admin") }, CookieAuthenticationDefaults.AuthenticationScheme));
 var scheme = new AuthenticationScheme(CookieAuthenticationDefaults.AuthenticationScheme, null, typeof(CookieAuthenticationHandler));
 var context = new CookieValidatePrincipalContext(new DefaultHttpContext(), scheme, new CookieAuthenticationOptions(), new AuthenticationTicket(principal, CookieAuthenticationDefaults.AuthenticationScheme));
+var authServices = new ServiceCollection();
+authServices.AddLogging();
+authServices.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+using var authProvider = authServices.BuildServiceProvider();
+context.HttpContext.RequestServices = authProvider;
 await new StoreCookieEvents(db).ValidatePrincipal(context);
-Check(!context.Principal!.IsInRole("Admin") && context.ShouldRenew, "stale admin cookie loses revoked role");
+Check(context.Principal is null, "stale admin cookie requires new authentication");
 await transaction.RollbackAsync();
 Console.WriteLine("All test role changes rolled back.");

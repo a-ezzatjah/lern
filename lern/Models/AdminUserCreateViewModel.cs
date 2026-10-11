@@ -21,7 +21,7 @@ public sealed class AdminUserCreateViewModel
     public string? Email { get; set; }
 
     [Required(ErrorMessage = "رمز عبور الزامی است.")]
-    [MinLength(8, ErrorMessage = "رمز عبور باید حداقل ۸ کاراکتر باشد.")]
+    [MinLength(15, ErrorMessage = "رمز عبور باید حداقل ۱۵ کاراکتر باشد.")]
     [DataType(DataType.Password)]
     public string Password { get; set; } = string.Empty;
 

@@ -89,7 +89,8 @@ public static class StoreRequestSecurity
     public static PartitionedRateLimiter<HttpContext> CreateAuthenticationLimiter() =>
         PartitionedRateLimiter.Create<HttpContext, string>(context =>
         {
-            var path = context.Request.Path;
+            // MVC accepts a trailing slash and ignores route casing; limits must match that behavior.
+            var path = new PathString(context.Request.Path.Value?.TrimEnd('/'));
             if (HttpMethods.IsPost(context.Request.Method) &&
                 (path.Equals("/api/account/login") || path.Equals("/api/account/register") || path.Equals("/account/change-password")))
                 return RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown",

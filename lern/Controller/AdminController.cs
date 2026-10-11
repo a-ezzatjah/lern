@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Cryptography;
+using Service.Security;
 using Entities;
 using lern.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -170,6 +170,8 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
 
         if (model.Role is not ("Admin" or "Customer"))
             ModelState.AddModelError(nameof(model.Role), "نقش انتخاب‌شده معتبر نیست.");
+        if (StorePasswords.PolicyError(model.Password) is string passwordError)
+            ModelState.AddModelError(nameof(model.Password), passwordError);
 
         if (await _db.Users.AnyAsync(x => x.PhoneNumber == model.PhoneNumber))
             ModelState.AddModelError(nameof(model.PhoneNumber), "کاربری با این شماره موبایل وجود دارد.");
@@ -183,7 +185,6 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         if (!ModelState.IsValid)
             return View("Users/Create", model);
 
-        var salt = RandomNumberGenerator.GetBytes(16);
         var user = new CustomerUser
         {
             FirstName = model.FirstName.Trim(),
@@ -191,11 +192,9 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
             PhoneNumber = model.PhoneNumber,
             Email = model.Email,
             Role = model.Role,
-            IsActive = model.IsActive,
-            PasswordSalt = Convert.ToBase64String(salt),
-            PasswordHash = Convert.ToBase64String(Rfc2898DeriveBytes.Pbkdf2(
-                model.Password, salt, 100_000, HashAlgorithmName.SHA256, 32))
+            IsActive = model.IsActive
         };
+        StorePasswords.Set(user, model.Password);
 
         if (model.Avatar is { Length: > 0 })
             user.ProfileImageUrl = await SaveAvatarAsync(model.Avatar);
@@ -231,6 +230,8 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         model.Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim().ToLowerInvariant();
         model.ExistingAvatarUrl = user.ProfileImageUrl;
         if (model.Role is not ("Admin" or "Customer")) ModelState.AddModelError(nameof(model.Role), "نقش انتخاب‌شده معتبر نیست.");
+        if (!string.IsNullOrWhiteSpace(model.Password) && StorePasswords.PolicyError(model.Password) is string passwordError)
+            ModelState.AddModelError(nameof(model.Password), passwordError);
         if (await _db.Users.AnyAsync(x => x.Id != id && x.PhoneNumber == model.PhoneNumber)) ModelState.AddModelError(nameof(model.PhoneNumber), "کاربری با این شماره موبایل وجود دارد.");
         if (model.Email is not null && await _db.Users.AnyAsync(x => x.Id != id && x.Email == model.Email)) ModelState.AddModelError(nameof(model.Email), "کاربری با این ایمیل وجود دارد.");
         if (model.Avatar is { Length: > 0 } && !IsValidAvatar(model.Avatar)) ModelState.AddModelError(nameof(model.Avatar), "تصویر باید JPG، PNG یا WEBP و حداکثر ۵ مگابایت باشد.");
@@ -244,9 +245,11 @@ public class AdminController : Microsoft.AspNetCore.Mvc.Controller
         user.Role = model.Role; user.IsActive = model.IsActive;
         if (!string.IsNullOrWhiteSpace(model.Password))
         {
-            var salt = RandomNumberGenerator.GetBytes(16);
-            user.PasswordSalt = Convert.ToBase64String(salt);
-            user.PasswordHash = Convert.ToBase64String(Rfc2898DeriveBytes.Pbkdf2(model.Password, salt, 100_000, HashAlgorithmName.SHA256, 32));
+            StorePasswords.Set(user, model.Password);
+            user.FailedLoginCount = 0;
+            user.FailureWindowStartedAt = null;
+            user.LockoutUntil = null;
+            user.LockoutLevel = 0;
         }
         if (model.Avatar is { Length: > 0 }) user.ProfileImageUrl = await SaveAvatarAsync(model.Avatar);
         await _db.SaveChangesAsync();
