@@ -45,6 +45,11 @@ public sealed class AccountController : Microsoft.AspNetCore.Mvc.Controller
     [HttpGet("/register")]
     public IActionResult Register() => View();
 
+    [AllowAnonymous]
+    [HttpGet("/forgot-password")]
+    [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult ForgotPassword() => View();
+
     [Authorize]
     [HttpGet("/account")]
     public async Task<IActionResult> Index()

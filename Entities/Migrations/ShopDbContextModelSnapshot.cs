@@ -366,6 +366,9 @@ namespace Entities.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
+                    b.Property<DateTime?>("PhoneVerifiedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ProfileImageUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -622,6 +625,61 @@ namespace Entities.Migrations
                         .HasFilter("[Authority] IS NOT NULL");
 
                     b.ToTable("PaymentTransactions", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.PhoneChallenge", b =>
+                {
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("AuthenticationVersion")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChallengeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<bool>("Consumed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastSentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<int>("SendCount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("WindowStartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PhoneNumber");
+
+                    b.HasIndex("WindowStartedAt");
+
+                    b.ToTable("PhoneChallenges");
                 });
 
             modelBuilder.Entity("Entities.Product", b =>

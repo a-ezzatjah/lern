@@ -16,6 +16,7 @@ public class CustomerUser
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastLoginAt { get; set; }
+    public DateTime? PhoneVerifiedAt { get; set; }
     public Guid AuthenticationVersion { get; set; } = Guid.NewGuid();
     public int FailedLoginCount { get; set; }
     public DateTime? FailureWindowStartedAt { get; set; }

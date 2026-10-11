@@ -36,6 +36,8 @@ builder.Services.AddScoped<IProductSaleOptionColorService, ProductSaleOptionColo
 builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IUserAuthService, UserAuthService>();
+builder.Services.AddScoped<IPhoneCodeSender, UnavailablePhoneCodeSender>();
+builder.Services.AddScoped<PhoneAuthentication>();
 builder.Services.AddScoped<StoreCookieEvents>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

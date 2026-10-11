@@ -20,6 +20,8 @@
   .admin-sidebar-overlay { backdrop-filter: blur(3px); }
   .admin-topbar { position: sticky; top: 0; z-index: 10; gap: .7rem; box-shadow: 0 3px 14px rgba(15,23,42,.04); }
   .admin-breadcrumb { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .admin-topbar-actions { flex: 0 0 auto; }
+  .admin-site-link { display: inline-flex; align-items: center; justify-content: center; min-height: 2.7rem; white-space: nowrap; }
   .admin-mobile-toggle, .admin-icon-button { flex: 0 0 auto; width: 2.7rem; height: 2.7rem; }
 }
 

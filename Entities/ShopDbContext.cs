@@ -30,6 +30,7 @@ namespace Entities
         public DbSet<Address> Addresses { get; set; }
         public DbSet<CustomerUser> Users { get; set; }
         public DbSet<AuthenticationSession> AuthenticationSessions { get; set; }
+        public DbSet<PhoneChallenge> PhoneChallenges { get; set; }
         public DbSet<ProductRating> ProductRatings { get; set; }
         public DbSet<ProductComment> ProductComments { get; set; }
         public DbSet<ProductViewHistory> ProductViewHistories { get; set; }
@@ -69,6 +70,15 @@ namespace Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<PhoneChallenge>(challenge =>
+            {
+                challenge.HasKey(x => x.PhoneNumber);
+                challenge.Property(x => x.PhoneNumber).HasMaxLength(11);
+                challenge.Property(x => x.Purpose).HasMaxLength(16);
+                challenge.Property(x => x.CodeHash).HasMaxLength(64);
+                challenge.Property(x => x.Salt).HasMaxLength(32);
+                challenge.HasIndex(x => x.WindowStartedAt);
+            });
             modelBuilder.Entity<CustomerUser>().Property(x => x.AuthenticationVersion).IsConcurrencyToken();
             modelBuilder.Entity<AuthenticationSession>(session =>
             {
