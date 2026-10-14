@@ -1,0 +1,31 @@
+﻿@model lern.Models.AdminSettingsViewModel
+@{ Layout = "_AdminLayout"; var integrationSection = Model.IntegrationSection; ViewData["Title"] = integrationSection switch { "sms" => "پنل پیامکی", "payment" => "درگاه پرداخت", "enamad" => "اینماد", _ => "اتصال‌های فروشگاه" }; }
+<link rel="stylesheet" href="~/assets/css/admin-settings.css" asp-append-version="true" />
+<div class="admin-page-heading"><div><span class="admin-eyebrow">تنظیمات اتصال‌ها</span><h1>@ViewData["Title"]</h1><p>اطلاعات این بخش فقط توسط مدیر سیستم قابل تغییر است.</p></div></div>
+@if (TempData["SettingsMessage"] is string message) { <div class="admin-alert" role="status">@message</div> }
+@if (TempData["SettingsError"] is string error) { <div class="admin-alert error" role="alert">@error</div> }
+<section class="settings-card"><form asp-action="SaveIntegrations" method="post" class="settings-form">
+ @Html.AntiForgeryToken()
+ <input type="hidden" name="section" value="@integrationSection" />
+ @if (integrationSection is "all" or "sms") {
+  <h2>پنل پیامکی</h2><label class="settings-check"><input type="checkbox" name="smsEnabled" value="true" checked="@Model.Integrations.SmsEnabled" /> فعال‌سازی ارسال پیامک</label>
+  <label>سرویس‌دهنده<input name="smsProvider" value="@Model.Integrations.SmsProvider" maxlength="40" /></label>
+  <label>کلید API<input name="smsApiKey" type="password" autocomplete="new-password" /></label>
+  <label>شماره فرستنده<input name="smsSender" value="@Model.Integrations.SmsSender" maxlength="40" /></label>
+ }
+ @if (integrationSection is "all" or "payment") {
+  @if (integrationSection == "all") { <hr /> }
+  <h2>درگاه پرداخت</h2><label class="settings-check"><input type="checkbox" name="paymentEnabled" value="true" checked="@Model.Integrations.PaymentEnabled" /> فعال‌سازی پرداخت آنلاین</label>
+  <label>درگاه<input name="paymentGateway" value="@Model.Integrations.PaymentGateway" maxlength="40" /></label>
+  <label>شناسه پذیرنده / Merchant ID<input name="paymentMerchantId" type="password" autocomplete="new-password" /></label>
+ }
+ @if (integrationSection is "all" or "enamad") {
+  @if (integrationSection == "all") { <hr /> }
+  <h2>اینماد</h2><label class="settings-check"><input type="checkbox" name="enamadEnabled" value="true" checked="@Model.Integrations.EnamadEnabled" /> نمایش نماد اعتماد</label>
+  <label>کد HTML یا اسکریپت اینماد<textarea name="enamadCode" rows="5" maxlength="4000">@Model.Integrations.EnamadCode</textarea></label>
+  <label>آدرس تصویر نماد<input name="enamadLogoUrl" value="@Model.Integrations.EnamadLogoUrl" maxlength="500" /></label>
+ }
+ <button type="submit" class="admin-primary-button">ذخیره تنظیمات</button>
+</form></section>
+
+

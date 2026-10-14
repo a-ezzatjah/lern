@@ -43,6 +43,7 @@ namespace Entities
         public DbSet<Article> Articles { get; set; }
         public DbSet<SeoPage> SeoPages { get; set; }
         public DbSet<StoreComplaint> StoreComplaints { get; set; }
+        public DbSet<SiteIntegrationSettings> SiteIntegrationSettings { get; set; }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
@@ -70,6 +71,11 @@ namespace Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<SiteIntegrationSettings>().HasKey(x => x.Id);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.SmsProvider).HasMaxLength(40);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.PaymentGateway).HasMaxLength(40);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.EnamadCode).HasMaxLength(4000);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.EnamadLogoUrl).HasMaxLength(500);
             modelBuilder.Entity<PhoneChallenge>(challenge =>
             {
                 challenge.HasKey(x => x.PhoneNumber);

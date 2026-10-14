@@ -1143,6 +1143,58 @@ namespace Entities.Migrations
                     b.ToTable("SiteInboxItems");
                 });
 
+            modelBuilder.Entity("Entities.SiteIntegrationSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EnamadCode")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<bool>("EnamadEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("EnamadLogoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("PaymentEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PaymentGateway")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("PaymentMerchantIdProtected")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SmsApiKeyProtected")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SmsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SmsProvider")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("SmsSender")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SiteIntegrationSettings");
+                });
+
             modelBuilder.Entity("Entities.StoreComplaint", b =>
                 {
                     b.Property<int>("Id")

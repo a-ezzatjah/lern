@@ -4,14 +4,16 @@ using lern.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace lern.Controller;
 
 [Authorize(Roles = "Admin")]
 [Route("Admin/Settings")]
 [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
-public sealed class AdminSettingsController(ShopDbContext db, IWebHostEnvironment environment) : Microsoft.AspNetCore.Mvc.Controller
+public sealed class AdminSettingsController(ShopDbContext db, IWebHostEnvironment environment, IDataProtectionProvider protectionProvider) : Microsoft.AspNetCore.Mvc.Controller
 {
+    private readonly IDataProtector _protector = protectionProvider.CreateProtector("lern.admin.integration-secrets.v1");
     [HttpGet("")]
     public IActionResult Index() => RedirectToAction(nameof(Banners));
 
@@ -27,6 +29,49 @@ public sealed class AdminSettingsController(ShopDbContext db, IWebHostEnvironmen
         Inbox = await db.SiteInboxItems.AsNoTracking().Include(x => x.RecipientUser)
             .OrderByDescending(x => x.CreatedAt).Take(20).ToListAsync()
     });
+
+    [HttpGet("integrations")]
+    public async Task<IActionResult> Integrations()
+        => await IntegrationPage("all");
+
+    private async Task<IActionResult> IntegrationPage(string section)
+    {
+        SiteIntegrationSettings settings;
+        try { settings = await db.SiteIntegrationSettings.FindAsync(1) ?? new SiteIntegrationSettings(); }
+        catch (Microsoft.Data.SqlClient.SqlException)
+        {
+            settings = new SiteIntegrationSettings();
+            TempData["SettingsError"] = "جدول تنظیمات اتصال‌ها در دیتابیس ساخته نشده است. migration جدید را اجرا کنید.";
+        }
+        return View("~/Views/Admin/Settings/Integrations.cshtml", new AdminSettingsViewModel { Integrations = settings, IntegrationSection = section });
+    }
+
+    [HttpGet("sms")]
+    public Task<IActionResult> Sms() => IntegrationPage("sms");
+
+    [HttpGet("payment")]
+    public Task<IActionResult> Payment() => IntegrationPage("payment");
+
+    [HttpGet("enamad")]
+    public Task<IActionResult> Enamad() => IntegrationPage("enamad");
+
+    [HttpPost("integrations")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveIntegrations(string section = "all", bool smsEnabled = false, string? smsProvider = null, string? smsApiKey = null, string? smsSender = null,
+        bool paymentEnabled = false, string? paymentGateway = null, string? paymentMerchantId = null, bool enamadEnabled = false, string? enamadCode = null, string? enamadLogoUrl = null)
+    {
+        var settings = await db.SiteIntegrationSettings.FindAsync(1);
+        var isNew = settings is null;
+        settings ??= new SiteIntegrationSettings();
+        if (section is "all" or "sms") { settings.SmsEnabled = smsEnabled; settings.SmsProvider = (smsProvider ?? "Kavenegar").Trim(); settings.SmsSender = smsSender?.Trim(); if (!string.IsNullOrWhiteSpace(smsApiKey)) settings.SmsApiKeyProtected = _protector.Protect(smsApiKey.Trim()); }
+        if (section is "all" or "payment") { settings.PaymentEnabled = paymentEnabled; settings.PaymentGateway = (paymentGateway ?? "Zarinpal").Trim(); if (!string.IsNullOrWhiteSpace(paymentMerchantId)) settings.PaymentMerchantIdProtected = _protector.Protect(paymentMerchantId.Trim()); }
+        if (section is "all" or "enamad") { settings.EnamadEnabled = enamadEnabled; settings.EnamadCode = enamadCode?.Trim(); settings.EnamadLogoUrl = enamadLogoUrl?.Trim(); }
+        settings.UpdatedAt = DateTime.UtcNow;
+        if (isNew) db.SiteIntegrationSettings.Add(settings);
+        await db.SaveChangesAsync();
+        TempData["SettingsMessage"] = "تنظیمات اتصال‌ها با موفقیت ذخیره شد.";
+        return RedirectToAction(nameof(Integrations));
+    }
 
     [HttpGet("category-images")]
     public async Task<IActionResult> CategoryImages() => View("~/Views/Admin/Settings/CategoryImages.cshtml", new AdminSettingsViewModel

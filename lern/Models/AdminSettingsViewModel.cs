@@ -7,4 +7,6 @@ public sealed class AdminSettingsViewModel
     public List<SiteBanner> Banners { get; set; } = [];
     public List<Category> MainCategories { get; set; } = [];
     public List<SiteInboxItem> Inbox { get; set; } = [];
+    public SiteIntegrationSettings Integrations { get; set; } = new();
+    public string IntegrationSection { get; set; } = "all";
 }
