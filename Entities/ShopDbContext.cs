@@ -73,7 +73,14 @@ namespace Entities
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<SiteIntegrationSettings>().HasKey(x => x.Id);
             modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.SmsProvider).HasMaxLength(40);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.SmsApiUrl).HasMaxLength(500);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.SmsApiKeyHeader).HasMaxLength(100);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.SmsMessageTemplate).HasMaxLength(500);
             modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.PaymentGateway).HasMaxLength(40);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.PaymentRequestUrl).HasMaxLength(500);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.PaymentVerifyUrl).HasMaxLength(500);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.PaymentCheckoutUrlTemplate).HasMaxLength(500);
+            modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.PaymentApiKeyHeader).HasMaxLength(100);
             modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.EnamadCode).HasMaxLength(4000);
             modelBuilder.Entity<SiteIntegrationSettings>().Property(x => x.EnamadLogoUrl).HasMaxLength(500);
             modelBuilder.Entity<PhoneChallenge>(challenge =>

@@ -57,14 +57,15 @@ public sealed class AdminSettingsController(ShopDbContext db, IWebHostEnvironmen
 
     [HttpPost("integrations")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SaveIntegrations(string section = "all", bool smsEnabled = false, string? smsProvider = null, string? smsApiKey = null, string? smsSender = null,
-        bool paymentEnabled = false, string? paymentGateway = null, string? paymentMerchantId = null, bool enamadEnabled = false, string? enamadCode = null, string? enamadLogoUrl = null)
+    public async Task<IActionResult> SaveIntegrations(string section = "all", bool smsEnabled = false, string? smsProvider = null, string? smsApiKey = null, string? smsSender = null, string? smsApiUrl = null, string? smsApiKeyHeader = null, string? smsMessageTemplate = null,
+        bool paymentEnabled = false, string? paymentGateway = null, string? paymentMerchantId = null, string? paymentRequestUrl = null, string? paymentVerifyUrl = null, string? paymentCheckoutUrlTemplate = null, string? paymentApiKeyHeader = null,
+        bool enamadEnabled = false, string? enamadCode = null, string? enamadLogoUrl = null)
     {
         var settings = await db.SiteIntegrationSettings.FindAsync(1);
         var isNew = settings is null;
         settings ??= new SiteIntegrationSettings();
-        if (section is "all" or "sms") { settings.SmsEnabled = smsEnabled; settings.SmsProvider = (smsProvider ?? "Kavenegar").Trim(); settings.SmsSender = smsSender?.Trim(); if (!string.IsNullOrWhiteSpace(smsApiKey)) settings.SmsApiKeyProtected = _protector.Protect(smsApiKey.Trim()); }
-        if (section is "all" or "payment") { settings.PaymentEnabled = paymentEnabled; settings.PaymentGateway = (paymentGateway ?? "Zarinpal").Trim(); if (!string.IsNullOrWhiteSpace(paymentMerchantId)) settings.PaymentMerchantIdProtected = _protector.Protect(paymentMerchantId.Trim()); }
+        if (section is "all" or "sms") { settings.SmsEnabled = smsEnabled; settings.SmsProvider = (smsProvider ?? "Kavenegar").Trim(); settings.SmsSender = smsSender?.Trim(); settings.SmsApiUrl = smsApiUrl?.Trim(); settings.SmsApiKeyHeader = smsApiKeyHeader?.Trim(); settings.SmsMessageTemplate = string.IsNullOrWhiteSpace(smsMessageTemplate) ? "کد تأیید فروشگاه: {code}" : smsMessageTemplate.Trim(); if (!string.IsNullOrWhiteSpace(smsApiKey)) settings.SmsApiKeyProtected = _protector.Protect(smsApiKey.Trim()); }
+        if (section is "all" or "payment") { settings.PaymentEnabled = paymentEnabled; settings.PaymentGateway = (paymentGateway ?? "Zarinpal").Trim(); settings.PaymentRequestUrl = paymentRequestUrl?.Trim(); settings.PaymentVerifyUrl = paymentVerifyUrl?.Trim(); settings.PaymentCheckoutUrlTemplate = paymentCheckoutUrlTemplate?.Trim(); settings.PaymentApiKeyHeader = paymentApiKeyHeader?.Trim(); if (!string.IsNullOrWhiteSpace(paymentMerchantId)) settings.PaymentMerchantIdProtected = _protector.Protect(paymentMerchantId.Trim()); }
         if (section is "all" or "enamad") { settings.EnamadEnabled = enamadEnabled; settings.EnamadCode = enamadCode?.Trim(); settings.EnamadLogoUrl = enamadLogoUrl?.Trim(); }
         settings.UpdatedAt = DateTime.UtcNow;
         if (isNew) db.SiteIntegrationSettings.Add(settings);

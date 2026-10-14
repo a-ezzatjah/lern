@@ -18,6 +18,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient("integrations", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(15);
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("lern-store/1.0");
+});
 builder.Services.AddStoreRequestSecurity(builder.Environment.IsDevelopment());
 builder.Services.AddDataProtection();
 builder.Services.AddSingleton(TimeProvider.System);
@@ -27,7 +32,7 @@ builder.Services.AddHostedService<AuthenticationSessionWorker>();
 builder.Services.AddScoped<CustomerSession>();
 builder.Services.AddScoped<OrderReservations>();
 builder.Services.AddScoped<OrderPayments>();
-builder.Services.AddScoped<IOrderPaymentGateway, UnavailablePaymentGateway>();
+builder.Services.AddScoped<IOrderPaymentGateway, ConfiguredPaymentGateway>();
 builder.Services.AddHostedService<OrderReservationWorker>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -36,7 +41,7 @@ builder.Services.AddScoped<IProductSaleOptionColorService, ProductSaleOptionColo
 builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IUserAuthService, UserAuthService>();
-builder.Services.AddScoped<IPhoneCodeSender, UnavailablePhoneCodeSender>();
+builder.Services.AddScoped<IPhoneCodeSender, ConfiguredPhoneCodeSender>();
 builder.Services.AddScoped<PhoneAuthentication>();
 builder.Services.AddScoped<StoreCookieEvents>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

@@ -69,7 +69,7 @@
                         <a href="/Admin/Settings/category-seo" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/category-seo") ? "page" : null)"><span class="admin-nav-icon" aria-hidden="true"><svg><use href="#admin-i-log"/></svg></span>توضیحات سئوی دسته‌بندی</a>
                         <a href="@Url.Action("CategoryImages", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/category-images") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-box"/></svg></span>تصاویر دسته‌های اصلی</a>
                         <a href="@Url.Action("Inbox", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/inbox") ? "page" : null)"><span class="admin-nav-icon"><svg><use href="#admin-i-wallet"/></svg></span>پیام‌ها و اعلان‌ها</a>
-                        <details class="admin-settings-menu" @(Context.Request.Path.StartsWithSegments("/Admin/Settings/integrations") || Context.Request.Path.StartsWithSegments("/Admin/Settings/enamad") || Context.Request.Path.StartsWithSegments("/Admin/Settings/payment") || Context.Request.Path.StartsWithSegments("/Admin/Settings/sms") ? "open" : "")>
+                        <details class="admin-settings-menu" @(Context.Request.Path.StartsWithSegments("/Admin/Settings/integrations") || Context.Request.Path.StartsWithSegments("/Admin/Settings/enamad") || Context.Request.Path.StartsWithSegments("/Admin/Settings/payment") || Context.Request.Path.StartsWithSegments("/Admin/Settings/sms") ? "open" : null)>
                             <summary class="admin-nav-link"><span class="admin-nav-icon"><svg><use href="#admin-i-settings"/></svg></span><span>اتصال‌های فروشگاه</span><span class="admin-settings-chevron" aria-hidden="true">⌄</span></summary>
                             <div class="admin-settings-submenu">
                                 <a href="@Url.Action("Enamad", "AdminSettings")" aria-current="@(Context.Request.Path.StartsWithSegments("/Admin/Settings/enamad") ? "page" : null)">اینماد</a>
@@ -79,15 +79,13 @@
                         </details>
                     </div>
                 </details>
-                <details class="admin-settings-group" open="@(Context.Request.Path.StartsWithSegments("/Admin/Articles"))">
+                <details class="admin-settings-group" @(Context.Request.Path.StartsWithSegments("/Admin/Articles") ? "open" : null)>
                     <summary class="admin-nav-link"><span class="admin-nav-icon"><svg><use href="#admin-i-log"/></svg></span><span>مقالات</span><span class="admin-settings-chevron" aria-hidden="true">⌄</span></summary>
                     <div class="admin-settings-submenu">
                         <a href="/Admin/Articles">فهرست مقالات</a>
                         <a href="/Admin/Articles/create">درج مقاله</a>
                     </div>
                 </details>
-                <a class="admin-nav-link" href="#"><span class="admin-nav-icon"><svg><use href="#admin-i-backup"/></svg></span><span>پشتیبان‌گیری</span></a>
-                <a class="admin-nav-link" href="#"><span class="admin-nav-icon"><svg><use href="#admin-i-log"/></svg></span><span>لاگ‌های سیستم</span></a>
             </nav>
 
             <div class="admin-sidebar-footer">

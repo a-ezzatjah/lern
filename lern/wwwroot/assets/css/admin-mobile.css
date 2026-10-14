@@ -3,7 +3,7 @@
 .admin-sidebar .admin-settings-menu summary.admin-nav-link::-webkit-details-marker { display: none; }
 .admin-sidebar .admin-settings-menu summary.admin-nav-link:hover { color: #434ece; background: linear-gradient(135deg,#e4e9ff,#e5f5e8); }
 .admin-sidebar .admin-settings-chevron { margin-inline-start: auto; transition: transform .2s; }
-.admin-sidebar .admin-settings-menu[open] .admin-settings-chevron { transform: rotate(180deg); }
+.admin-sidebar .admin-settings-menu[open] > summary > .admin-settings-chevron { transform: rotate(180deg); }
 .admin-sidebar .admin-settings-submenu { display: grid; gap: .25rem; margin: .25rem 1.2rem .5rem 0; padding-right: .75rem; border-right: 2px solid #dbe4ee; }
 .admin-sidebar .admin-settings-submenu a { display: flex; align-items: center; gap: .65rem; min-height: 2.8rem; padding: .65rem .8rem; border-radius: .75rem; color: #64748b; font-size: .82rem; font-weight: 700; cursor: pointer; }
 .admin-sidebar .admin-settings-submenu a:hover, .admin-sidebar .admin-settings-submenu a[aria-current="page"] { color: #434ece; background: #e7ebff; }

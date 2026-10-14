@@ -1162,6 +1162,14 @@ namespace Entities.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("PaymentApiKeyHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PaymentCheckoutUrlTemplate")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<bool>("PaymentEnabled")
                         .HasColumnType("bit");
 
@@ -1173,11 +1181,32 @@ namespace Entities.Migrations
                     b.Property<string>("PaymentMerchantIdProtected")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PaymentRequestUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PaymentVerifyUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SmsApiKeyHeader")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("SmsApiKeyProtected")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SmsApiUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<bool>("SmsEnabled")
                         .HasColumnType("bit");
+
+                    b.Property<string>("SmsMessageTemplate")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("SmsProvider")
                         .IsRequired()

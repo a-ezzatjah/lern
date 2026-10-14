@@ -1,4 +1,13 @@
 @using lern.Infrastructure
+@using Ganss.Xss
+@using Microsoft.EntityFrameworkCore
+@inject Entities.ShopDbContext StoreDb
+@{
+    Entities.SiteIntegrationSettings? integration = null;
+    try { integration = await StoreDb.SiteIntegrationSettings.AsNoTracking().SingleOrDefaultAsync(x => x.Id == 1); }
+    catch (Microsoft.Data.SqlClient.SqlException) { }
+    var safeEnamadCode = string.IsNullOrWhiteSpace(integration?.EnamadCode) ? null : new HtmlSanitizer().Sanitize(integration.EnamadCode);
+}
 <partial name="_SupportIcons" />
 <footer class="ks-footer" aria-label="فوتر خرازی کوهستانی" itemscope itemtype="https://schema.org/WPFooter">
     <div class="ks-footer-inner">
@@ -21,8 +30,10 @@
         <section class="ks-footer-trust" aria-labelledby="ks-enamad-title">
             <div class="ks-enamad-copy"><h3 id="ks-enamad-title">نماد اعتماد الکترونیکی</h3><p>جایگاه نمایش نشان اینماد فروشگاه</p></div>
             <div id="enamad-badge" class="ks-enamad-slot">
-                @* Replace the placeholder below with the store's official eNAMAD embed code when available. *@
-                <div class="ks-enamad-placeholder"><span>اینماد</span><small>محل درج نشان</small></div>
+                @if (integration?.EnamadEnabled == true && !string.IsNullOrWhiteSpace(safeEnamadCode))
+                { @Html.Raw(safeEnamadCode) }
+                else
+                { <div class="ks-enamad-placeholder"><span>اینماد</span><small>محل درج نشان</small></div> }
             </div>
         </section>
             </section>
