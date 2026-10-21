@@ -6,7 +6,11 @@ namespace lern.Controller;
 public sealed class OrderPaymentsController(OrderPayments payments, CustomerSession session, IOrderPaymentGateway gateway, IConfiguration configuration) : Microsoft.AspNetCore.Mvc.Controller
 {
     [HttpGet("/api/payments/status")]
-    public IActionResult Status() => Ok(new { available = gateway.IsConfigured, message = gateway.IsConfigured ? "پرداخت آنلاین" : "پرداخت آنلاین هنوز فعال نشده است؛ ثبت سفارش به معنی پرداخت نیست." });
+    public IActionResult Status()
+    {
+        var available = gateway.IsConfigured;
+        return Ok(new { available, message = available ? "پرداخت آنلاین" : "پرداخت آنلاین هنوز فعال نشده است؛ ثبت سفارش به معنی پرداخت نیست." });
+    }
 
     [HttpPost("/api/orders/{id:int}/payment")]
     public async Task<IActionResult> Start(int id)

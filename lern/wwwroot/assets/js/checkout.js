@@ -4,7 +4,19 @@
     const message = (text, error = false) => { byId('checkout-message').textContent = text; byId('checkout-message').classList.toggle('is-error', error); };
     const request = async (url, options = {}) => {
         const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...options });
-        if (!response.ok) { const body = await response.text(); let error = body; try { error = JSON.parse(body).message || JSON.parse(body).Message || body; } catch {} throw new Error(error || 'ارتباط با فروشگاه انجام نشد.'); }
+        if (!response.ok) {
+            let error = 'ارتباط با فروشگاه انجام نشد. لطفاً دوباره تلاش کنید.';
+            // Server failures can contain a development stack trace or an HTML error page.
+            // Only display short validation messages from expected client errors.
+            if (response.status >= 400 && response.status < 500) {
+                const body = await response.text();
+                let candidate;
+                try { const data = JSON.parse(body); candidate = typeof data === 'string' ? data : data.message || data.Message; }
+                catch { if (response.headers.get('content-type')?.includes('text/plain')) candidate = body; }
+                if (typeof candidate === 'string' && candidate.trim() && candidate.length <= 300 && !/[<>\r\n]/.test(candidate)) error = candidate;
+            }
+            throw new Error(error);
+        }
         return response.status === 204 ? null : response.json();
     };
     let items = [], addresses = [], selectedAddress = null, couponCode = '', couponDiscount = 0, paymentAvailable = false;
