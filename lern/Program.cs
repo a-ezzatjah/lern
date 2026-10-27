@@ -12,12 +12,26 @@ using lern.Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using System.IO.Compression;
+using Microsoft.AspNetCore.ResponseCompression;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddMemoryCache();
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+    {
+        "image/svg+xml", "application/xml", "text/xml", "text/javascript"
+    });
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
 builder.Services.AddHttpClient("integrations", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(15);
@@ -100,6 +114,16 @@ if (builder.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup"))
         await using var scope = app.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<ShopDbContext>();
         await db.Database.MigrateAsync();
+        if (builder.Configuration.GetValue<bool>("Database:ImportLegacyDataOnStartup"))
+        {
+            var databaseName = db.Database.GetDbConnection().Database;
+            if (!string.Equals(databaseName, "kohesta2_shop", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("ShopDb import is restricted to the approved kohesta2_shop database.");
+
+            var importPath = Path.Combine(AppContext.BaseDirectory, "shopdb-data-import.sql");
+            var importSql = await File.ReadAllTextAsync(importPath);
+            await db.Database.ExecuteSqlRawAsync(importSql);
+        }
         await CategoryCatalogSeeder.SeedAsync(db);
         await ArticleSeeder.SeedAsync(db, app.Environment);
     }
@@ -126,6 +150,7 @@ if (builder.Configuration.GetValue<bool>("InitialAdmin:Enabled"))
 }
 
 app.UseStoreResponseSecurity();
+app.UseResponseCompression();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -146,7 +171,21 @@ else
     app.UseHsts();
     app.UseHttpsRedirection();
 }
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        var path = ctx.File.Name;
+        // Hashed assets (asp-append-version) and media can be cached hard.
+        var longLived = path.EndsWith(".woff2") || path.EndsWith(".woff") || path.EndsWith(".svg")
+            || path.EndsWith(".png") || path.EndsWith(".jpg") || path.EndsWith(".jpeg")
+            || path.EndsWith(".webp") || path.EndsWith(".ico") || path.EndsWith(".mp4")
+            || path.EndsWith(".css") || path.EndsWith(".js");
+        ctx.Context.Response.Headers.CacheControl = longLived
+            ? "public, max-age=2592000"
+            : "public, max-age=3600";
+    }
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();

@@ -10,19 +10,24 @@ public class HomeController : Microsoft.AspNetCore.Mvc.Controller
 {
     private readonly IProductService _productService;
     private readonly ShopDbContext _db;
+    private readonly IWebHostEnvironment _env;
 
-    public HomeController(IProductService productService, ShopDbContext db)
+    public HomeController(IProductService productService, ShopDbContext db, IWebHostEnvironment env)
     {
         _productService = productService;
         _db = db;
+        _env = env;
     }
 
     public async Task<IActionResult> Index()
     {
+        var banners = await _db.SiteBanners.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.SortOrder).ToListAsync();
+        foreach (var banner in banners) lern.Models.BannerImage.Apply(banner, _env);
+
         var viewModel = new HomeIndexViewModel
         {
             Articles = await _db.Articles.AsNoTracking().Where(x => x.IsPublished).OrderByDescending(x => x.PublishedAt).ThenByDescending(x => x.Id).Take(3).ToListAsync(),
-            Banners = await _db.SiteBanners.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.SortOrder).ToListAsync(),
+            Banners = banners,
             MainCategories = await _db.Categories.AsNoTracking().Where(x => x.ParentId == null)
                 .OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToListAsync(),
             DiscountedProducts = await _productService.GetDiscountedProductCardsAsync(),

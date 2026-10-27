@@ -34,7 +34,7 @@
             const token = document.querySelector('#favorite-security input').value;
             const response = await fetch('/api/favorites/' + id, {
                 method: active ? 'PUT' : 'DELETE',
-                headers: { RequestVerificationToken: token }
+                headers: { 'X-CSRF-TOKEN': token }
             });
             if (response.status === 401) { location.href = '/login?returnUrl=' + encodeURIComponent(location.pathname); return; }
             if (!response.ok) throw new Error('ذخیره علاقه‌مندی انجام نشد. دوباره تلاش کنید.');

@@ -8,6 +8,12 @@
 
   <ItemGroup>
     <Content Include="Data\Articles\*.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\tmp\shopdb-data-import.sql" Link="shopdb-data-import.sql" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Image backup folders are local-only; never publish them to the host. -->
+    <Content Remove="wwwroot\**\_original\**" />
   </ItemGroup>
 
   <ItemGroup>
